@@ -1,12 +1,12 @@
 <?php
 
-namespace Ekv\Component\Debug;
+namespace Warkhosh\Component\Debug;
 
 
 /**
  * Class Dump
  *
- * @package Ekv\Component\Debug
+ * @package Warkhosh\Component\Debug
  */
 class Dump
 {

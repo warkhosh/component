@@ -1,6 +1,6 @@
 <?php
 
-namespace Ekv\Component\Collection;
+namespace Warkhosh\Component\Collection;
 
 use ArrayAccess;
 use Closure;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ekv\Component\Collection\Interfaces;
+namespace Warkhosh\Component\Collection\Interfaces;
 
 interface Htmlable
 {

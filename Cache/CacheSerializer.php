@@ -1,8 +1,8 @@
 <?php
 
-namespace Ekv\Component\Cache;
+namespace Warkhosh\Component\Cache;
 
-use Ekv\Component\Cache\Exception\CacheException;
+use Warkhosh\Component\Cache\Exception\CacheException;
 
 class CacheSerializer implements CacheSerializerInterface
 {

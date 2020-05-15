@@ -1,9 +1,9 @@
 <?php
 
-namespace Ekv\Component\Cache;
+namespace Warkhosh\Component\Cache;
 
-use Ekv\Component\Cache\Exception\CacheException;
-use Ekv\Component\Cache\Exception\InvalidArgumentException;
+use Warkhosh\Component\Cache\Exception\CacheException;
+use Warkhosh\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * Class ArrayCache

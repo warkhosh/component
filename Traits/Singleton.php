@@ -1,13 +1,13 @@
 <?php
 
-namespace Ekv\Component\Traits;
+namespace Warkhosh\Component\Traits;
 
 use Exception;
 
 /**
  * Trait Singleton
  *
- * @package Ekv\Component\Traits
+ * @package Warkhosh\Component\Traits
  */
 trait Singleton
 {

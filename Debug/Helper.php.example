@@ -9,7 +9,7 @@ if (! function_exists('dd')) {
      */
     function dd($value = 'test', $title = 'PRINT PARAM')
     {
-        echo Ekv\Component\Debug\Dump::get($value, $title);
+        echo Warkhosh\Component\Debug\Dump::get($value, $title);
         die;
     }
 }
@@ -23,6 +23,6 @@ if (! function_exists('ds')) {
      */
     function ds($value = 'test', $title = 'PRINT PARAM')
     {
-        echo Ekv\Component\Debug\Dump::get($value, $title);
+        echo Warkhosh\Component\Debug\Dump::get($value, $title);
     }
 }

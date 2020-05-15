@@ -1,9 +1,9 @@
 <?php
 
-namespace Ekv\Component\Std;
+namespace Warkhosh\Component\Std;
 
-use Ekv\Component\Collection\Interfaces\Arrayable;
-use Ekv\Component\Collection\Interfaces\Jsonable;
+use Warkhosh\Component\Collection\Interfaces\Arrayable;
+use Warkhosh\Component\Collection\Interfaces\Jsonable;
 use JsonSerializable;
 
 /**
@@ -14,7 +14,7 @@ use JsonSerializable;
  * @note    Не реализует Iterator ( foreach и while с объектом не выдадут ошибку, но и не отработают )
  * @note    ArrayObject используется для декоративного применения, чтобы phpstorm не подсвечивал magic переменные
  *
- * @package Ekv\Component\Std
+ * @package Warkhosh\Component\Std
  */
 class BaseDataProvider extends \ArrayObject implements Arrayable
 {
@@ -473,7 +473,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
         }
 
         return array_reduce($array, function($result, $item) use ($depth) {
-            $item = $item instanceof \Ekv\Component\Std\BaseDataProvider ? $item->toArray() : $item;
+            $item = $item instanceof \Warkhosh\Component\Std\BaseDataProvider ? $item->toArray() : $item;
 
             if (! is_array($item)) {
                 return array_merge($result, [$item]);
@@ -508,7 +508,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
         $results = [];
 
         foreach ($array as $key => $values) {
-            if ($values instanceof \Ekv\Component\Std\BaseDataProvider) {
+            if ($values instanceof \Warkhosh\Component\Std\BaseDataProvider) {
                 $values = $values->toArray();
 
             } elseif (! is_array($values)) {

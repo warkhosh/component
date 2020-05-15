@@ -1,9 +1,9 @@
 <?php
 
-namespace Ekv\Component\Cache;
+namespace Warkhosh\Component\Cache;
 
 
-use Ekv\Component\Cache\Exception\InvalidArgumentException;
+use Warkhosh\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * Class MemcachedCache
@@ -47,7 +47,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
             }
 
         } else {
-            throw new \Ekv\Component\Cache\Exception\CacheException("Error in Memcached setup");
+            throw new \Warkhosh\Component\Cache\Exception\CacheException("Error in Memcached setup");
 
         }
     }

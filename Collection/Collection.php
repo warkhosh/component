@@ -1,11 +1,11 @@
 <?php
 
-namespace Ekv\Component\Collection;
+namespace Warkhosh\Component\Collection;
 
-use Ekv\Component\Collection\Interfaces\Arrayable;
-use Ekv\Component\Collection\Interfaces\BaseCollection;
-use Ekv\Component\Collection\Interfaces\Jsonable;
-use Ekv\Component\Traits\CollectionMethod;
+use Warkhosh\Component\Collection\Interfaces\Arrayable;
+use Warkhosh\Component\Collection\Interfaces\BaseCollection;
+use Warkhosh\Component\Collection\Interfaces\Jsonable;
+use Warkhosh\Component\Traits\CollectionMethod;
 use JsonSerializable;
 use Traversable;
 use Throwable;
@@ -14,7 +14,7 @@ use Closure;
 /**
  * Collection
  *
- * @package Ekv\Component\Collection
+ * @package Warkhosh\Component\Collection
  * @link    http://laravel.su/docs/5.5/collections#method-flatmap
  */
 class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable, Arrayable, Jsonable, JsonSerializable

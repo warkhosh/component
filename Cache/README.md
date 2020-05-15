@@ -21,21 +21,21 @@ File use
 ```php
 $cachePath = sys_get_temp_dir() . "/cache";
 
-$cache = new \Ekv\Component\Cache\FileCache($cachePath);
+$cache = new \Warkhosh\Component\Cache\FileCache($cachePath);
 ```
 
 Array use
 -------
 
 ```php
-$cache = new \Ekv\Component\Cache\ArrayCache();
+$cache = new \Warkhosh\Component\Cache\ArrayCache();
 ```
 
 Memcached use
 -------
 
 ```php
-$cache = new \Ekv\Component\Cache\MemcachedCache([
+$cache = new \Warkhosh\Component\Cache\MemcachedCache([
     "server"  => "127.0.0.1",
     "port"    => 11211,
     "weight" => 0,
@@ -47,7 +47,7 @@ $cache = new \Ekv\Component\Cache\MemcachedCache([
 -------
 
 ```php
-$cache = new \Ekv\Component\Cache\RedisCache([
+$cache = new \Warkhosh\Component\Cache\RedisCache([
     "server"   => '127.0.0.1',
     "port"     => 6379,
     "timeout"  => 0.0,
@@ -63,7 +63,7 @@ Settings
 -------
 
 ```php
-$cache = new \Ekv\Component\Cache\ArrayCache();
+$cache = new \Warkhosh\Component\Cache\ArrayCache();
 
 // Cache expiration in seconds
 $cache->setCacheExpiry(900);
@@ -71,7 +71,7 @@ $cache->setCacheExpiry(900);
 // A sign of a cache region
 $cache->setScope('<prefix_name>');
 
-$cache->setSerializerObject(new \Ekv\Component\Cache\CacheSerializer('serialize'));
+$cache->setSerializerObject(new \Warkhosh\Component\Cache\CacheSerializer('serialize'));
 
 // Current driver
 $cache->getDriver();

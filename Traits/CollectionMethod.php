@@ -1,9 +1,9 @@
 <?php
 
-namespace Ekv\Component\Traits;
+namespace Warkhosh\Component\Traits;
 
-use Ekv\Component\Collection\Interfaces\Arrayable;
-use Ekv\Component\Collection\Interfaces\Jsonable;
+use Warkhosh\Component\Collection\Interfaces\Arrayable;
+use Warkhosh\Component\Collection\Interfaces\Jsonable;
 use JsonSerializable;
 
 /**
@@ -11,7 +11,7 @@ use JsonSerializable;
  *
  * Методы для интерфейсов: Arrayable, Jsonable, Iterator, ArrayAccess, Countable, JsonSerializable
  *
- * @package Ekv\Component\Traits
+ * @package Warkhosh\Component\Traits
  */
 trait CollectionMethod
 {

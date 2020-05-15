@@ -1,9 +1,9 @@
 <?php
 
-namespace Ekv\Component\Cache;
+namespace Warkhosh\Component\Cache;
 
-use Ekv\Component\Cache\Exception\CacheException;
-use Ekv\Component\Cache\Exception\InvalidArgumentException;
+use Warkhosh\Component\Cache\Exception\CacheException;
+use Warkhosh\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * Class RedisCache
@@ -47,7 +47,7 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
             $this->client = new \Redis();
 
             if ($this->client->connect($config['server'], $config['port']) === false) {
-                throw new \Ekv\Component\Cache\Exception\CacheException("Redis connection error");
+                throw new \Warkhosh\Component\Cache\Exception\CacheException("Redis connection error");
             }
 
             if (! key_exists(\Redis::OPT_SERIALIZER, $config['options'])) {

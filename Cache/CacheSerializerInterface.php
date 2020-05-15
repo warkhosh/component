@@ -1,6 +1,6 @@
 <?php
 
-namespace Ekv\Component\Cache;
+namespace Warkhosh\Component\Cache;
 
 interface CacheSerializerInterface
 {

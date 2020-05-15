@@ -1,14 +1,14 @@
 <?php
 
-namespace Ekv\Component\Cache;
+namespace Warkhosh\Component\Cache;
 
-use Ekv\Component\Cache\Exception\InvalidArgumentException;
+use Warkhosh\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * Class BaseCache
  *
  * @author  Konstantin Egorov <ekv.programmer@gmail.com>
- * @package Ekv\Component\Cache
+ * @package Warkhosh\Component\Cache
  */
 abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
 {
