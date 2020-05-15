@@ -1,0 +1,28 @@
+<?php
+
+if (! function_exists('dd')) {
+    /**
+     * Dump and die
+     *
+     * @param string $value = 'test'
+     * @param string $title = 'PRINT PARAM'
+     */
+    function dd($value = 'test', $title = 'PRINT PARAM')
+    {
+        echo Ekv\Component\Debug\Dump::get($value, $title);
+        die;
+    }
+}
+
+if (! function_exists('ds')) {
+    /**
+     * Dump and show
+     *
+     * @param string $value = 'test'
+     * @param string $title = 'PRINT PARAM'
+     */
+    function ds($value = 'test', $title = 'PRINT PARAM')
+    {
+        echo Ekv\Component\Debug\Dump::get($value, $title);
+    }
+}
