@@ -39,7 +39,7 @@
       "Warkhosh\\Component\\": ""
     },
     "files": [
-      "Url/Support/Helpers.php"
+      "Support/Helpers.php"
     ]
   }
 }
