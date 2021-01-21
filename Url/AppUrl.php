@@ -36,7 +36,7 @@ class AppUrl
     protected $url = '';
 
     /**
-     * Отдельно хранит только пути без фала и query парамтеров
+     * Отдельно хранит только пути без фала и query параметров
      *
      * @var string
      */
@@ -121,10 +121,10 @@ class AppUrl
     /**
      * AppUrl constructor.
      *
-     * @param null  $url
-     * @param false $strict
+     * @param string|null $url
+     * @param false       $strict
      */
-    public function __construct($url = null, $strict = false)
+    public function __construct(?string $url = null, bool $strict = false)
     {
         $this->set($url, $strict);
     }
@@ -132,11 +132,11 @@ class AppUrl
     /**
      * Установка урла как передали для последующих проверок
      *
-     * @param string $url
-     * @param bool   $strict - флаг вырезания лишних символов ( не корректных с точки зрения ЧПУ )
+     * @param string|null $url
+     * @param bool        $strict - флаг вырезания лишних символов ( не корректных с точки зрения ЧПУ )
      * @return $this
      */
-    public function set($url = null, $strict = false)
+    public function set(?string $url = null, bool $strict = false)
     {
         $this->originalUrl = VarStr::trim(VarStr::getMakeString($url));
         $this->primaryUrl = is_null($url) ? null : $this->originalUrl;
@@ -468,8 +468,10 @@ class AppUrl
                 if (is_array($arg[0])) {
                     return VarArray::getOnly($arg[0], $data);
 
-                } else if (is_string($arg[0])) { // если передали один строчный параметр
-                    return VarArray::getFirst(VarArray::getOnly([$arg[0]], $data)); // вернуть одно значение
+                } else {
+                    if (is_string($arg[0])) { // если передали один строчный параметр
+                        return VarArray::getFirst(VarArray::getOnly([$arg[0]], $data)); // вернуть одно значение
+                    }
                 }
             }
         }

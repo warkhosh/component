@@ -22,9 +22,9 @@ class AppUrlPath
      * При разборе важно не удалять не допустимые символы или пустоты между слешами как: //,
      * иначе потом в проверках не поймем что урл не допустимый.
      *
-     * @param string $url
+     * @param string|null $url
      */
-    public function __construct($url = null)
+    public function __construct(?string $url = null)
     {
         $url = empty($url) ? server()->request_uri : $url;
         $url = parse_url(rawurldecode($url));
