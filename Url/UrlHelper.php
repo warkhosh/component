@@ -1,6 +1,6 @@
 <?php
 
-namespace Warkhosh\Component\Url\Helper;
+namespace Warkhosh\Component\Url;
 
 use Warkhosh\Variable\VarArray;
 use Warkhosh\Variable\VarStr;
@@ -70,7 +70,7 @@ class UrlHelper
 
         $str = rawurldecode($str); // преобразовывает символьные коды в их символы. %20 - станет пробелом
 
-        // Что-бы правильно обрабатывать кривые урлы левый слеш убираем а правый оставляем
+        // Что-бы правильно обрабатывать кривые урлы, левый слеш убираем а правый оставляем
         $part = VarArray::explode('/', ltrim($str, '/'), '');
 
         if (count($part) >= 1) {
@@ -250,7 +250,6 @@ class UrlHelper
         return trim($result, '-');
     }
 
-
     /**
      * Возвращает порт на компьютере сервера, используемый веб-сервером для соединения.
      *
@@ -265,7 +264,6 @@ class UrlHelper
         return $_SERVER['CMF_SERVER_PORT'] = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 'ru';
     }
 
-
     /**
      * Возвращает имя хоста, на котором выполняется текущий скрипт
      *
@@ -279,7 +277,6 @@ class UrlHelper
 
         return $_SERVER['CMF_SERVER_NAME'] = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'ru';
     }
-
 
     /**
      * Возвращает протокол с его префиксами для домена.
@@ -296,7 +293,6 @@ class UrlHelper
 
         return 'http://';
     }
-
 
     /**
      * Возвращает путь текущего запроса
@@ -344,7 +340,6 @@ class UrlHelper
         return $_SERVER['CMF_REQUEST_URI'];
     }
 
-
     /**
      * Возвращает путь без файла и query параметров
      *
@@ -362,7 +357,7 @@ class UrlHelper
         } else {
             $info['dirname'] = isset($info['dirname']) ? "{$info['dirname']}/" : '';
 
-            // Данное решение фиксит баг при обработке кривого урла, когда в конце get параметров идет слэш или слеши
+            // Данное решение фиксит баг при обрабатке кривого урла, когда в конце get параметров идет слэш или слеши
             // example: http://photogora.ru/background/muslin&filter_category=126/
             $tmp = "{$info['dirname']}{$info['basename']}";
             $uri = rtrim($uri, '/') == $tmp ? $uri : $tmp;
@@ -370,7 +365,6 @@ class UrlHelper
 
         return VarStr::start("/", $uri);
     }
-
 
     /**
      * Возвращает адрес страницы с которой пришли на страницу
@@ -402,7 +396,6 @@ class UrlHelper
         return $_SERVER['CMF_REFERER'] = '';
     }
 
-
     /**
      * Возвращает название агента ( браузер ) через который просматривают сайт
      *
@@ -430,7 +423,6 @@ class UrlHelper
         return static::USER_AGENT_NOT_DEFINED;
     }
 
-
     /**
      * Возвращает строку запроса, если есть
      *
@@ -447,7 +439,6 @@ class UrlHelper
 
         return $_SERVER['CMF_QUERY_STRING'];
     }
-
 
     /**
      * Возвращает IP посетителя
@@ -509,7 +500,6 @@ class UrlHelper
         return $_SERVER['CMF_SERVER_ADDR'];
     }
 
-
     /**
      * Возвращает информацию о файле по указанному пути
      *
@@ -537,7 +527,6 @@ class UrlHelper
         return $file;
     }
 
-
     /**
      * Возвращает массив query переменных из указанной строки
      *
@@ -558,7 +547,6 @@ class UrlHelper
 
         return $queries;
     }
-
 
     /**
      * Возвращает название используемого метода для запроса текущей страницы
@@ -593,7 +581,6 @@ class UrlHelper
         return $requestMethod = 'undefined';
     }
 
-
     /**
      * Генератор урлов
      *
@@ -627,11 +614,10 @@ class UrlHelper
         return "{$server_name}{$path}{$query}{$fragment}";
     }
 
-
     /**
      * Переключает в query переменных значения на противоположные
      *
-     * @note если значение преключения равно null то переменная будет просто удалена
+     * @note если значение переключения равно null то переменная будет просто удалена
      *
      * @param array  $queries
      * @param string $query
@@ -648,7 +634,7 @@ class UrlHelper
         $query = is_array($query) ? $query : [$query];
         $vars = [];
 
-        // если указали массив перменных то подготавливаем к нему массив значений на основе проверок значений ON и OFF
+        // если указали массив переменных то подготавливаем к нему массив значений на основе проверок значений ON и OFF
         if (is_array($query)) {
             foreach ($query as $key => $row) {
                 $currentOn = is_array($on) ? (array_key_exists($key, $on) ? $on[$key] : null) : $on;

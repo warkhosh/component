@@ -3,7 +3,7 @@
 namespace Warkhosh\Component\Server;
 
 use Warkhosh\Component\Traits\Singleton;
-use Warkhosh\Component\Url\Helper\UrlHelper;
+use Warkhosh\Component\Url\UrlHelper;
 use Warkhosh\Variable\VarArray;
 
 /**
