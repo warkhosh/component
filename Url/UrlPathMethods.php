@@ -316,6 +316,10 @@ trait UrlPathMethods
             case "float":
                 return VarFloat::getMake($url);
                 break;
+
+            case "string":
+                return VarStr::getMakeString($url);
+                break;
         }
 
         return $url;
@@ -359,6 +363,10 @@ trait UrlPathMethods
 
             case "float":
                 return VarFloat::getMake($url);
+                break;
+
+            case "string":
+                return VarStr::getMakeString($url);
                 break;
         }
 
@@ -404,6 +412,10 @@ trait UrlPathMethods
             case "float":
                 return VarFloat::getMake($url);
                 break;
+
+            case "string":
+                return VarStr::getMakeString($url);
+                break;
         }
 
         return $url;
@@ -447,6 +459,10 @@ trait UrlPathMethods
 
             case "float":
                 return VarFloat::getMake($url);
+                break;
+
+            case "string":
+                return VarStr::getMakeString($url);
                 break;
         }
 
@@ -492,6 +508,10 @@ trait UrlPathMethods
             case "float":
                 return VarFloat::getMake($url);
                 break;
+
+            case "string":
+                return VarStr::getMakeString($url);
+                break;
         }
 
         return $url;
@@ -535,6 +555,10 @@ trait UrlPathMethods
 
             case "float":
                 return VarFloat::getMake($url);
+                break;
+
+            case "string":
+                return VarStr::getMakeString($url);
                 break;
         }
 
@@ -580,6 +604,10 @@ trait UrlPathMethods
             case "float":
                 return VarFloat::getMake($url);
                 break;
+
+            case "string":
+                return VarStr::getMakeString($url);
+                break;
         }
 
         return $url;
@@ -623,6 +651,10 @@ trait UrlPathMethods
 
             case "float":
                 return VarFloat::getMake($url);
+                break;
+
+            case "string":
+                return VarStr::getMakeString($url);
                 break;
         }
 
