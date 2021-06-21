@@ -43,11 +43,16 @@ if (! function_exists('collection')) {
      * Создайте коллекцию из заданного значения
      *
      * @param array|string|integer|float $input
-     * @return \ Warkhosh\Component\Collection\Collection
+     * @return \Warkhosh\Component\Collection\Collection
      */
     function collection($input = [])
     {
-        return (new \ Warkhosh\Component\Collection\Collection($input));
+        try {
+            return new \Warkhosh\Component\Collection\Collection($input);
+
+        } catch (Throwable $e) {
+            trigger_error($e->getMessage());
+        }
     }
 }
 
