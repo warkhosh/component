@@ -68,10 +68,10 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
-     * @param string $field
+     * @param null|string $field
      * @return $this
      */
-    public function field(string $field)
+    public function field(?string $field = null)
     {
         $this->setField($field);
 
@@ -79,16 +79,16 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
-     * @param string $field
+     * @param null|string $field
      * @return void
      */
-    private function setField(string $field)
+    private function setField(?string $field = null)
     {
         $this->field = $field;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getField()
     {
