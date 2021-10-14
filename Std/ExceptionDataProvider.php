@@ -99,7 +99,7 @@ class ExceptionDataProvider extends \Exception
      * @param int $signal
      * @return $this
      */
-    public function system(int $signal)
+    public function signal(int $signal)
     {
         $this->setSignal($signal);
 
