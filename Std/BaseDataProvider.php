@@ -565,6 +565,30 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
             $this->data['exception_file'] = $exception->getFile() . "(" . $exception->getLine() . ")";
             $this->data['exception_line'] = $exception->getLine();
             $this->data['exception_trace'] = $exception->getTraceAsString();
+
+            if ($exception instanceof ExceptionDataProvider) {
+                $field = $exception->getField();
+                $this->data['field'] = is_null($field) || empty($field) ? null : $field;
+
+                if ($exception->getSignal() !== 1) {
+                    if (isset($this->data['exception_code'])) {
+                        unset($this->data['exception_code']);
+                    }
+
+                    if (isset($this->data['exception_file'])) {
+                        unset($this->data['exception_file']);
+                    }
+
+                    if (isset($this->data['exception_line'])) {
+                        unset($this->data['exception_line']);
+                    }
+
+                    if (isset($this->data['exception_trace'])) {
+                        unset($this->data['exception_trace']);
+                    }
+                }
+            }
+
         } else {
             $this->data['exception_message'] = (string)$exception;
         }
