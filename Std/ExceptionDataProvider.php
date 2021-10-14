@@ -83,4 +83,12 @@ class ExceptionDataProvider extends \Exception
     {
         $this->field = $field;
     }
+
+    /**
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
 }
