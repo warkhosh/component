@@ -22,9 +22,9 @@ class ExceptionDataProvider extends \Exception
     /**
      * signal
      *
-     * @var int
+     * @var int|string|null
      */
-    protected $signal = 0;
+    protected $signal = null;
 
     /**
      * @var int
@@ -105,10 +105,10 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
-     * @param int $signal
+     * @param int|string|null $signal
      * @return $this
      */
-    public function signal(int $signal)
+    public function signal($signal)
     {
         $this->setSignal($signal);
 
@@ -116,16 +116,20 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
-     * @param int $signal
+     * @param int|string|null $signal
      * @return void
      */
-    private function setSignal(int $signal)
+    private function setSignal($signal)
     {
+        if (! (is_null($signal) || is_string($signal) || is_int($signal))) {
+            $signal = null;
+        }
+
         $this->signal = $signal;
     }
 
     /**
-     * @return int
+     * @return int|string|null
      */
     public function getSignal()
     {
