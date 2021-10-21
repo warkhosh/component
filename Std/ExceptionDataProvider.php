@@ -19,8 +19,17 @@ class ExceptionDataProvider extends \Exception
     /** Название поля */
     protected $field;
 
-    /** signal */
-    protected $signal = 1;
+    /**
+     * signal
+     *
+     * @var int
+     */
+    protected $signal = 0;
+
+    /**
+     * @var int
+     */
+    protected $system = 1;
 
     public function __construct(string $message = "", int $code = 1, \Throwable $previous = null)
     {
@@ -121,5 +130,33 @@ class ExceptionDataProvider extends \Exception
     public function getSignal()
     {
         return $this->signal;
+    }
+
+    /**
+     * @param int $system
+     * @return $this
+     */
+    public function system(int $system)
+    {
+        $this->setSystem($system);
+
+        return $this;
+    }
+
+    /**
+     * @param int $system
+     * @return void
+     */
+    private function setSystem(int $system)
+    {
+        $this->system = $system;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSystem()
+    {
+        return $this->system;
     }
 }
