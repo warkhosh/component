@@ -356,6 +356,7 @@ class UrlHelper
             $uri = $info['dirname'];
         } else {
             $info['dirname'] = isset($info['dirname']) ? "{$info['dirname']}/" : '';
+            $info['dirname'] = $info['dirname'] === '//' ? "/" : $info['dirname'];
 
             // Данное решение фиксит баг при обрабатке кривого урла, когда в конце get параметров идет слэш или слеши
             // example: http://photogora.ru/background/muslin&filter_category=126/
