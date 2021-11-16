@@ -486,7 +486,7 @@ class AppSimpleRequest
         if ($this->getHeader('content-type') === 'json') {
             $data = $cached ? $data : json_decode($this->result['document'], true);
 
-            return \Warkhosh\Framework\Components\Support\VarArray::get($key, $data, $default);
+            return \Warkhosh\Variable\VarArray::get($key, $data, $default);
         }
 
         return $default;
