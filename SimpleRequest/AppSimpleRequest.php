@@ -1,11 +1,11 @@
 <?php
 
-namespace Warkhosh\Framework\Components\SimpleRequest;
+namespace Warkhosh\Component\SimpleRequest;
 
 /**
  * Class AppSimpleRequest
  *
- * @package Warkhosh\Framework\Components\SimpleRequest
+ * @package Warkhosh\Component\SimpleRequest
  */
 class AppSimpleRequest
 {

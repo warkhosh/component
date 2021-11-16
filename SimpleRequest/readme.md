@@ -9,10 +9,10 @@
 $request = SimpleRequest::get($url);
 
 // or
-$request = (new \Warkhosh\Framework\Components\SimpleRequest\AppSimpleRequest())->get($url);
+$request = (new \Warkhosh\Component\SimpleRequest\AppSimpleRequest())->get($url);
 
 // Запрос и скачивание документа из ответа
-$request = (new \Warkhosh\Framework\Components\SimpleRequest\AppSimpleRequest())->headersInOutput(false)->get($url);
+$request = (new \Warkhosh\Component\SimpleRequest\AppSimpleRequest())->headersInOutput(false)->get($url);
 
 if ($request->getResult()) {
     copy($request->getDocument(), "/save/to/file.xml");
