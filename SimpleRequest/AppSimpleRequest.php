@@ -535,9 +535,9 @@ class AppSimpleRequest
     /**
      * Устанавливает для передачи указанный файл.
      *
-     * @param string $path     - путь до файла на диске
-     * @param string $name     - Имя файла в данных для загрузки
-     * @param string $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
+     * @param string            $path     - путь до файла на диске
+     * @param null|string|array $name     - Имя файла в данных для загрузки
+     * @param string            $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
      * @return $this
      */
     public function file($path, $name = null, $mimeType = 'application/octet-stream')
@@ -550,16 +550,25 @@ class AppSimpleRequest
     /**
      * Устанавливает для передачи указанный файл.
      *
-     * @param string $path     - путь до файла на диске
-     * @param string $name     - Имя файла в данных для загрузки
-     * @param string $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
+     * @param string            $path     - путь до файла на диске
+     * @param null|string|array $name     - Имя файла в данных для загрузки
+     * @param string            $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
      * @return void
      */
-    protected function setFile($path, $name = null, $mimeType = 'application/octet-stream')
+    protected function setFile($path = null, $name = null, $mimeType = 'application/octet-stream')
     {
-        if (file_exists($path)) {
-            $name = is_null($name) ? "file_" . (count($this->files) + 1) : $name;
-            $this->files[$name] = new \CURLFile($path, $mimeType, $name);
+        if (! is_null($path) && file_exists($path)) {
+            if (is_array($name)) {
+                $field = array_shift($name);
+                $name = (string)array_shift($name);
+                $field = empty($field) ? "file_" . (count($this->files) + 1) : $field;
+                $name = empty($name) ? "file_" . (count($this->files) + 1) : $name;
+                $this->files[$field] = new \CURLFile($path, $mimeType, $name);
+
+            } else {
+                $name = is_null($name) ? "file_" . (count($this->files) + 1) : $name;
+                $this->files[$name] = new \CURLFile($path, $mimeType, $name);
+            }
         }
     }
 
