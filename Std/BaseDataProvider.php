@@ -88,9 +88,10 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
      * Сортировать записи по значению
      *
      * @link https://php.net/manual/en/arrayobject.asort.php
+     * @param int $flags
      * @return $this
      */
-    public function asort()
+    public function asort($flags = SORT_REGULAR)
     {
         asort($this->data);
 
@@ -112,9 +113,10 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
      * Сортировать записи по ключам
      *
      * @link https://php.net/manual/en/arrayobject.ksort.php
+     * @param int $flags
      * @return $this
      */
-    public function ksort()
+    public function ksort($flags = SORT_REGULAR)
     {
         krsort($this->data);
 
