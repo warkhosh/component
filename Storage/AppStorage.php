@@ -65,7 +65,7 @@ class AppStorage
         try {
             if ($dh = opendir($dir)) {
                 while (($file = readdir($dh)) !== false) {
-                    if (filetype($dir . $file) === "file") {
+                    if (is_file($dir . $file)) {
                         $return = true;
                         break;
                     }
