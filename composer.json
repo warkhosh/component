@@ -32,7 +32,9 @@
     "ext-iconv": "*",
     "ext-mbstring": "*",
     "psr/simple-cache": "^1.0",
-    "warkhosh/variable": "dev-master"
+    "warkhosh/variable": "dev-master",
+    "ext-fileinfo": "*",
+    "ext-posix": "*"
   },
   "autoload": {
     "psr-4": {
