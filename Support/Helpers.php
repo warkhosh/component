@@ -888,6 +888,7 @@ if (! function_exists('toCamelCase')) {
      */
     function toCamelCase($input = '')
     {
+        $input = str_replace('-', '_', strval($input));
         return join("", \Warkhosh\Variable\VarArray::ucfirst(explode("_", $input)));
     }
 }
