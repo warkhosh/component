@@ -409,18 +409,18 @@ class AppSimpleRequest
                             $row = explode(";", $result['headers'][$first]);
                             $first = is_string($first = array_shift($row)) ? trim($first) : '';
 
-                            switch ($first) {
-                                case 'application/xml':
-                                    $result['headers']['Content-Type'] = 'xml';
-                                    break;
-
-                                case 'application/json':
-                                    $result['headers']['Content-Type'] = 'json';
-                                    break;
-
-                                default:
-                                    $result['headers']['Content-Type'] = $first;
-                            }
+                            //switch ($first) {
+                            //    case 'application/xml':
+                            //        $result['headers']['Content-Type'] = 'xml';
+                            //        break;
+                            //
+                            //    case 'application/json':
+                            //        $result['headers']['Content-Type'] = 'json';
+                            //        break;
+                            //
+                            //    default:
+                            //        $result['headers']['Content-Type'] = $first;
+                            //}
 
                             $second = is_string($second = array_shift($row)) ? trim($second) : '';
                             $result['headers']['Content-Charset'] = str_replace('charset=', '', $second);

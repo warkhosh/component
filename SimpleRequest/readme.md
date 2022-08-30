@@ -76,21 +76,27 @@ $simpleRequest->header(['test-script: testing'])->post([...], $url);;
 $response = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init()->get($url);
 
 // Проверка кода ответа
-if ($response->getResult(200)) { ...
+if ($response->getResult(200)) {
+    // code
+}
 
 // Проверка по ответу типа содержимого в ответе
-if ($response->getHeader('Content-Type') === 'json') ...
+if (stripos($response->getHeaderLine('Content-Type'), 'application/json') !== false) {
+    // code
+}
 
 $stream = $response->getBody();
 
-// Проверка содержимого в ответе
-if ($response->getResult(200) && $stream->getContents() === 'ok') { ...
+// Проверка содержимого по телу ответа
+if ($stream->getContents() === '{"result":"ok"}') {
+    // code
+}
 
-// К началу контента
+// Для повторного обращения к содержимому контента
 $stream->rewind();
 
-// Проверка в ответе типа JSON значения status
-if ($response->getHeader('Content-Type') === 'json') {
+// Проверка содержимого на конкретное значение
+if (stripos($response->getHeaderLine('Content-Type'), 'application/json') !== false) {
     $data = json_decode($stream->getContents(), true);
     
     if (key_exists('status', $data) && $data['status'] === 'ok') { 
