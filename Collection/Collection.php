@@ -600,7 +600,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возращает первый элемент в коллекции.
+     * Возвращает первый элемент в коллекции.
      *
      * @param callable $callback
      * @param mixed    $default
@@ -791,7 +791,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возращает результат проверки: не является ли коллекция пустой.
+     * Возвращает результат проверки: не является ли коллекция пустой.
      *
      * @return bool
      */
@@ -801,7 +801,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возращает результат проверки: является ли коллекция пустой или нет.
+     * Возвращает результат проверки: является ли коллекция пустой или нет.
      *
      * @return bool
      */

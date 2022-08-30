@@ -169,7 +169,7 @@ interface BaseCollection
     public function where($key, $operator, $value = null);
 
     /**
-     * Возращает первый элемент в коллекции.
+     * Возвращает первый элемент в коллекции.
      *
      * @param callable $callback
      * @param mixed    $default
@@ -248,14 +248,14 @@ interface BaseCollection
     public function intersect($items);
 
     /**
-     * Возращает результат проверки: не является ли коллекция пустой.
+     * Возвращает результат проверки: не является ли коллекция пустой.
      *
      * @return bool
      */
     public function isNotEmpty();
 
     /**
-     * Возращает результат проверки: является ли коллекция пустой или нет.
+     * Возвращает результат проверки: является ли коллекция пустой или нет.
      *
      * @return bool
      */

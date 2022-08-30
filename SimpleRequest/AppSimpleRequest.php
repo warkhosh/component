@@ -2,12 +2,15 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
+use Psr\Http\Message\StreamInterface;
+use Warkhosh\Variable\VarArray;
+
 /**
  * Class AppSimpleRequest
  *
  * @package Warkhosh\Component\SimpleRequest
  */
-class AppSimpleRequest
+class AppSimpleRequest implements \Psr\Http\Message\ResponseInterface
 {
     /**
      * @var string
@@ -128,7 +131,7 @@ class AppSimpleRequest
 
     /**
      * @param string $uri
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function get($uri = null)
     {
@@ -145,7 +148,7 @@ class AppSimpleRequest
      * @param array  $fields
      * @param string $uri
      * @param string $referer
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function post($fields = [], $uri = null, $referer = null)
     {
@@ -166,7 +169,7 @@ class AppSimpleRequest
     /**
      * @param array  $fields
      * @param string $uri
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function put($fields = [], $uri = null)
     {
@@ -184,7 +187,7 @@ class AppSimpleRequest
     /**
      * @param array  $fields
      * @param string $uri
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function patch($fields = [], $uri = null)
     {
@@ -202,7 +205,7 @@ class AppSimpleRequest
     /**
      * @param array  $fields
      * @param string $uri
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function delete($fields = [], $uri = null)
     {
@@ -219,7 +222,7 @@ class AppSimpleRequest
 
     /**
      * @param string $uri
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function head($uri = null)
     {
@@ -258,7 +261,7 @@ class AppSimpleRequest
     /**
      * Выполнить сеанс
      *
-     * @return $this
+     * @return AppSimpleResponse
      */
     public function request()
     {
@@ -269,7 +272,7 @@ class AppSimpleRequest
             $this->setMethod("POST");
         }
 
-        // Последовательность устаовки этого параметра важна для POST!
+        // Последовательность установки этого параметра важна для POST!
         if ($this->method === "POST") {
             $this->options[CURLOPT_POST] = true;
 
@@ -319,28 +322,27 @@ class AppSimpleRequest
         $document = curl_exec($ch);
         $err = curl_errno($ch);
         $error = curl_error($ch);
-
-        $this->result = curl_getinfo($ch);
+        $result = curl_getinfo($ch);
         $headerSize = $this->headerInResponse ? curl_getinfo($ch, CURLINFO_HEADER_SIZE) : 0;
 
         curl_close($ch);
 
-        $this->result['errno'] = intval($err);
-        $this->result['error'] = $error;
-        $this->result['document'] = trim($document);
-        $this->result['headers'] = [];
+        $result['errno'] = intval($err);
+        $result['error'] = $error;
+        $result['document'] = trim($document);
+        $result['headers'] = [];
 
         if ($this->headerInResponse) {
-            $this->result['headers'] = substr($this->result['document'], 0, $headerSize);
-            $this->result['headers'] = $headerSize > 0 ? explode("\n", $this->result['headers']) : [];
-            $this->result['document'] = substr($this->result['document'], $headerSize);
+            $result['headers'] = substr($result['document'], 0, $headerSize);
+            $result['headers'] = $headerSize > 0 ? explode("\n", $result['headers']) : [];
+            $result['document'] = substr($result['document'], $headerSize);
 
             // перебираем все заголовки и старые удаляем а добавляем на их основе новые с буквеными ключами
-            foreach ($this->result['headers'] as $key => $row) {
+            foreach ($result['headers'] as $key => $row) {
                 $row = trim($row);
 
                 if ($row === "") {
-                    unset($this->result['headers'][$key]);
+                    unset($result['headers'][$key]);
                     continue;
                 }
 
@@ -349,169 +351,38 @@ class AppSimpleRequest
                 if (count($data) > 1) {
                     $first = array_shift($data);
                     $first = mb_strtolower($first);
-                    $this->result['headers'][$first] = trim(join(":", $data));
-                    unset($this->result['headers'][$key]);
+                    $result['headers'][$first] = trim(join(":", $data));
+                    unset($result['headers'][$key]);
 
                     if ($first === 'content-type') {
-                        $row = explode(";", $this->result['headers'][$first]);
+                        $row = explode(";", $result['headers'][$first]);
                         $first = is_string($first = array_shift($row)) ? trim($first) : '';
 
                         switch ($first) {
                             case 'application/xml':
-                                $this->result['headers']['content-type'] = 'xml';
+                                $result['headers']['content-type'] = 'xml';
                                 break;
                             case 'application/json':
-                                $this->result['headers']['content-type'] = 'json';
+                                $result['headers']['content-type'] = 'json';
                                 break;
                             default:
-                                $this->result['headers']['content-type'] = $first;
+                                $result['headers']['content-type'] = $first;
                         }
 
                         $second = is_string($second = array_shift($row)) ? trim($second) : '';
-                        $this->result['headers']['content-charset'] = str_replace('charset=', '', $second);
+                        $result['headers']['content-charset'] = str_replace('charset=', '', $second);
                     }
 
                 } elseif (preg_match("/^HTTP\//is", $row)) {
                     preg_match('/^HTTP\/(.*)/is', $row, $match);
-                    $this->result['headers']['http'] = isset($match[1]) ? trim($match[1]) : trim($row);
-                    $this->result['headers']['http-version'] = substr($this->result['headers']['http'], 0, 3);
-                    unset($this->result['headers'][$key]);
+                    $result['headers']['http'] = isset($match[1]) ? trim($match[1]) : trim($row);
+                    $result['headers']['http-version'] = substr($result['headers']['http'], 0, 3);
+                    unset($result['headers'][$key]);
                 }
             }
         }
 
-        return $this;
-    }
-
-    /**
-     * Возращает значения указаного заголовка из ответа сервера
-     *
-     * @param string $key
-     * @param mixed  $default
-     * @return string
-     */
-    public function getHeader($key, $default = "")
-    {
-        if (is_string($key) && isset($this->result['headers']) && is_array($this->result['headers'])) {
-            return array_key_exists($key, $this->result['headers']) ? $this->result['headers'][$key] : $default;
-        }
-
-        return $default;
-    }
-
-    /**
-     * Возращает список всех заголовков в ответе
-     *
-     * @return array
-     */
-    public function getHeaders()
-    {
-        return is_array($this->result['headers']) ? $this->result['headers'] : [];
-    }
-
-    /**
-     * Сокращенный вариант проверки.
-     *
-     * @param int $code
-     * @return bool
-     */
-    public function getResult($code = 200)
-    {
-        return ($this->getErrno() === 0 && $this->getStatusCode() === $code);
-    }
-
-    /**
-     * @return integer
-     */
-    public function getErrorCode()
-    {
-        return $this->result['errno'];
-    }
-
-    /**
-     * @return integer
-     */
-    public function getErrno()
-    {
-        return $this->result['errno'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getError()
-    {
-        return $this->result['error'];
-    }
-
-    /**
-     * @param string $type
-     * @return string|array|\stdClass
-     * @throws \Throwable
-     */
-    public function getDocument($type = 'raw')
-    {
-        try {
-            // Если тип ответа в формате JSON нужно превратить в массив
-            if ($type === 'toArray') {
-                return json_decode($this->result['document'], true);
-
-            }
-
-            // Если тип ответа в формате JSON, нужно преобразовать его в объект stdClass
-            if ($type === 'toObject') {
-                return json_decode($this->result['document'], false);
-            }
-
-            return $this->result['document'];
-
-        } catch (\Throwable $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * Обращение за данными в JSON ответе по ключу.
-     *
-     * @param string $key
-     * @param mixed  $default
-     * @return mixed|null
-     * @throws \Throwable
-     */
-    public function getDocumentValue($key = '', $default = null)
-    {
-        static $cacheDocument, $data;
-
-        try {
-            if ($cacheDocument !== $this->result['document']) {
-                $cacheDocument = $this->result['document'];
-                $cached = false;
-
-            } else {
-                $cached = true;
-            }
-
-            if ($this->getHeader('content-type') === 'json') {
-                $data = $cached ? $data : json_decode($this->result['document'], true);
-
-                return \Warkhosh\Variable\VarArray::get($key, $data, $default);
-            }
-
-            return $default;
-
-        } catch (\Throwable $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * Возращает код HTTP ответа который получаем используя curl_getinfo(resource).
-     *
-     * @return integer
-     */
-    public function getStatusCode()
-    {
-        return isset($this->result['http_code']) ? intval($this->result['http_code']) : 0;
+        return new AppSimpleResponse($result);
     }
 
     /**
@@ -613,7 +484,7 @@ class AppSimpleRequest
     /**
      * Передать указанный массив как поток данных в формате JSON.
      *
-     * @note метод устанавливает дополнительне параметры для передачи!
+     * @note метод устанавливает дополнительные параметры для передачи!
      *
      * @param array | string $data
      * @param string         $uri
@@ -629,7 +500,7 @@ class AppSimpleRequest
     /**
      * Передать указанный массив как поток данных в формате JSON.
      *
-     * @note метод устанавливает дополнительне параметры для передачи!
+     * @note метод устанавливает дополнительные параметры для передачи!
      *
      * @param array | string $data
      * @param string         $uri
@@ -658,7 +529,7 @@ class AppSimpleRequest
     /**
      * Передать указанный массив как поток данных в формате XML.
      *
-     * @note метод устанавливает дополнительне параметры для передачи!
+     * @note метод устанавливает дополнительные параметры для передачи!
      *
      * @param array | string $data
      * @param string         $uri
@@ -674,7 +545,7 @@ class AppSimpleRequest
     /**
      * Передать указанный массив как поток данных в формате XML.
      *
-     * @note метод устанавливает дополнительне параметры для передачи!
+     * @note метод устанавливает дополнительные параметры для передачи!
      *
      * @param array | string $data
      * @param null           $uri
@@ -796,7 +667,7 @@ class AppSimpleRequest
     }
 
     /**
-     * @param string | array $headers
+     * @param string|array $headers
      * @return void
      */
     protected function setHeader($headers)
@@ -1096,7 +967,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setNewSession($flag)
+    protected function setNewSession(bool $flag)
     {
         $this->options[CURLOPT_COOKIESESSION] = (boolean)$flag;
     }
@@ -1107,7 +978,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
-    public function freshConnect($flag)
+    public function freshConnect(bool $flag)
     {
         $this->setFreshConnect($flag);
 
@@ -1120,7 +991,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setFreshConnect($flag)
+    protected function setFreshConnect(bool $flag)
     {
         $this->options[CURLOPT_FRESH_CONNECT] = (boolean)$flag;
     }
@@ -1131,7 +1002,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
-    public function forbidReUse($flag)
+    public function forbidReUse(bool $flag)
     {
         $this->setForbidReUse($flag);
 
@@ -1144,7 +1015,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setForbidReUse($flag)
+    protected function setForbidReUse(bool $flag)
     {
         $this->options[CURLOPT_FORBID_REUSE] = (boolean)$flag;
     }
@@ -1155,7 +1026,7 @@ class AppSimpleRequest
      * @param string $name
      * @return $this
      */
-    public function customRequest($name)
+    public function customRequest(string $name)
     {
         $this->setCustomRequest($name);
 
@@ -1168,7 +1039,7 @@ class AppSimpleRequest
      * @param string $name
      * @return void
      */
-    protected function setCustomRequest($name)
+    protected function setCustomRequest(string $name)
     {
         $this->options[CURLOPT_CUSTOMREQUEST] = strtoupper((string)$name);
     }
@@ -1182,7 +1053,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
-    public function sslValidation($flag)
+    public function sslValidation(bool $flag)
     {
         $this->setSslValidation($flag);
 
@@ -1195,7 +1066,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setSslValidation($flag)
+    protected function setSslValidation(bool $flag)
     {
         $this->options[CURLOPT_SSL_VERIFYPEER] = (boolean)$flag;
     }
@@ -1208,7 +1079,7 @@ class AppSimpleRequest
      * @param integer $num
      * @return $this
      */
-    public function sslValidationHost($num)
+    public function sslValidationHost(int $num)
     {
         $this->setSslValidationHost($num);
 
@@ -1223,7 +1094,7 @@ class AppSimpleRequest
      * @param integer $num
      * @return void
      */
-    protected function setSslValidationHost($num)
+    protected function setSslValidationHost(int $num)
     {
         $this->options[CURLOPT_SSL_VERIFYHOST] = (int)$num;
     }
@@ -1234,7 +1105,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
-    public function sslChecks($flag)
+    public function sslChecks(bool $flag)
     {
         $this->setSslValidationHost($flag);
 
@@ -1242,9 +1113,9 @@ class AppSimpleRequest
     }
 
     /**
-     * @param $flag
+     * @param bool $flag
      */
-    protected function setSslChecks($flag)
+    protected function setSslChecks(bool $flag)
     {
         $this->sslChecks = (boolean)$flag;
     }

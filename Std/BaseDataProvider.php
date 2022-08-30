@@ -379,7 +379,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
     }
 
     /**
-     * Возращает результат проверки: не является ли пустой выборкой.
+     * Возвращает результат проверки: не является ли пустой выборкой.
      *
      * @return bool
      */
@@ -389,7 +389,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
     }
 
     /**
-     * Возращает результат проверки: является ли выборка пустой или нет.
+     * Возвращает результат проверки: является ли выборка пустой или нет.
      *
      * @return bool
      */

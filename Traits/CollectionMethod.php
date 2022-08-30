@@ -74,7 +74,7 @@ trait CollectionMethod
     }
 
     /**
-     * Возращает текущий жлемент.
+     * Возвращает текущий элемент.
      *
      * @link  http://php.net/manual/en/iterator.current.php
      * @note  Может возвращать любой тип!
@@ -159,7 +159,7 @@ trait CollectionMethod
      * @link  http://php.net/manual/en/arrayaccess.offsetexists.php
      * @note  Данный метод исполняется, когда используется функция isset() или функция empty() для объекта
      * @param mixed $offset - смещение для проверки.
-     * @return boolean - возращает true в случае успешного завершения или false в случае возникновения ошибки
+     * @return boolean - возвращает true в случае успешного завершения или false в случае возникновения ошибки
      */
     public function offsetExists($offset)
     {
