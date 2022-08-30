@@ -2,15 +2,12 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
-use Psr\Http\Message\StreamInterface;
-use Warkhosh\Variable\VarArray;
-
 /**
  * Class AppSimpleRequest
  *
  * @package Warkhosh\Component\SimpleRequest
  */
-class AppSimpleRequest implements \Psr\Http\Message\ResponseInterface
+class AppSimpleRequest
 {
     /**
      * @var string
