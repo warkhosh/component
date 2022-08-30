@@ -121,7 +121,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
             throw new \RuntimeException('Cannot read from non-readable stream');
         }
 
-        return static::tryGetContents($this->stream);
+        return static::tryToGetContents($this->stream);
     }
 
     /**
@@ -194,7 +194,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function isWritable(): bool
+    public function isWritable()
     {
         return $this->writable;
     }
@@ -202,7 +202,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function isSeekable(): bool
+    public function isSeekable()
     {
         return $this->seekable;
     }
@@ -210,7 +210,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function eof(): bool
+    public function eof()
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -223,7 +223,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return int
      * @throws \RuntimeException
      */
-    public function tell(): int
+    public function tell()
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -239,22 +239,27 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     }
 
     /**
+     * Устанавливает смещение к началу потока
+     *
      * @throws \RuntimeException on failure.
      * @link http://www.php.net/manual/en/function.fseek.php
      * @see  seek()
      */
-    public function rewind(): void
+    public function rewind()
     {
         $this->seek(0);
     }
 
     /**
+     * Устанавливает позицию в потоке
+     *
      * @link http://www.php.net/manual/en/function.fseek.php
      * @param int $offset
      * @param int $whence
+     * @return void
      * @throws \RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek($offset, $whence = SEEK_SET)
     {
         $whence = (int)$whence;
 
@@ -265,17 +270,19 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
             throw new \RuntimeException('Stream is not seekable');
         }
         if (fseek($this->stream, $offset, $whence) === -1) {
-            throw new \RuntimeException('Unable to seek to stream position '
-                . $offset . ' with whence ' . var_export($whence, true));
+            throw new \RuntimeException("Unable to seek to stream position {$offset} with whence "
+                . var_export($whence, true));
         }
     }
 
     /**
+     * Чтение данных из потока
+     *
      * @param int $length
      * @return string
      * @throws \RuntimeException
      */
-    public function read($length): string
+    public function read($length)
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -395,7 +402,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     public static function tryFopen(string $filename, string $mode)
     {
         $ex = null;
-        set_error_handler(static function (int $errno, string $errstr) use ($filename, $mode, &$ex): bool {
+        set_error_handler(static function (int $errno, string $errstr) use ($filename, $mode, &$ex) {
             $ex = new \RuntimeException(sprintf(
                 'Unable to open "%s" using mode "%s": %s',
                 $filename,
@@ -433,10 +440,10 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return string
      * @throws \RuntimeException
      */
-    public static function tryGetContents($stream): string
+    public static function tryToGetContents($stream)
     {
         $ex = null;
-        set_error_handler(static function (int $errno, string $errstr) use (&$ex): bool {
+        set_error_handler(static function (int $errno, string $errstr) use (&$ex) {
             $ex = new \RuntimeException(sprintf(
                 'Unable to read stream contents: %s',
                 $errstr
