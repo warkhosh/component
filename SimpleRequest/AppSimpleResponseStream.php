@@ -55,6 +55,8 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
             }
 
         } else {
+            $stream = $resource;
+
             if ((\stream_get_meta_data($resource)['uri'] ?? '') === 'php://input') {
                 $stream = static::tryFopen('php://temp', 'w+');
                 stream_copy_to_stream($resource, $stream);
@@ -67,12 +69,12 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
             $this->size = $options['size'];
 
         } else {
-            $fstat = fstat($resource);
+            $fstat = fstat($stream);
             $options['size'] = (int)VarArray::get("size", array_slice($fstat, 13), 0);
         }
 
         $this->metaData = $options['meta_data'] ?? [];
-        $this->stream = $resource;
+        $this->stream = $stream;
         $meta = stream_get_meta_data($this->stream);
         $this->seekable = $meta['seekable'];
         $this->readable = (bool)preg_match(self::READABLE_MODES, $meta['mode']);
@@ -347,6 +349,41 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         $meta = stream_get_meta_data($this->stream);
 
         return $meta[$key] ?? null;
+    }
+
+    /**
+     * @param resource|string|int|float|bool|null $resource
+     * @return resource
+     * @throws \InvalidArgumentException
+     */
+    public static function stream($resource = '')
+    {
+        if (is_scalar($resource)) {
+            $stream = static::tryFopen('php://temp', 'r+');
+
+            if ($resource !== '') {
+                fwrite($stream, (string)$resource);
+                fseek($stream, 0);
+            }
+
+            return $stream;
+
+        } elseif (is_resource($resource)) {
+            $stream = $resource;
+
+            if ((\stream_get_meta_data($resource)['uri'] ?? '') === 'php://input') {
+                $stream = static::tryFopen('php://temp', 'w+');
+                stream_copy_to_stream($resource, $stream);
+                fseek($stream, 0);
+            }
+
+            return $stream;
+
+        } elseif (is_null($resource)) {
+            return static::tryFopen('php://temp', 'r+');
+        }
+
+        throw new \InvalidArgumentException('Invalid resource type: ' . gettype($resource));
     }
 
     /**

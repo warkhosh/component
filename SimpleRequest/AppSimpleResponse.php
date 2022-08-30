@@ -2,12 +2,24 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\StreamInterface;
 use Warkhosh\Variable\VarArray;
 
 class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 {
+    protected $response = [
+        'errno'     => 0,
+        'error'     => '',
+        'document'  => '',
+        'headers'   => [],
+        'http_code' => 0,
+    ];
 
-    protected $response = ['errno' => 0, 'error' => '', 'document' => '', 'headers' => [], 'http_code' => 0];
+    /**
+     * @var AppSimpleResponseStream
+     */
+    protected $stream;
 
     /**
      * AppSimpleResponse constructor.
@@ -23,6 +35,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
         $response['http_code'] = (int)VarArray::get("http_code", $response, 0);
 
         $this->response = $response;
+        $this->stream = new AppSimpleResponseStream($this->response['document']);
     }
 
     /**
@@ -166,6 +179,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @param string $type
      * @return string|array|\stdClass
      * @throws \Throwable
+     * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
     public function getDocument($type = 'raw')
     {
@@ -181,7 +195,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
                 return json_decode($this->response['document'], false);
             }
 
-            return $this->response['document'];
+            return $this->getBody()->getContents();
 
         } catch (\Throwable $e) {
             throw $e;
@@ -195,6 +209,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @param mixed  $default
      * @return mixed|null
      * @throws \Throwable
+     * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
     public function getDocumentValue($key = '', $default = null)
     {
@@ -223,28 +238,36 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     }
 
     /**
-     * Gets the body of the message.
+     * Получает тело сообщения в виде потока
      *
-     * @return \Psr\Http\Message\StreamInterface Returns the body as a stream.
+     * @return \Psr\Http\Message\StreamInterface
      * @throws \Exception
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
     public function getBody()
     {
-        throw new \Exception("Этот метод не поддерживается в этой редакции кода");
+        if (! $this->stream) {
+            $this->stream = AppSimpleResponseStream::stream('');
+        }
+
+        return $this->stream;
     }
 
     /**
-     * Return an instance with the specified message body.
+     * Вернуть экземпляр с указанным телом сообщения
      *
      * @param \Psr\Http\Message\StreamInterface $body Body.
      * @return static
      * @throws \InvalidArgumentException When the body is not valid.
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
     public function withBody(\Psr\Http\Message\StreamInterface $body)
     {
-        throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
+        if ($body === $this->stream) {
+            return $this;
+        }
+
+        $new = clone $this;
+        $new->stream = $body;
+        return $new;
     }
 
     /**

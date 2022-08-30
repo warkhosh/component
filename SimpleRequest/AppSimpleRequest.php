@@ -2,6 +2,8 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
+use Throwable;
+
 /**
  * Class AppSimpleRequest
  *
@@ -96,6 +98,13 @@ class AppSimpleRequest
     }
 
     /**
+     * @return static
+     */
+    public static function init() {
+        return new static();
+    }
+
+    /**
      * Настройки приложения для большинства запросов
      *
      * @return $this
@@ -111,14 +120,11 @@ class AppSimpleRequest
         $this->setReturnTransfer(getConfig("spider.setting.default.return_transfer", true));      // return web page
         $this->setHeadersInOutput(getConfig("spider.setting.default.headers_in_output", true));   // return headers
         $this->setFollowsAnyHeader(getConfig("spider.setting.default.follows_any_header", true)); // follow redirects
-        $this->setAcceptEncoding(getConfig("spider.setting.default.accept_encoding",
-            ""));        // handle all encodings
-        $this->setAutoReferer(getConfig("spider.setting.default.auto_referer",
-            true));            // set referer on redirect
-        $this->setConnectTimeout(getConfig("spider.setting.default.connect_timeout", 10));        // timeout on connect
-        $this->setTimeout(getConfig("spider.setting.default.timeout", 120));                      // timeout on response
-        $this->setMaxRedirect(getConfig("spider.setting.default.max_redirect",
-            10));              // stop after 10 redirects
+        $this->setAcceptEncoding(getConfig("spider.setting.default.accept_encoding", ""));        // handle all encoding
+        $this->setAutoReferer(getConfig("spider.setting.default.auto_referer", true));        // set referer on redirect
+        $this->setConnectTimeout(getConfig("spider.setting.default.connect_timeout", 10));    // timeout on connect
+        $this->setTimeout(getConfig("spider.setting.default.timeout", 120));                  // timeout on response
+        $this->setMaxRedirect(getConfig("spider.setting.default.max_redirect", 10));          // stop after 10 redirects
         $this->setFreshConnect(getConfig("spider.setting.default.fresh_connect", true));
         $this->setForbidReUse(getConfig("spider.setting.default.forbid_re_use", true));
 
@@ -136,16 +142,22 @@ class AppSimpleRequest
     /**
      * @param string $uri
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function get($uri = null)
     {
-        if (! is_null($uri)) {
-            $this->setUrl($uri);
+        try {
+            if (! is_null($uri)) {
+                $this->setUrl($uri);
+            }
+
+            $this->setMethod("GET");
+
+            return $this->request();
+
+        } catch (Throwable $e) {
+            throw $e;
         }
-
-        $this->setMethod("GET");
-
-        return $this->request();
     }
 
     /**
@@ -153,91 +165,121 @@ class AppSimpleRequest
      * @param string $uri
      * @param string $referer
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function post($fields = [], $uri = null, $referer = null)
     {
-        if (! is_null($uri)) {
-            $this->setUrl($uri);
+        try {
+            if (! is_null($uri)) {
+                $this->setUrl($uri);
+            }
+
+            if (! is_null($referer)) {
+                $this->setHeader("Referer: {$referer}");
+            }
+
+            $this->setMethod("POST");
+            $this->fields($fields);
+
+            return $this->request();
+
+        } catch (Throwable $e) {
+            throw $e;
         }
-
-        if (! is_null($referer)) {
-            $this->setHeader("Referer: {$referer}");
-        }
-
-        $this->setMethod("POST");
-        $this->fields($fields);
-
-        return $this->request();
     }
 
     /**
      * @param array  $fields
      * @param string $uri
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function put($fields = [], $uri = null)
     {
-        if (! is_null($uri)) {
-            $this->setUrl($uri);
+        try {
+            if (! is_null($uri)) {
+                $this->setUrl($uri);
+            }
+
+            $this->setMethod("PUT");
+            $this->setCustomRequest("PUT");
+            $this->fields($fields);
+
+            return $this->request();
+
+        } catch (Throwable $e) {
+            throw $e;
         }
-
-        $this->setMethod("PUT");
-        $this->setCustomRequest("PUT");
-        $this->fields($fields);
-
-        return $this->request();
     }
 
     /**
      * @param array  $fields
      * @param string $uri
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function patch($fields = [], $uri = null)
     {
-        if (! is_null($uri)) {
-            $this->setUrl($uri);
+        try {
+            if (! is_null($uri)) {
+                $this->setUrl($uri);
+            }
+
+            $this->setMethod("PATCH");
+            $this->setCustomRequest("PATCH");
+            $this->fields($fields);
+
+            return $this->request();
+
+        } catch (Throwable $e) {
+            throw $e;
         }
-
-        $this->setMethod("PATCH");
-        $this->setCustomRequest("PATCH");
-        $this->fields($fields);
-
-        return $this->request();
     }
 
     /**
      * @param array  $fields
      * @param string $uri
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function delete($fields = [], $uri = null)
     {
-        if (! is_null($uri)) {
-            $this->setUrl($uri);
+        try {
+            if (! is_null($uri)) {
+                $this->setUrl($uri);
+            }
+
+            $this->setMethod("DELETE");
+            $this->setCustomRequest("DELETE");
+            $this->fields($fields);
+
+            return $this->request();
+
+        } catch (Throwable $e) {
+            throw $e;
         }
-
-        $this->setMethod("DELETE");
-        $this->setCustomRequest("DELETE");
-        $this->fields($fields);
-
-        return $this->request();
     }
 
     /**
      * @param string $uri
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function head($uri = null)
     {
-        if (! is_null($uri)) {
-            $this->setUrl($uri);
+        try {
+            if (! is_null($uri)) {
+                $this->setUrl($uri);
+            }
+
+            $this->setMethod("GET");
+            $this->setHeadersInOutput(true); // принудительно включаем получение заголовков в результате запроса
+
+            return $this->request();
+
+        } catch (Throwable $e) {
+            throw $e;
         }
-
-        $this->setMethod("GET");
-        $this->setHeadersInOutput(true); // принудительно включаем получение заголовков в результате запроса
-
-        return $this->request();
     }
 
     /**
@@ -266,140 +308,145 @@ class AppSimpleRequest
      * Выполнить сеанс
      *
      * @return AppSimpleResponse
+     * @throws Throwable
      */
     public function request()
     {
-        $ch = curl_init();
+        try {
+            $ch = curl_init();
 
-        // Если указали передачу файла но метод не POST, меняем его!
-        if (count($this->files) > 0 && $this->method !== "POST") {
-            $this->setMethod("POST");
-        }
-
-        // Последовательность установки этого параметра важна для POST!
-        if ($this->method === "POST") {
-            $this->options[CURLOPT_POST] = true;
-
-        } elseif ($this->method === "PUT") {
-            $this->setCustomRequest("PUT");
-
-        } elseif ($this->method === "PATCH") {
-            $this->setCustomRequest("PATCH");
-
-        } elseif ($this->method === "DELETE") {
-            $this->setCustomRequest("DELETE");
-        }
-
-        // CURLOPT_POSTFIELDS принимает значения в двух форматах, и это установит как будут кодироваться данные:
-        // array: данные будут отправляться как multipart/form-data
-        // string: данные будут отправляться как application/x-www-form-urlencoded, которая является кодировкой по умолчанию для представленных данных форм.
-        if (count($this->files) > 0) {
-            $this->options[CURLOPT_POSTFIELDS] = array_merge(count($this->fields) ? $this->fields : [], $this->files);
-            $this->setHeader('Content-Type: multipart/form-data');
-            $this->setFollowsAnyHeader(true); // follow redirects
-
-        } elseif (count($this->fields) > 0) {
-            $this->options[CURLOPT_POSTFIELDS] = http_build_query($this->fields);
-
-        } elseif (count($this->stream) > 0) {
-            $this->options[CURLOPT_POSTFIELDS] = $this->stream[1];
-        }
-
-        if (count($this->cookies) && is_string($cookies = "")) {
-            foreach ($this->cookies as $token => $value) {
-                $cookies .= "{$token}={$value}; ";
+            // Если указали передачу файла но метод не POST, меняем его!
+            if (count($this->files) > 0 && $this->method !== "POST") {
+                $this->setMethod("POST");
             }
 
-            $this->options[CURLOPT_COOKIE] = trim($cookies);
-        }
+            // Последовательность установки этого параметра важна для POST!
+            if ($this->method === "POST") {
+                $this->options[CURLOPT_POST] = true;
 
-        if (count($this->accept) > 0) {
-            $this->setHeader("Accept: " . trim(join(", ", $this->accept)));
-        }
+            } elseif ($this->method === "PUT") {
+                $this->setCustomRequest("PUT");
 
-        if (count($this->headers) > 0) {
-            $this->options[CURLOPT_HTTPHEADER] = $this->headers;
-        }
+            } elseif ($this->method === "PATCH") {
+                $this->setCustomRequest("PATCH");
 
-        curl_setopt_array($ch, $this->options);
+            } elseif ($this->method === "DELETE") {
+                $this->setCustomRequest("DELETE");
+            }
 
-        $document = curl_exec($ch);
-        $err = curl_errno($ch);
-        $error = curl_error($ch);
-        $result = curl_getinfo($ch);
-        $headerSize = $this->headerInResponse ? curl_getinfo($ch, CURLINFO_HEADER_SIZE) : 0;
+            // CURLOPT_POSTFIELDS принимает значения в двух форматах, и это установит как будут кодироваться данные:
+            // array: данные будут отправляться как multipart/form-data
+            // string: данные будут отправляться как application/x-www-form-urlencoded, которая является кодировкой по умолчанию для представленных данных форм.
+            if (count($this->files) > 0) {
+                $this->options[CURLOPT_POSTFIELDS] = array_merge(count($this->fields) ? $this->fields
+                    : [], $this->files);
+                $this->setHeader('Content-Type: multipart/form-data');
+                $this->setFollowsAnyHeader(true); // follow redirects
 
-        curl_close($ch);
+            } elseif (count($this->fields) > 0) {
+                $this->options[CURLOPT_POSTFIELDS] = http_build_query($this->fields);
 
-        $result['errno'] = intval($err);
-        $result['error'] = $error;
-        $result['document'] = trim($document);
-        $result['headers'] = [];
+            } elseif (count($this->stream) > 0) {
+                $this->options[CURLOPT_POSTFIELDS] = $this->stream[1];
+            }
 
-        if ($this->headerInResponse) {
-            $result['headers'] = substr($result['document'], 0, $headerSize);
-            $result['headers'] = $headerSize > 0 ? explode("\n", $result['headers']) : [];
-            $result['stream'] = substr($result['document'], $headerSize);
-
-            $result['stream'] = new AppSimpleResponseStream($result['stream']);
-
-            // перебираем все заголовки и старые удаляем а добавляем на их основе новые с буквеными ключами
-            foreach ($result['headers'] as $key => $row) {
-                $row = trim($row);
-
-                if ($row === "") {
-                    unset($result['headers'][$key]);
-                    continue;
+            if (count($this->cookies) && is_string($cookies = "")) {
+                foreach ($this->cookies as $token => $value) {
+                    $cookies .= "{$token}={$value}; ";
                 }
 
-                $data = explode(":", $row);
+                $this->options[CURLOPT_COOKIE] = trim($cookies);
+            }
 
-                if (count($data) > 1) {
-                    $first = array_shift($data);
-                    $first = trim(mb_strtolower($first));
-                    $first = str_replace(" ", "-", ucwords(str_replace("-", " ", $first)));
+            if (count($this->accept) > 0) {
+                $this->setHeader("Accept: " . trim(join(", ", $this->accept)));
+            }
 
-                    $result['headers'][$first] = trim(join(":", $data));
-                    unset($result['headers'][$key]);
+            if (count($this->headers) > 0) {
+                $this->options[CURLOPT_HTTPHEADER] = $this->headers;
+            }
 
-                    if ($first === 'Content-Type') {
-                        $row = explode(";", $result['headers'][$first]);
-                        $first = is_string($first = array_shift($row)) ? trim($first) : '';
+            curl_setopt_array($ch, $this->options);
 
-                        switch ($first) {
-                            case 'application/xml':
-                                $result['headers']['Content-Type'] = 'xml';
-                                break;
+            $document = curl_exec($ch);
+            $err = curl_errno($ch);
+            $error = curl_error($ch);
+            $result = curl_getinfo($ch);
+            $headerSize = $this->headerInResponse ? curl_getinfo($ch, CURLINFO_HEADER_SIZE) : 0;
 
-                            case 'application/json':
-                                $result['headers']['Content-Type'] = 'json';
-                                break;
+            curl_close($ch);
 
-                            default:
-                                $result['headers']['Content-Type'] = $first;
-                        }
+            $result['errno'] = intval($err);
+            $result['error'] = $error;
+            $result['document'] = trim($document);
+            $result['headers'] = [];
 
-                        $second = is_string($second = array_shift($row)) ? trim($second) : '';
-                        $result['headers']['Content-Charset'] = str_replace('charset=', '', $second);
+            if ($this->headerInResponse) {
+                $result['headers'] = substr($result['document'], 0, $headerSize);
+                $result['headers'] = $headerSize > 0 ? explode("\n", $result['headers']) : [];
+                $result['document'] = substr($result['document'], $headerSize);
+
+                // перебираем все заголовки и старые удаляем а добавляем на их основе новые с буквеными ключами
+                foreach ($result['headers'] as $key => $row) {
+                    $row = trim($row);
+
+                    if ($row === "") {
+                        unset($result['headers'][$key]);
+                        continue;
                     }
 
-                } elseif (preg_match("/^HTTP\//is", $row)) {
-                    $str = preg_replace('/[^0-9\s]/isu', '', $row);
-                    $match = explode(" ", $str);
-                    $code = isset($match[0]) && (int)$match[0] >= 100
-                        ? $match[0]
-                        : (isset($match[1])
-                        && (int)$match[1]
-                        >= 100 ? $match[1] : trim($row));
-                    $version = isset($match[0]) && (int)$match[0] < 100 ? trim($match[0]) : substr($row, 0, 3);
-                    $result['headers']['HTTP'] = empty($code) ? trim($row) : trim($code);
-                    $result['headers']['Http-Version'] = $version;
-                    unset($result['headers'][$key]);
+                    $data = explode(":", $row);
+
+                    if (count($data) > 1) {
+                        $first = array_shift($data);
+                        $first = trim(mb_strtolower($first));
+                        $first = str_replace(" ", "-", ucwords(str_replace("-", " ", $first)));
+
+                        $result['headers'][$first] = trim(join(":", $data));
+                        unset($result['headers'][$key]);
+
+                        if ($first === 'Content-Type') {
+                            $row = explode(";", $result['headers'][$first]);
+                            $first = is_string($first = array_shift($row)) ? trim($first) : '';
+
+                            switch ($first) {
+                                case 'application/xml':
+                                    $result['headers']['Content-Type'] = 'xml';
+                                    break;
+
+                                case 'application/json':
+                                    $result['headers']['Content-Type'] = 'json';
+                                    break;
+
+                                default:
+                                    $result['headers']['Content-Type'] = $first;
+                            }
+
+                            $second = is_string($second = array_shift($row)) ? trim($second) : '';
+                            $result['headers']['Content-Charset'] = str_replace('charset=', '', $second);
+                        }
+
+                    } elseif (preg_match("/^HTTP\//is", $row)) {
+                        $str = preg_replace('/[^0-9\s]/isu', '', $row);
+                        $match = explode(" ", $str);
+                        $code = isset($match[0]) && (int)$match[0] >= 100
+                            ? $match[0]
+                            : (isset($match[1])
+                            && (int)$match[1]
+                            >= 100 ? $match[1] : trim($row));
+                        $version = isset($match[0]) && (int)$match[0] < 100 ? trim($match[0]) : substr($row, 0, 3);
+                        $result['headers']['HTTP'] = empty($code) ? trim($row) : trim($code);
+                        $result['headers']['Http-Version'] = $version;
+                        unset($result['headers'][$key]);
+                    }
                 }
             }
-        }
 
-        return new AppSimpleResponse($result);
+            return new AppSimpleResponse($result);
+
+        } catch (Throwable $e) {
+            throw $e;
+        }
     }
 
     /**

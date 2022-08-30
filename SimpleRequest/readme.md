@@ -1,29 +1,31 @@
 # AppSimpleRequest
 
-Класс AppSimpleRequest создан для простого взаимодействования между серверами по протоколу HTTP. 
+Класс AppSimpleRequest создан для простого взаимодействия между серверами по протоколу HTTP. 
 
-> Для простоты использования он поставляется с фасадом SimpleRequest но вы всегда можете расширить его в своем проекте.
+##### GET
 
-##### GET 
 ```php
-$request = SimpleRequest::get($url);
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init();
 
+$request = $simpleRequest->get($url);
 // or
 $request = (new \Warkhosh\Component\SimpleRequest\AppSimpleRequest())->get($url);
 
 // Запрос и скачивание документа из ответа
-$request = (new \Warkhosh\Component\SimpleRequest\AppSimpleRequest())->headersInOutput(false)->get($url);
+$request = $simpleRequest->headersInOutput(false)->get($url);
 
 if ($request->getResult()) {
-    copy($request->getDocument(), "/save/to/file.xml");
+    copy($request->getBody()->getContents(), "/save/to/file.xml");
 }
 ```
 
 ##### HEAD 
 ```php
-$request = SimpleRequest::head($url);
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init();
+
+$request = $simpleRequest->head($url);
 // or
-$request = (new AppSimpleRequest())->head($url);
+$request = (new \Warkhosh\Component\SimpleRequest\AppSimpleRequest())->head($url);
 
 // если нужно узнать только доступность ресурса, так можно сразу проверить код ответа
 $code = $request->getStatusCode();
@@ -31,74 +33,73 @@ $code = $request->getStatusCode();
 
 ##### POST
 ```php
-$request = SimpleRequest::post([...], $url);
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init();
+
+$request = $simpleRequest->post([...], $url);
 
 // Передать указанный массив как поток данных в формате JSON
-$request = SimpleRequest::streamJson([...], $url)->request();
+$request = $simpleRequest->streamJson([...], $url)->request();
 
 // Передать указанный массив как поток данных в формате XML
-$request = SimpleRequest::streamXml([...], $url)->request();
+$request = $simpleRequest->streamXml([...], $url)->request();
 ```
 
 ##### PUT
 ```php
-$request = SimpleRequest::put([...], $url);
+$request = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init()->put([...], $url);
 ```
 
 ##### Передача файла
 ```php
-$request = new AppSimpleRequest();
-$request->file("path/file1.jpg", "field_name");
-$request->file("path/file2.jpg", "field_some_name");
-$request->post([...], $url);
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init();
+$simpleRequest->file("path/file1.jpg", "field_name");
+$simpleRequest->file("path/file2.jpg", "field_some_name");
+$simpleRequest->post([...], $url);
 ```
 
 ##### Basic Auth
 ```php
-$request = SimpleRequest::httpAuth('user', 'password');
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init();
+$simpleRequest->httpAuth('user', 'password');
 ```
 
 ##### Custom Header
 ```php
-$request = new AppSimpleRequest();
-...
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init();
+
 // указание своего дополнительного заголовка в запросе
-$request->header(['test-script: testing']);
+$simpleRequest->header(['test-script: testing'])->post([...], $url);;
 ```
 
 ##### Обработка ответа
 ```php
-$request = SimpleRequest::get($url);
+$response = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init()->get($url);
 
 // Проверка кода ответа
-if ($request->getResult(200)) ...
-
-// Проверка содержимого в ответе
-if ($request->getResult(200) && $request->getDocument() === 'ok') ...
+if ($response->getResult(200)) { ...
 
 // Проверка по ответу типа содержимого в ответе
-if ($request->getResult(200) && $request->getHeader('content-type') === 'json') ...
+if ($response->getHeader('Content-Type') === 'json') ...
+
+$stream = $response->getBody();
+
+// Проверка содержимого в ответе
+if ($response->getResult(200) && $stream->getContents() === 'ok') { ...
+
+// К началу контента
+$stream->rewind();
 
 // Проверка в ответе типа JSON значения status
-if ($request->getHeader('content-type') === 'json' && $request->getDocumentValue('status') === 'ok') ...
-```
-
-##### Обработка тела ответа
-```php
-// Получить тело ответа
-$response = $request->getDocument();
-
-// Преобразовать и вернуть результат JSON ответ в массив
-$response = $request->getDocument('toArray');
-
-// Преобразовать и вернуть JSON ответ в объект stdClass
-$response = $request->getDocument('toObject');
-
-// Вернуть значеение в JSON ответе
-$result = $request->getDocumentValue('import.result')
+if ($response->getHeader('Content-Type') === 'json') {
+    $data = json_decode($stream->getContents(), true);
+    
+    if (key_exists('status', $data) && $data['status'] === 'ok') { 
+        // code
+    }
+}
 ```
 
 ##### Timeout
 ```php
-$request = SimpleRequest::timeout(2);
+$simpleRequest = Warkhosh\Component\SimpleRequest\AppSimpleRequest::init()->timeout(2);
 ```
