@@ -241,6 +241,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * Устанавливает смещение к началу потока
      *
+     * @return void
      * @throws \RuntimeException on failure.
      * @link http://www.php.net/manual/en/function.fseek.php
      * @see  seek()
