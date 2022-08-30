@@ -78,7 +78,14 @@ class AppSimpleRequest
      *
      * @var array
      */
-    protected $result = ['errno' => 0, 'error' => '', 'document' => '', 'headers' => [], 'http_code' => 0];
+    protected $result = [
+        'errno'     => 0,
+        'error'     => '',
+        'document'  => '',
+        'stream'    => null,
+        'headers'   => [],
+        'http_code' => 0,
+    ];
 
     /**
      * AppSimpleRequest constructor.
@@ -332,7 +339,9 @@ class AppSimpleRequest
         if ($this->headerInResponse) {
             $result['headers'] = substr($result['document'], 0, $headerSize);
             $result['headers'] = $headerSize > 0 ? explode("\n", $result['headers']) : [];
-            $result['document'] = substr($result['document'], $headerSize);
+            $result['stream'] = substr($result['document'], $headerSize);
+
+            $result['stream'] = new AppSimpleResponseStream($result['stream']);
 
             // перебираем все заголовки и старые удаляем а добавляем на их основе новые с буквеными ключами
             foreach ($result['headers'] as $key => $row) {
@@ -377,7 +386,11 @@ class AppSimpleRequest
                 } elseif (preg_match("/^HTTP\//is", $row)) {
                     $str = preg_replace('/[^0-9\s]/isu', '', $row);
                     $match = explode(" ", $str);
-                    $code = isset($match[0]) && (int)$match[0] >= 100 ? $match[0] : (isset($match[1]) && (int)$match[1] >= 100 ? $match[1] : trim($row));
+                    $code = isset($match[0]) && (int)$match[0] >= 100
+                        ? $match[0]
+                        : (isset($match[1])
+                        && (int)$match[1]
+                        >= 100 ? $match[1] : trim($row));
                     $version = isset($match[0]) && (int)$match[0] < 100 ? trim($match[0]) : substr($row, 0, 3);
                     $result['headers']['HTTP'] = empty($code) ? trim($row) : trim($code);
                     $result['headers']['Http-Version'] = $version;
