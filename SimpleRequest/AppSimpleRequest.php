@@ -446,22 +446,28 @@ class AppSimpleRequest
 
     /**
      * @param string $type
-     * @return string | array | \stdClass
+     * @return string|array|\stdClass
+     * @throws \Throwable
      */
     public function getDocument($type = 'raw')
     {
-        // Если тип ответа в формате JSON нужно превратить в массив
-        if ($type === 'toArray') {
-            return json_decode($this->result['document'], true);
+        try {
+            // Если тип ответа в формате JSON нужно превратить в массив
+            if ($type === 'toArray') {
+                return json_decode($this->result['document'], true);
 
+            }
+
+            // Если тип ответа в формате JSON, нужно преобразовать его в объект stdClass
+            if ($type === 'toObject') {
+                return json_decode($this->result['document'], false);
+            }
+
+            return $this->result['document'];
+
+        } catch (\Throwable $e) {
+            throw $e;
         }
-
-        // Если тип ответа в формате JSON, нужно преобразовать его в объект stdClass
-        if ($type === 'toObject') {
-            return json_decode($this->result['document'], false);
-        }
-
-        return $this->result['document'];
     }
 
     /**
@@ -470,26 +476,32 @@ class AppSimpleRequest
      * @param string $key
      * @param mixed  $default
      * @return mixed|null
+     * @throws \Throwable
      */
     public function getDocumentValue($key = '', $default = null)
     {
         static $cacheDocument, $data;
 
-        if ($cacheDocument !== $this->result['document']) {
-            $cacheDocument = $this->result['document'];
-            $cached = false;
+        try {
+            if ($cacheDocument !== $this->result['document']) {
+                $cacheDocument = $this->result['document'];
+                $cached = false;
 
-        } else {
-            $cached = true;
+            } else {
+                $cached = true;
+            }
+
+            if ($this->getHeader('content-type') === 'json') {
+                $data = $cached ? $data : json_decode($this->result['document'], true);
+
+                return \Warkhosh\Variable\VarArray::get($key, $data, $default);
+            }
+
+            return $default;
+
+        } catch (\Throwable $e) {
+            throw $e;
         }
-
-        if ($this->getHeader('content-type') === 'json') {
-            $data = $cached ? $data : json_decode($this->result['document'], true);
-
-            return \Warkhosh\Variable\VarArray::get($key, $data, $default);
-        }
-
-        return $default;
     }
 
     /**
