@@ -28,13 +28,18 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     /**
      * Возвращает значения указанного заголовка из ответа сервера
      *
-     * @param string $key
+     * @param string $name
      * @return string[]
      */
-    public function getHeader($key)
+    public function getHeader($name)
     {
-        if (is_string($key) && array_key_exists($key, $this->response['headers'])) {
-            return $this->response['headers'][$key];
+        if (is_string($name) && ! empty($name)) {
+            $name = trim(mb_strtolower($name));
+            $name = str_replace(" ", "-", ucwords(str_replace("-", " ", $name)));
+
+            if (array_key_exists($name, $this->response['headers'])) {
+                return $this->response['headers'][$name];
+            }
         }
 
         return [];
@@ -50,6 +55,9 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      */
     public function hasHeader($name)
     {
+        $name = trim(mb_strtolower($name));
+        $name = str_replace(" ", "-", ucwords(str_replace("-", " ", $name)));
+
         return key_exists($name, $this->response['headers']);
     }
 

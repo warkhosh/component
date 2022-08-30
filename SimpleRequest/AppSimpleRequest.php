@@ -347,33 +347,40 @@ class AppSimpleRequest
 
                 if (count($data) > 1) {
                     $first = array_shift($data);
-                    $first = mb_strtolower($first);
+                    $first = trim(mb_strtolower($first));
+                    $first = str_replace(" ", "-", ucwords(str_replace("-", " ", $first)));
+
                     $result['headers'][$first] = trim(join(":", $data));
                     unset($result['headers'][$key]);
 
-                    if ($first === 'content-type') {
+                    if ($first === 'Content-Type') {
                         $row = explode(";", $result['headers'][$first]);
                         $first = is_string($first = array_shift($row)) ? trim($first) : '';
 
                         switch ($first) {
                             case 'application/xml':
-                                $result['headers']['content-type'] = 'xml';
+                                $result['headers']['Content-Type'] = 'xml';
                                 break;
+
                             case 'application/json':
-                                $result['headers']['content-type'] = 'json';
+                                $result['headers']['Content-Type'] = 'json';
                                 break;
+
                             default:
-                                $result['headers']['content-type'] = $first;
+                                $result['headers']['Content-Type'] = $first;
                         }
 
                         $second = is_string($second = array_shift($row)) ? trim($second) : '';
-                        $result['headers']['content-charset'] = str_replace('charset=', '', $second);
+                        $result['headers']['Content-Charset'] = str_replace('charset=', '', $second);
                     }
 
                 } elseif (preg_match("/^HTTP\//is", $row)) {
-                    preg_match('/^HTTP\/(.*)/is', $row, $match);
-                    $result['headers']['http'] = isset($match[1]) ? trim($match[1]) : trim($row);
-                    $result['headers']['http-version'] = substr($result['headers']['http'], 0, 3);
+                    $str = preg_replace('/[^0-9\s]/isu', '', $row);
+                    $match = explode(" ", $str);
+                    $code = isset($match[0]) && (int)$match[0] >= 100 ? $match[0] : (isset($match[1]) && (int)$match[1] >= 100 ? $match[1] : trim($row));
+                    $version = isset($match[0]) && (int)$match[0] < 100 ? trim($match[0]) : substr($row, 0, 3);
+                    $result['headers']['HTTP'] = empty($code) ? trim($row) : trim($code);
+                    $result['headers']['Http-Version'] = $version;
                     unset($result['headers'][$key]);
                 }
             }
