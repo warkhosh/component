@@ -4,7 +4,8 @@ namespace Warkhosh\Component\SimpleRequest;
 
 use Warkhosh\Variable\VarArray;
 
-class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
+class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
+{
 
     protected $response = ['errno' => 0, 'error' => '', 'document' => '', 'headers' => [], 'http_code' => 0];
 
@@ -15,6 +16,12 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
      */
     public function __construct(array $response)
     {
+        $response['errno'] = (int)VarArray::get("errno", $response, 0);
+        $response['error'] = (string)VarArray::get("error", $response, "");
+        $response['document'] = (string)VarArray::get("document", $response, "");
+        $response['headers'] = (array)VarArray::get("headers", $response, []);
+        $response['http_code'] = (int)VarArray::get("http_code", $response, 0);
+
         $this->response = $response;
     }
 
@@ -22,16 +29,15 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
      * Возвращает значения указанного заголовка из ответа сервера
      *
      * @param string $key
-     * @param mixed  $default
-     * @return string
+     * @return string[]
      */
-    public function getHeader($key, $default = "")
+    public function getHeader($key)
     {
-        if (is_string($key) && isset($this->response['headers']) && is_array($this->response['headers'])) {
-            return array_key_exists($key, $this->response['headers']) ? $this->response['headers'][$key] : $default;
+        if (is_string($key) && array_key_exists($key, $this->response['headers'])) {
+            return $this->response['headers'][$key];
         }
 
-        return $default;
+        return [];
     }
 
     /**
@@ -39,10 +45,11 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
      *
      * @param string $name Case-insensitive header field name.
      * @return bool Returns true if any header names match the given header
-     *     name using a case-insensitive string comparison. Returns false if
-     *     no matching header name is found in the message.
+     *                     name using a case-insensitive string comparison. Returns false if
+     *                     no matching header name is found in the message.
      */
-    public function hasHeader($name) {
+    public function hasHeader($name)
+    {
         return key_exists($name, $this->response['headers']);
     }
 
@@ -61,10 +68,11 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
      *
      * @param string $name Case-insensitive header field name.
      * @return string A string of values as provided for the given header
-     *    concatenated together using a comma. If the header does not appear in
-     *    the message, this method MUST return an empty string.
+     *                     concatenated together using a comma. If the header does not appear in
+     *                     the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name) {
+    public function getHeaderLine($name)
+    {
         $header = $this->getHeader($name);
 
         return is_array($header) ? join(",", $header) : strval($header);
@@ -73,26 +81,28 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
     /**
      * Return an instance with the provided value replacing the specified header.
      *
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
-     * @param string $name Case-insensitive header field name.
+     * @param string          $name  Case-insensitive header field name.
      * @param string|string[] $value Header value(s).
      * @return static
      * @throws \InvalidArgumentException for invalid header names or values.
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function withHeader($name, $value) {
+    public function withHeader($name, $value)
+    {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
      * Return an instance with the specified header appended with the given value.
      *
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
-     * @param string $name Case-insensitive header field name to add.
+     * @param string          $name  Case-insensitive header field name to add.
      * @param string|string[] $value Header value(s).
      * @return static
      * @throws \InvalidArgumentException for invalid header names or values.
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function withAddedHeader($name, $value) {
+    public function withAddedHeader($name, $value)
+    {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
@@ -104,7 +114,8 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
      * @throws \Exception
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function withoutHeader($name) {
+    public function withoutHeader($name)
+    {
         throw new \Exception("Этот метод не поддерживается в этой редакции кода");
     }
 
@@ -206,23 +217,25 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
     /**
      * Gets the body of the message.
      *
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      * @return \Psr\Http\Message\StreamInterface Returns the body as a stream.
      * @throws \Exception
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function getBody() {
+    public function getBody()
+    {
         throw new \Exception("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
      * Return an instance with the specified message body.
      *
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      * @param \Psr\Http\Message\StreamInterface $body Body.
      * @return static
      * @throws \InvalidArgumentException When the body is not valid.
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function withBody(\Psr\Http\Message\StreamInterface $body) {
+    public function withBody(\Psr\Http\Message\StreamInterface $body)
+    {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
@@ -241,52 +254,52 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface {
      *
      * @return string HTTP protocol version.
      */
-    public function getProtocolVersion() {
+    public function getProtocolVersion()
+    {
         return (string)VarArray::get("headers.http-version", $this->response, "");
     }
 
     /**
      * Return an instance with the specified HTTP protocol version.
      *
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      * @param string $version HTTP protocol version
      * @return static
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function withProtocolVersion($version) {
+    public function withProtocolVersion($version)
+    {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
      * Return an instance with the specified status code and, optionally, reason phrase.
      *
-     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
-     * @link http://tools.ietf.org/html/rfc7231#section-6
-     * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
-     * @param int $code The 3-digit integer result code to set.
+     * @param int    $code         The 3-digit integer result code to set.
      * @param string $reasonPhrase The reason phrase to use with the
-     *     provided status code; if none is provided, implementations MAY
-     *     use the defaults as suggested in the HTTP specification.
+     *                             provided status code; if none is provided, implementations MAY
+     *                             use the defaults as suggested in the HTTP specification.
      * @return static
      * @throws \InvalidArgumentException For invalid status code arguments.
+     * @link http://tools.ietf.org/html/rfc7231#section-6
+     * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    public function withStatus($code, $reasonPhrase = '') {
+    public function withStatus($code, $reasonPhrase = '')
+    {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
      * Gets the response reason phrase associated with the status code.
      *
-     * Because a reason phrase is not a required element in a response
-     * status line, the reason phrase value MAY be null. Implementations MAY
-     * choose to return the default RFC 7231 recommended reason phrase (or those
-     * listed in the IANA HTTP Status Code Registry) for the response's
-     * status code.
-     *
      * @link http://tools.ietf.org/html/rfc7231#section-6
      * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      * @return string Reason phrase; must return an empty string if none present.
+     * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
+     * @throws \Exception
      */
-    public function getReasonPhrase() {
-        return "";
+    public function getReasonPhrase()
+    {
+        throw new \Exception("Этот метод не поддерживается в этой редакции кода");
     }
 }
