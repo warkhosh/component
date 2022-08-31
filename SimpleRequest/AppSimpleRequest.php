@@ -363,7 +363,7 @@ class AppSimpleRequest
             }
 
             if (count($this->headers) > 0) {
-                $this->options[CURLOPT_HTTPHEADER] = $this->headers;
+                $this->options[CURLOPT_HTTPHEADER] = array_values($this->headers);
             }
 
             curl_setopt_array($ch, $this->options);
@@ -738,12 +738,12 @@ class AppSimpleRequest
     {
         if (is_array($headers)) {
             foreach ($headers as $row) {
-                $this->headers[] = $row;
+                $this->headers[md5($row)] = $row;
             }
         }
 
         if (is_string($headers)) {
-            $this->headers[] = $headers;
+            $this->headers[md5($headers)] = $headers;
         }
     }
 
