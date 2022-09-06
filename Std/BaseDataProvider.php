@@ -93,7 +93,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
      */
     public function asort($flags = SORT_REGULAR)
     {
-        asort($this->data);
+        asort($this->data, $flags);
 
         return $this;
     }
@@ -118,7 +118,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable
      */
     public function ksort($flags = SORT_REGULAR)
     {
-        krsort($this->data);
+        krsort($this->data, $flags);
 
         return $this;
     }
