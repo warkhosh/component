@@ -97,160 +97,6 @@ class UrlHelper
     }
 
     /**
-     * Преобразует строку в человеко подобный урл
-     *
-     * @param string $str
-     * @param array  $options
-     * @return string
-     */
-    static public function getSemanticStr($str = '', $options = [])
-    {
-        $str = VarStr::trim((string)$str);
-        $chars = [
-            "а"  => "a",
-            "к"  => "k",
-            "х"  => "kh",
-            "б"  => "b",
-            "л"  => "l",
-            "ц"  => "c",
-            "в"  => "v",
-            "м"  => "m",
-            "ч"  => "ch",
-            "г"  => "g",
-            "н"  => "n",
-            "ш"  => "sh",
-            "д"  => "d",
-            "о"  => "o",
-            "щ"  => "sch",
-            "е"  => "e",
-            "п"  => "p",
-            "ъ"  => "",
-            "ё"  => "yo",
-            "р"  => "r",
-            "ы"  => "y",
-            "ж"  => "zh",
-            "с"  => "s",
-            "ь"  => "",
-            "з"  => "z",
-            "т"  => "t",
-            "э"  => "e",
-            "и"  => "i",
-            "у"  => "u",
-            "ю"  => "yu",
-            "й"  => "y",
-            "ф"  => "f",
-            "я"  => "ya",
-            "-"  => "-",
-            " "  => "-",
-            "\\" => "-diff-",
-            "/"  => "-slash-",
-            "+"  => "-plus-",
-            "="  => "-equal-",
-            ":"  => "-colon-",
-            "."  => "-dot-",
-        ];
-
-        $makeLowerStr = key_exists('to_lower', $options) ? isTrue($options['to_lower']) : true;
-
-        if ($makeLowerStr) {
-            $upperChars = [
-                "А" => "a",
-                "К" => "k",
-                "Х" => "kh",
-                "Б" => "b",
-                "Л" => "l",
-                "Ц" => "c",
-                "В" => "v",
-                "М" => "m",
-                "Ч" => "ch",
-                "Г" => "g",
-                "Н" => "n",
-                "Ш" => "sh",
-                "Д" => "d",
-                "О" => "o",
-                "Щ" => "sch",
-                "Е" => "e",
-                "П" => "p",
-                "Ъ" => "",
-                "Ё" => "yo",
-                "Р" => "r",
-                "Ы" => "y",
-                "Ж" => "zh",
-                "С" => "s",
-                "Ь" => "",
-                "З" => "z",
-                "Т" => "t",
-                "Э" => "e",
-                "И" => "i",
-                "У" => "u",
-                "Ю" => "yu",
-                "Й" => "y",
-                "Ф" => "f",
-                "Я" => "ya",
-            ];
-        } else {
-            $upperChars = [
-                "А" => "А",
-                "К" => "К",
-                "Х" => "KH",
-                "Б" => "B",
-                "Л" => "L",
-                "Ц" => "C",
-                "В" => "V",
-                "М" => "M",
-                "Ч" => "CH",
-                "Г" => "G",
-                "Н" => "N",
-                "Ш" => "SH",
-                "Д" => "D",
-                "О" => "O",
-                "Щ" => "SCH",
-                "Е" => "E",
-                "П" => "P",
-                "Ъ" => "",
-                "Ё" => "yo",
-                "Р" => "r",
-                "Ы" => "y",
-                "Ж" => "zh",
-                "С" => "s",
-                "Ь" => "",
-                "З" => "Z",
-                "Т" => "T",
-                "Э" => "E",
-                "И" => "I",
-                "У" => "U",
-                "Ю" => "YU",
-                "Й" => "Y",
-                "Ф" => "F",
-                "Я" => "YA",
-            ];
-        }
-
-        $chars = $chars + $upperChars;
-
-        if (getEncoding($str) == 'windows-1251') {
-            $str = @iconv('windows-1251', "UTF-8//IGNORE", $str);
-        }
-
-        $str = urldecode($str); // Декодирование URL из кодированной строки с переводом в нижний регистр
-        $str = $makeLowerStr ? strtolower($str) : $str;
-        $str = preg_split('//u', $str, -1, PREG_SPLIT_NO_EMPTY);
-        $result = '';
-
-        if (is_array($str) && count($str)) {
-            foreach ($str as $key => $row) {
-                // преобразовывает русские символы в их аналоги
-                $result .= isset($chars[$row]) && array_key_exists($row, $chars) ? $chars[$row] : $row;
-            }
-        }
-
-        $result = static::getRemoveNoSemanticChar($result, '', $makeLowerStr); // убираем недопустимые символы если были
-        $result = preg_replace("/[-]+/", '-', $result); // убираем задвоения
-
-        return trim($result, '-');
-    }
-
-    /**
      * Возвращает порт на компьютере сервера, используемый веб-сервером для соединения.
      *
      * @return string
@@ -299,6 +145,7 @@ class UrlHelper
      *
      * @param bool $query - флаг для включения\выключения query параметров запроса
      * @return string
+     * @throws \Exception
      */
     static public function getRequestUri($query = true)
     {
@@ -344,33 +191,36 @@ class UrlHelper
      * Возвращает путь без файла и query параметров
      *
      * @note метод следит что-бы значения начинались со слэша
-     * @param string $uri
+     * @param string|null $uri
      * @return string
      */
-    static public function getPath($uri = '')
+    static public function getPath(?string $uri)
     {
-        $uri = parse_url(rawurldecode(trim(VarStr::getMakeString($uri))), PHP_URL_PATH);
-        $info = pathinfo($uri);
+        if ($uri !== "") {
+            $uri = parse_url(rawurldecode(VarStr::trim((string)$uri)), PHP_URL_PATH);
+            $info = pathinfo($uri);
 
-        if (isset($info['extension'])) {
-            $uri = $info['dirname'];
-        } else {
-            $info['dirname'] = isset($info['dirname']) ? "{$info['dirname']}/" : '';
-            $info['dirname'] = $info['dirname'] === '//' ? "/" : $info['dirname'];
+            if (isset($info['extension'])) {
+                $uri = $info['dirname'];
+            } else {
+                $info['dirname'] = isset($info['dirname']) ? "{$info['dirname']}/" : '';
+                $info['dirname'] = $info['dirname'] === '//' ? "/" : $info['dirname'];
 
-            // Данное решение фиксит баг при обрабатке кривого урла, когда в конце get параметров идет слэш или слеши
-            // example: http://photogora.ru/background/muslin&filter_category=126/
-            $tmp = "{$info['dirname']}{$info['basename']}";
-            $uri = rtrim($uri, '/') == $tmp ? $uri : $tmp;
+                // Данное решение фиксит баг при обрабатке кривого урла, когда в конце get параметров идет слэш или слеши
+                // example: http://photogora.ru/background/muslin&filter_category=126/
+                $tmp = "{$info['dirname']}{$info['basename']}";
+                $uri = rtrim($uri, '/') == $tmp ? $uri : $tmp;
+            }
         }
 
-        return VarStr::start("/", $uri);
+        return VarStr::start("/", (string)$uri);
     }
 
     /**
      * Возвращает адрес страницы с которой пришли на страницу
      *
      * @return mixed|string
+     * @throws \Exception
      */
     static public function getReferer()
     {
@@ -401,6 +251,7 @@ class UrlHelper
      * Возвращает название агента ( браузер ) через который просматривают сайт
      *
      * @return string
+     * @throws \Exception
      */
     static public function getUserAgent()
     {
@@ -428,6 +279,7 @@ class UrlHelper
      * Возвращает строку запроса, если есть
      *
      * @return string
+     * @throws \Exception
      */
     static public function getQueryString()
     {
@@ -506,12 +358,16 @@ class UrlHelper
      *
      * @note в случае не удачи вернет пустую строку
      *
-     * @param string $str
+     * @param string|null $str
      * @return string
      */
-    static public function getFile($str = '')
+    static public function getFile(?string $str)
     {
-        $str = parse_url($str, PHP_URL_PATH);
+        if (is_null($str) || $str === "") {
+            return "";
+        }
+
+        $str = parse_url(VarStr::trim((string)$str), PHP_URL_PATH);
         $info = pathinfo($str);
         $file = '';
 
@@ -531,12 +387,17 @@ class UrlHelper
     /**
      * Возвращает массив query переменных из указанной строки
      *
-     * @param string $str
+     * @param string|null $str
      * @return array
+     * @throws \Exception
      */
-    static public function getQueries($str = '')
+    static public function getQueries(?string $str)
     {
-        $str = VarStr::getMakeString($str);
+        if (is_null($str) || $str === "") {
+            return [];
+        }
+
+        $str = VarStr::getMakeString(VarStr::trim((string)$str));
         $str = VarStr::getUrlDecode($str);
 
         // если указали ссылку с путями то выбираем из неё только query параметры
@@ -553,6 +414,7 @@ class UrlHelper
      * Возвращает название используемого метода для запроса текущей страницы
      *
      * @return string
+     * @throws \Exception
      */
     static public function getRequestMethod()
     {
