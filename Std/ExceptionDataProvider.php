@@ -37,6 +37,19 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
+     * Static constructor
+     *
+     * @param string         $message
+     * @param int            $code
+     * @param \Throwable|null $previous
+     * @return \Warkhosh\Component\Std\ExceptionDataProvider
+     */
+    public static function init($message = "", $code = 0, \Throwable $previous = null)
+    {
+        return new static($message, $code, $previous);
+    }
+
+    /**
      * @param string $file
      * @return $this
      */
