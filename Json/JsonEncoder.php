@@ -38,6 +38,19 @@ class JsonEncoder
     }
 
     /**
+     * Статичный вариант для начала работы с объектом
+     *
+     * @param null $value
+     * @param int  $flags
+     * @param int  $depth
+     * @return static
+     */
+    static public function init($value = null, int $flags = 0, int $depth = 512)
+    {
+        return new static($value, $flags, $depth);
+    }
+
+    /**
      * Быстрый синтаксис проверки удачного преобразования
      *
      * @return bool
