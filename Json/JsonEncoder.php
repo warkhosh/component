@@ -1,6 +1,6 @@
 <?php
 
-namespace Warkhosh\Component\Std;
+namespace Warkhosh\Component\Json;
 
 use Exception;
 
@@ -10,7 +10,7 @@ use Exception;
  * @param string $value
  * @param mixed  $source
  */
-class JsonDataProvider
+class JsonEncoder
 {
     /**
      * Значения JSON строки
@@ -75,7 +75,7 @@ class JsonDataProvider
      * Бросает исключение если объект имеет значение отрицательного результата
      *
      * @param string|null $message
-     * @return JsonDataProvider
+     * @return $this
      * @throws Exception
      */
     public function exceptionInError(?string $message = null)
