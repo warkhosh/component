@@ -17,36 +17,23 @@ class JsonDataProvider
      *
      * @var string
      */
-    public $value = "";
+    private $value = "";
 
     /**
      * Кодируемые значения
      *
      * @var mixed
      */
-    public $source = null;
+    private $source = null;
 
     /**
-     * @param array|string|int|float|null $input
+     * @param mixed $value
+     * @param int   $flags
+     * @param int   $depth
      */
-    public function __construct($input = [])
+    public function __construct($value = null, int $flags = 0, int $depth = 512)
     {
-        $this->source = $input;
-
-        if (is_bool($this->source) || is_null($this->source) || is_numeric($this->source)) {
-            $this->value = $input;
-        }
-    }
-
-    /**
-     * Кодирование данных в JSON
-     *
-     * @param array|string|int|float|null $value
-     * @param int                         $flags
-     * @param int                         $depth
-     */
-    public function encode($value, int $flags = 0, int $depth = 512)
-    {
+        $this->source = $value;
         $this->value = json_encode($value, $flags, $depth);
     }
 
@@ -98,5 +85,26 @@ class JsonDataProvider
         }
 
         return $this;
+    }
+
+    /**
+     * Возвращает JSON
+     *
+     * @note вернёт пустоту если при кодировании возникла ошибка
+     * @return string
+     */
+    public function getJson()
+    {
+        return is_string($this->value) ? $this->value : "";
+    }
+
+    /**
+     * Возвращает оригинальные данные что были указаны для кодирования
+     *
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->source;
     }
 }
