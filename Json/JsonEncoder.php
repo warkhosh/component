@@ -3,9 +3,10 @@
 namespace Warkhosh\Component\Json;
 
 use Exception;
+use Throwable;
 
 /**
- * Объект для работы с JSON
+ * Объект для преобразования данных в JSON
  *
  * @param string $value
  * @param mixed  $source
@@ -13,18 +14,30 @@ use Exception;
 class JsonEncoder
 {
     /**
-     * Значения JSON строки
+     * Значения для преобразования в JSON строку
      *
      * @var string
      */
     private $value = "";
 
     /**
-     * Кодируемые значения
+     * Значения для преобразования
      *
      * @var mixed
      */
-    private $source = null;
+    private $source;
+
+    /**
+     * Признак допущения простых типов (null, numeric, bool) для кодирования
+     *
+     * @var int
+     */
+    private $simpleType = false;
+
+    /**
+     * @var bool
+     */
+    private $hasError = false;
 
     /**
      * @param mixed $value
@@ -34,7 +47,22 @@ class JsonEncoder
     public function __construct($value = null, int $flags = 0, int $depth = 512)
     {
         $this->source = $value;
-        $this->value = json_encode($value, $flags, $depth);
+
+        try {
+            if (defined('PHP_VERSION_ID') && PHP_VERSION_ID >= 70300 && defined('JSON_THROW_ON_ERROR')) {
+                $flags += JSON_THROW_ON_ERROR;
+            }
+
+            $this->value = json_encode($value, $flags, $depth);
+
+            // Фиксируем ошибку если передали не FALSE а результат FALSE
+            if ($value !== false && $this->value === false) {
+                throw new Exception("Error");
+            }
+
+        } catch (Throwable $e) {
+            $this->value = $this->hasError = false;
+        }
     }
 
     /**
@@ -51,41 +79,59 @@ class JsonEncoder
     }
 
     /**
+     * Установка флага для проверки полученных данных на сложный тип
+     *
+     * @param bool $flag
+     * @return $this
+     */
+    public function simpleType(bool $flag)
+    {
+        $this->simpleType = boolval($flag);
+
+        return $this;
+    }
+
+    /**
      * Быстрый синтаксис проверки удачного преобразования
      *
      * @return bool
      */
     public function isSuccess(): bool
     {
-        if (is_bool($this->source) || is_null($this->source) || is_numeric($this->source)) {
-            return true;
-
-        } elseif (! empty($this->source) && ! empty($this->value)) {
-            return true;
+        if ($this->hasError === false) {
+            return false;
         }
 
-        return false;
+        // Если указан флаг преобразования данных только сложного типа (array | object)
+        if ($this->simpleType === false) {
+            $varType = gettype($this->source); // Устанавливаем тип полученных данных
+
+            // Формируем ошибку если тип был простой
+            switch ($varType) {
+                case "string":
+                case "boolean":
+                case "integer":
+                case "double":
+                case "NULL":
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * Быстрый синтаксис проверки состояния
+     * Быстрый синтаксис проверки не удачного преобразования
      *
      * @return bool
      */
     public function isFail(): bool
     {
-        if (is_bool($this->source) || is_null($this->source) || is_numeric($this->source)) {
-            return false;
-
-        } elseif (! empty($this->source) && empty($this->value)) {
-            return true;
-        }
-
-        return false;
+        return ! $this->isSuccess();
     }
 
     /**
-     * Бросает исключение если объект имеет значение отрицательного результата
+     * Бросает исключение если результат преобразования не удачный
      *
      * @param string|null $message
      * @return $this
