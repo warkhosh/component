@@ -135,14 +135,15 @@ class JsonDecode
     /**
      * Бросает исключение если результат декодирования не удачный
      *
-     * @param string|null $message
+     * @param string|null $customMessage
      * @return $this
      * @throws Exception
      */
-    public function exceptionInError(?string $message = null)
+    public function exceptionInError(?string $customMessage = null)
     {
         if ($this->isFail() === true) {
-            throw new Exception(empty($message) ? "JSON decoding error" : $message);
+            $message = $this->simpleType === false ? "Simple data type is formed from JSON" : "JSON decoding error";
+            throw new Exception(! empty($customMessage) ? $customMessage : $message);
         }
 
         return $this;

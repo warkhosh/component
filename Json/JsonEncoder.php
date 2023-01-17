@@ -132,14 +132,15 @@ class JsonEncoder
     /**
      * Бросает исключение если результат преобразования не удачный
      *
-     * @param string|null $message
+     * @param string|null $customMessage
      * @return $this
      * @throws Exception
      */
-    public function exceptionInError(?string $message = null)
+    public function exceptionInError(?string $customMessage = null)
     {
         if ($this->isFail() === true) {
-            throw new Exception(empty($message) ? "JSON encoding error" : $message);
+            $message = $this->simpleType === false ? "Specified a simple data type for JSON" : "JSON encoding error";
+            throw new Exception(! empty($customMessage) ? $customMessage : $message);
         }
 
         return $this;
