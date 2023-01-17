@@ -8,8 +8,7 @@ use Throwable;
 /**
  * Объект для преобразования данных в JSON
  *
- * @param string $value
- * @param mixed  $source
+ * @version 1.1
  */
 class JsonEncoder
 {

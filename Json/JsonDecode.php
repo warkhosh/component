@@ -8,8 +8,7 @@ use Throwable;
 /**
  * Объект для декодирования JSON данных
  *
- * @param string $value
- * @param mixed  $source
+ * @version 1.1
  */
 class JsonDecode
 {
