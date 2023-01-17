@@ -97,7 +97,7 @@ class JsonEncoder
      */
     public function isSuccess(): bool
     {
-        if ($this->hasError === false) {
+        if ($this->hasError === true) {
             return false;
         }
 
