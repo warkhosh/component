@@ -112,6 +112,17 @@ class JsonEncoder
     }
 
     /**
+     * Возвращает JSON
+     *
+     * @alias getJson method
+     * @return string
+     */
+    public function get()
+    {
+        return $this->getJson();
+    }
+
+    /**
      * Возвращает оригинальные данные что были указаны для кодирования
      *
      * @return mixed
