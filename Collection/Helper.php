@@ -14,7 +14,7 @@ class Helper
      * @param callable $callback
      * @return array
      */
-    public static function getWhere($array, callable $callback)
+    public static function getWhere($array, callable $callback): array
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
@@ -28,7 +28,7 @@ class Helper
      * @param array          $array - массив в котором убираем значения по ключам
      * @return array
      */
-    static public function getExcept($keys = [], $array = [])
+    static public function getExcept($keys = [], $array = []): array
     {
         static::arrayForget($keys, $array);
 
@@ -36,16 +36,16 @@ class Helper
     }
 
     /**
-     * Удаляет в массиве один или несколько ключей из переданых значений.
+     * Удаляет в массиве один или несколько ключей из переданных значений.
      *
      * @note в удаляемых ключах допускается точка для вложенного действия
-     * @note улучшеный вариант without() но взят из ларавеля и нуно переписать!
+     * @note улучшенный вариант without() но взят из laravel и нужно переписать!
      *
      * @param array|string $keys  - ключи которые надо исключить
      * @param array        $array - массив в котором убираем значения по ключам
      * @return void
      */
-    public static function arrayForget($keys, &$array)
+    public static function arrayForget($keys, &$array): void
     {
         $original = &$array;
         $keys = (array)$keys;
@@ -88,7 +88,7 @@ class Helper
      * @param ArrayAccess|array $array
      * @return bool
      */
-    public static function exists($key, $array)
+    public static function exists($key, $array): bool
     {
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
@@ -106,6 +106,7 @@ class Helper
      * @param mixed        $default
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public static function arrayGet($target, $key, $default = null)
     {
         if (is_null($key)) {
@@ -145,11 +146,12 @@ class Helper
      * Возвращает первый элемента массива, прошедшего заданный тест истинности.
      *
      * @note Вы также можете вызвать метод без аргументов, чтобы получить первый элемент в списке.
-     * @param array    $array
-     * @param callable $callback
-     * @param mixed    $default
+     * @param array         $array
+     * @param callable|null $callback
+     * @param mixed         $default
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public static function arrayFirst($array = [], callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
@@ -176,11 +178,12 @@ class Helper
      *
      * @note можно вызвать последний метод без аргументов, чтобы получить последний элемент в коллекции
      *
-     * @param array    $array
-     * @param callable $callback
-     * @param mixed    $default
+     * @param array         $array
+     * @param callable|null $callback
+     * @param mixed         $default
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public static function arrayLast($array = [], callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
@@ -197,14 +200,14 @@ class Helper
      * @param int   $depth
      * @return array
      */
-    public static function arrayFlatten($array = [], $depth = INF)
+    public static function arrayFlatten($array = [], $depth = INF): array
     {
         if (! is_array($array)) {
             return [];
         }
 
         return array_reduce($array, function ($result, $item) use ($depth) {
-            $item = $item instanceof \Collection\Interfaces\BaseCollection ? $item->all() : $item;
+            $item = $item instanceof \Warkhosh\Component\Collection\Interfaces\BaseCollection ? $item->all() : $item;
 
             if (! is_array($item)) {
                 return array_merge($result, [$item]);
@@ -226,11 +229,11 @@ class Helper
      * @param string|array|null $key
      * @return array
      */
-    public static function arrayPluck($array, $value, $key = null)
+    public static function arrayPluck($array, $value, $key = null): array
     {
         $results = [];
 
-        list($value, $key) = static::arrayExplodePluckParameters($value, $key);
+        [$value, $key] = static::arrayExplodePluckParameters($value, $key);
 
         foreach ($array as $item) {
             $itemValue = static::arrayGet($item, $value);
@@ -257,7 +260,7 @@ class Helper
      * @param string|array|null $key
      * @return array
      */
-    protected static function arrayExplodePluckParameters($value, $key)
+    protected static function arrayExplodePluckParameters($value, $key): array
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
@@ -273,7 +276,7 @@ class Helper
      * @param array          $array    - список который фильтруем
      * @return array
      */
-    public static function arrayOnly($haystack, array $array)
+    public static function arrayOnly($haystack, array $array): array
     {
         return array_intersect_key($array, array_flip((array)$haystack));
     }
@@ -286,7 +289,7 @@ class Helper
      * @param mixed $key
      * @return array
      */
-    public static function arrayPrepend($array, $value, $key = null)
+    public static function arrayPrepend($array, $value, $key = null): array
     {
         if (is_null($key)) {
             array_unshift($array, $value);
@@ -305,6 +308,7 @@ class Helper
      * @param mixed        $default
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public static function arrayPull($key, &$array, $default = null)
     {
         $value = $default;
@@ -323,7 +327,7 @@ class Helper
     }
 
     /**
-     * Удаляет в массиве один или несколько ключей из переданых значений
+     * Удаляет в массиве один или несколько ключей из переданных значений
      *
      * @note в удаляемых ключах допускается точка для вложенного действия
      *
@@ -331,7 +335,7 @@ class Helper
      * @param array        $array - массив в котором убираем значения по ключам
      * @return void
      */
-    static public function arrayExcept($keys, &$array)
+    static public function arrayExcept($keys, &$array): void
     {
         static::arrayForget($keys, $array);
     }

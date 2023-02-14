@@ -110,8 +110,9 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
     /**
      * @return string
+     * @throws \RuntimeException
      */
-    public function getContents()
+    public function getContents(): string
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -127,7 +128,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return void
      */
-    public function close()
+    public function close(): void
     {
         if (isset($this->stream)) {
             if (is_resource($this->stream)) {
@@ -141,6 +142,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return resource|null
      */
+    #[\ReturnTypeWillChange]
     public function detach()
     {
         if (! isset($this->stream)) {
@@ -158,6 +160,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return int|null
      */
+    #[\ReturnTypeWillChange]
     public function getSize()
     {
         if ($this->size !== null) {
@@ -186,7 +189,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function isReadable()
+    public function isReadable(): bool
     {
         return $this->readable;
     }
@@ -194,7 +197,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         return $this->writable;
     }
@@ -202,7 +205,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function isSeekable()
+    public function isSeekable(): bool
     {
         return $this->seekable;
     }
@@ -210,7 +213,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return bool
      */
-    public function eof()
+    public function eof(): bool
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -223,7 +226,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return int
      * @throws \RuntimeException
      */
-    public function tell()
+    public function tell(): int
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -246,7 +249,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @link http://www.php.net/manual/en/function.fseek.php
      * @see  seek()
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->seek(0);
     }
@@ -260,7 +263,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return void
      * @throws \RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = SEEK_SET): void
     {
         $whence = (int)$whence;
 
@@ -283,7 +286,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return string
      * @throws \RuntimeException
      */
-    public function read($length)
+    public function read($length): string
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -317,7 +320,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return int
      * @throws \RuntimeException
      */
-    public function write($string)
+    public function write($string): int
     {
         if (! isset($this->stream)) {
             throw new \RuntimeException('Stream is detached');
@@ -342,6 +345,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @param string $key
      * @return array|mixed|null
      */
+    #[\ReturnTypeWillChange]
     public function getMetadata($key = null)
     {
         if (! isset($this->stream)) {
@@ -364,6 +368,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return resource
      * @throws \InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public static function stream($resource = '')
     {
         if (is_scalar($resource)) {
@@ -400,6 +405,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return resource
      * @throws \RuntimeException
      */
+    #[\ReturnTypeWillChange]
     public static function tryFopen(string $filename, string $mode)
     {
         $ex = null;
@@ -441,7 +447,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return string
      * @throws \RuntimeException
      */
-    public static function tryToGetContents($stream)
+    public static function tryToGetContents($stream): string
     {
         $ex = null;
         set_error_handler(static function (int $errno, string $errstr) use (&$ex) {

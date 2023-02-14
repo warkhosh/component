@@ -27,8 +27,7 @@ trait CollectionMethod
      *
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function toArray()
+    public function toArray(): array
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
@@ -49,8 +48,7 @@ trait CollectionMethod
      * @param int $options
      * @return string
      */
-    #[\ReturnTypeWillChange]
-    public function toJson($options = 0)
+    public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
     }
@@ -70,8 +68,7 @@ trait CollectionMethod
      * @note  Любое возвращаемое значение игнорируется
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->data);
     }
@@ -114,8 +111,7 @@ trait CollectionMethod
      * @note  Любое возвращаемое значение игнорируется
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function next()
+    public function next(): void
     {
         next($this->data);
     }
@@ -125,10 +121,9 @@ trait CollectionMethod
      *
      * @link  http://php.net/manual/en/iterator.valid.php
      * @note  Возвращает true при успешном выполнении или false при сбое.
-     * @return boolean
+     * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->data[$this->key()]);
     }
@@ -138,7 +133,7 @@ trait CollectionMethod
      *
      * @param string | integer $key
      * @param mixed            $item
-     * @return $this;
+     * @return $this
      */
     #[\ReturnTypeWillChange]
     public function add($key = null, $item = null)
@@ -167,10 +162,9 @@ trait CollectionMethod
      * @link  http://php.net/manual/en/arrayaccess.offsetexists.php
      * @note  Данный метод исполняется, когда используется функция isset() или функция empty() для объекта
      * @param mixed $offset - смещение для проверки.
-     * @return boolean - возвращает true в случае успешного завершения или false в случае возникновения ошибки
+     * @return bool - возвращает true в случае успешного завершения или false в случае возникновения ошибки
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->data);
     }
@@ -210,8 +204,7 @@ trait CollectionMethod
      * @param mixed $value  - значение для установки
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset = null, $value = null)
+    public function offsetSet($offset = null, $value = null): void
     {
         if (is_null($offset)) {
             $this->data[] = $value;
@@ -227,8 +220,7 @@ trait CollectionMethod
      * @param mixed $offset - смещение для удаления
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         // if ($this->offsetExists($offset)) {
         if (array_key_exists($offset, $this->data)) {
@@ -250,8 +242,7 @@ trait CollectionMethod
      * @link  http://php.net/manual/en/countable.count.php
      * @return integer Возвращаемое значение приводится к целому числу
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }
@@ -269,8 +260,7 @@ trait CollectionMethod
      *
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {

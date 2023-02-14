@@ -72,6 +72,7 @@ class JsonEncoder
      * @param int  $depth
      * @return static
      */
+    #[\ReturnTypeWillChange]
     static public function init($value = null, int $flags = 0, int $depth = 512)
     {
         return new static($value, $flags, $depth);
@@ -83,6 +84,7 @@ class JsonEncoder
      * @param bool $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function simpleType(bool $flag)
     {
         $this->simpleType = boolval($flag);
@@ -136,6 +138,7 @@ class JsonEncoder
      * @return $this
      * @throws Exception
      */
+    #[\ReturnTypeWillChange]
     public function exceptionInError(?string $customMessage = null)
     {
         if ($this->isFail() === true) {
@@ -152,7 +155,7 @@ class JsonEncoder
      * @note вернёт пустоту если при кодировании возникла ошибка
      * @return string
      */
-    public function getJson()
+    public function getJson(): string
     {
         return is_string($this->value) ? $this->value : "";
     }
@@ -163,7 +166,7 @@ class JsonEncoder
      * @alias getJson method
      * @return string
      */
-    public function get()
+    public function get(): string
     {
         return $this->getJson();
     }
@@ -173,6 +176,7 @@ class JsonEncoder
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function getSource()
     {
         return $this->source;

@@ -55,11 +55,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     /**
      * @param string $key     The unique key of this item in the cache
      * @param mixed  $default Default value to return if the key does not exist
-     *
-     * @return mixed The value of the item from the cache, or $default in case of cache miss
-     *
+     * @return mixed          The value of the item from the cache, or $default in case of cache miss
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function get($key, $default = null)
     {
         try {
@@ -91,12 +90,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
      * @param null|int|\DateInterval $ttl   Optional. The TTL value of this item. If no value is sent and
      *                                      the driver supports TTL then the library may set a default value
      *                                      for it or let the driver take care of that
-     *
-     * @return bool True on success and false on failure
-     *
+     * @return bool                         True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         try {
             $this->validateKey($key);
@@ -125,12 +122,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
     /**
      * @param string $key The unique cache key of the item to delete
-     *
-     * @return bool True if the item was successfully removed. False if there was an error
-     *
+     * @return bool       True if the item was successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         $this->validateKey($key);
 
@@ -147,7 +142,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     /**
      * @return bool True on success and false on failure
      */
-    public function clear()
+    public function clear(): bool
     {
         try {
             return $this->client->flush();
@@ -160,9 +155,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     /**
      * @param iterable $keys    A list of keys that can obtained in a single operation
      * @param mixed    $default Default value to return for keys that do not exist
-     *
-     * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
-     *
+     * @return iterable         A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function getMultiple($keys, $default = null)
@@ -211,12 +204,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
      * @param null|int|\DateInterval $ttl    Optional. The TTL value of this item. If no value is sent and
      *                                       the driver supports TTL then the library may set a default value
      *                                       for it or let the driver take care of that
-     *
-     * @return bool True on success and false on failure
-     *
+     * @return bool                          True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         $this->validateValues($values);
 
@@ -251,12 +242,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
     /**
      * @param iterable $keys A list of string-based keys to be deleted
-     *
-     * @return bool True if the items were successfully removed. False if there was an error
-     *
+     * @return bool          True if the items were successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $this->validateKeys($keys);
 
@@ -290,12 +279,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
     /**
      * @param string $key The cache item key
-     *
      * @return bool
-     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function has($key)
+    public function has($key): bool
     {
         $this->validateKey($key);
 
@@ -317,11 +304,12 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     /**
      * Checks the result of memcached for a bad key provided, this must be used after a memcached operation
      *
-     * @param int    $resultCode
-     * @param string $key
+     * @param int         $resultCode
+     * @param string|null $key
+     * @return void
      * @throws \Exception
      */
-    private function checkException($resultCode, ?string $key = null)
+    private function checkException($resultCode, ?string $key = null): void
     {
         switch ($resultCode) {
             case \Memcached::RES_BAD_KEY_PROVIDED:

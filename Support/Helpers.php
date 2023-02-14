@@ -1,5 +1,24 @@
 <?php
 
+/* Пример для реализации в проектах
+if (! function_exists('getConfig')) {
+     *
+     * Короткий синтаксис обращения к конфигу
+     *
+     * @param string $name
+     * @param mixed  $default
+     * @return mixed
+    function getConfig($name = null, $default = null)
+    {
+        try {
+            return \Warkhosh\Component\Config\AppConfig::getInstance()->get($name, $default);
+
+        } catch (\Throwable $e) {
+            return $default;
+        }
+    }
+} */
+
 if (! function_exists('e')) {
     /**
      * Escape HTML entities in a string.
@@ -7,7 +26,7 @@ if (! function_exists('e')) {
      * @param string $value
      * @return string
      */
-    function e($value)
+    function e($value): string
     {
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
         // return htmlentities($value, ENT_QUOTES, 'UTF-8', false);

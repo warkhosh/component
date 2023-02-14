@@ -54,11 +54,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @param string $key     The unique key of this item in the cache
      * @param mixed  $default Default value to return if the key does not exist
-     *
-     * @return mixed The value of the item from the cache, or $default in case of cache miss
-     *
+     * @return mixed          The value of the item from the cache, or $default in case of cache miss
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function get($key, $default = null)
     {
         $this->validateKey($key);
@@ -101,12 +100,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param null|int|\DateInterval $ttl   Optional. The TTL value of this item. If no value is sent and
      *                                      the driver supports TTL then the library may set a default value
      *                                      for it or let the driver take care of that
-     *
-     * @return bool True on success and false on failure
-     *
+     * @return bool                         True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         $this->validateKey($key);
 
@@ -163,12 +160,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param string $key The unique cache key of the item to delete
-     *
-     * @return bool True if the item was successfully removed. False if there was an error
-     *
+     * @return bool       True if the item was successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         $this->validateKey($key);
 
@@ -190,7 +185,7 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @return bool True on success and false on failure
      */
-    public function clear()
+    public function clear(): bool
     {
         try {
             $iterator = new \RecursiveDirectoryIterator($this->path, \FilesystemIterator::SKIP_DOTS);
@@ -209,11 +204,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @param iterable $keys    A list of keys that can obtained in a single operation
      * @param mixed    $default Default value to return for keys that do not exist
-     *
-     * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
-     *
+     * @return iterable         A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function getMultiple($keys, $default = null)
     {
         $result = [];
@@ -234,12 +228,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param null|int|\DateInterval $ttl    Optional. The TTL value of this item. If no value is sent and
      *                                       the driver supports TTL then the library may set a default value
      *                                       for it or let the driver take care of that
-     *
-     * @return bool True on success and false on failure
-     *
+     * @return bool                          True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         $this->validateValues($values);
 
@@ -263,12 +255,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param iterable $keys A list of string-based keys to be deleted
-     *
-     * @return bool True if the items were successfully removed. False if there was an error
-     *
+     * @return bool          True if the items were successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $this->validateKeys($keys);
 
@@ -281,12 +271,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param string $key The cache item key
-     *
      * @return bool
-     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function has($key)
+    public function has($key): bool
     {
         $this->validateKey($key);
 
@@ -319,12 +307,10 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param string   $key   The cache key the file is stored under
      * @param mixed    $value The data being stored
      * @param int|null $ttl   The timestamp of when the data will expire. If null, the data won't expire
-     *
-     * @return array Cache value
-     *
+     * @return array          Cache value
      * @throws \Psr\SimpleCache\CacheException
      */
-    protected function createCacheValue(string $key, $value, $ttl = null)
+    protected function createCacheValue(string $key, $value, $ttl = null): array
     {
         try {
             $value = $this->getEncodeValue($value);
@@ -346,9 +332,9 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * Checks if a value is expired
      *
      * @param null|int $expires
-     * @return bool True if the value is expired
+     * @return bool             True if the value is expired
      */
-    protected function isExpired(?int $expires)
+    protected function isExpired(?int $expires): bool
     {
         if (! $expires) {
             return false;
@@ -361,9 +347,9 @@ class FileCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * Get cache filename
      *
      * @param string $key Key
-     * @return string Filename
+     * @return string     Filename
      */
-    protected function getFilename(string $key)
+    protected function getFilename(string $key): string
     {
         $sha1 = sha1($key);
 

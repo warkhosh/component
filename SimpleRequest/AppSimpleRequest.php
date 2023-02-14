@@ -100,6 +100,7 @@ class AppSimpleRequest
     /**
      * @return static
      */
+    #[\ReturnTypeWillChange]
     public static function init() {
         return new static();
     }
@@ -109,6 +110,7 @@ class AppSimpleRequest
      *
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function initDefault()
     {
         $this->url = '';
@@ -144,6 +146,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function get($uri = null)
     {
         try {
@@ -167,6 +170,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function post($fields = [], $uri = null, $referer = null)
     {
         try {
@@ -194,6 +198,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function put($fields = [], $uri = null)
     {
         try {
@@ -218,6 +223,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function patch($fields = [], $uri = null)
     {
         try {
@@ -242,6 +248,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function delete($fields = [], $uri = null)
     {
         try {
@@ -265,6 +272,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function head($uri = null)
     {
         try {
@@ -289,6 +297,7 @@ class AppSimpleRequest
      * @param string $uri
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function fields($fields = [], $uri = null)
     {
         if (! is_null($uri)) {
@@ -310,6 +319,7 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
+    #[\ReturnTypeWillChange]
     public function request()
     {
         try {
@@ -456,6 +466,7 @@ class AppSimpleRequest
      * @param string $password
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function httpAuth($user, $password)
     {
         $this->setHttpAuth($user, $password);
@@ -470,7 +481,7 @@ class AppSimpleRequest
      * @param string $password
      * @return void
      */
-    protected function setHttpAuth($user, $password)
+    protected function setHttpAuth($user, $password): void
     {
         $encodedAuth = base64_encode($user . ":" . $password);
 
@@ -487,6 +498,7 @@ class AppSimpleRequest
      * @param string            $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function file($path, $name = null, $mimeType = 'application/octet-stream')
     {
         $this->setFile($path, $name, $mimeType);
@@ -502,7 +514,7 @@ class AppSimpleRequest
      * @param string            $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
      * @return void
      */
-    protected function setFile($path = null, $name = null, $mimeType = 'application/octet-stream')
+    protected function setFile($path = null, $name = null, $mimeType = 'application/octet-stream'): void
     {
         if (! is_null($path) && file_exists($path)) {
             if (is_array($name)) {
@@ -525,6 +537,7 @@ class AppSimpleRequest
      * @param array $cookies
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function cookies($cookies)
     {
         $this->setCookies($cookies);
@@ -538,7 +551,7 @@ class AppSimpleRequest
      * @param array $cookies
      * @return void
      */
-    protected function setCookies($cookies)
+    protected function setCookies($cookies): void
     {
         if (is_array($cookies)) {
             $this->cookies = array_merge($this->cookies, $cookies);
@@ -554,6 +567,7 @@ class AppSimpleRequest
      * @param string         $uri
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function streamJson($data, $uri = null)
     {
         $this->setStreamJson($data, $uri);
@@ -570,7 +584,7 @@ class AppSimpleRequest
      * @param string         $uri
      * @return void
      */
-    protected function setStreamJson($data, $uri = null)
+    protected function setStreamJson($data, $uri = null): void
     {
         if (! is_null($uri)) {
             $this->setUrl($uri);
@@ -599,6 +613,7 @@ class AppSimpleRequest
      * @param string         $uri
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function streamXml($data, $uri = null)
     {
         $this->setStreamXml($data, $uri);
@@ -616,7 +631,7 @@ class AppSimpleRequest
      * @param string         $rootNode
      * @return void
      */
-    protected function setStreamXml($data, $uri = null, $rootNode = 'root')
+    protected function setStreamXml($data, $uri = null, $rootNode = 'root'): void
     {
         if (! is_null($uri)) {
             $this->setUrl($uri);
@@ -646,6 +661,7 @@ class AppSimpleRequest
      * @param string $str
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function method($str)
     {
         $this->setMethod($str);
@@ -657,8 +673,9 @@ class AppSimpleRequest
      * Устанавливает метод был использования в запросе.
      *
      * @param string $str
+     * @return void
      */
-    protected function setMethod($str)
+    protected function setMethod($str): void
     {
         if (is_string($str)) {
             $this->method = in_array($str, ["GET", "POST", "PUT", "PATCH", "DELETE"]) ? $str : "GET";
@@ -671,6 +688,7 @@ class AppSimpleRequest
      * @param string $str
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function url($str)
     {
         $this->setUrl($str);
@@ -684,7 +702,7 @@ class AppSimpleRequest
      * @param string $str
      * @return void
      */
-    protected function setUrl($str)
+    protected function setUrl($str): void
     {
         $this->url = $this->options[CURLOPT_URL] = (string)$str;
         $this->settingsForURI($str);
@@ -695,7 +713,7 @@ class AppSimpleRequest
      *
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -704,6 +722,7 @@ class AppSimpleRequest
      * @param string $uri
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     protected function settingsForURI($uri)
     {
         if (strtolower((substr($uri, 0, 5)) === 'https')) {
@@ -723,6 +742,7 @@ class AppSimpleRequest
      * @param string|array $headers
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function header($headers)
     {
         $this->setHeader($headers);
@@ -734,7 +754,7 @@ class AppSimpleRequest
      * @param string|array $headers
      * @return void
      */
-    protected function setHeader($headers)
+    protected function setHeader($headers): void
     {
         if (is_array($headers)) {
             foreach ($headers as $row) {
@@ -755,6 +775,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function returnTransfer($flag)
     {
         $this->setReturnTransfer($flag);
@@ -770,7 +791,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setReturnTransfer($flag)
+    protected function setReturnTransfer($flag): void
     {
         $this->options[CURLOPT_RETURNTRANSFER] = (boolean)$flag;
     }
@@ -781,6 +802,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function headersInOutput($flag)
     {
         $this->setHeadersInOutput($flag);
@@ -794,7 +816,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setHeadersInOutput($flag)
+    protected function setHeadersInOutput($flag): void
     {
         $this->options[CURLOPT_HEADER] = $this->headerInResponse = (boolean)$flag;
     }
@@ -805,6 +827,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function followsAnyHeader($flag)
     {
         $this->setFollowsAnyHeader($flag);
@@ -818,7 +841,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setFollowsAnyHeader($flag)
+    protected function setFollowsAnyHeader($flag): void
     {
         $this->options[CURLOPT_FOLLOWLOCATION] = (boolean)$flag;
     }
@@ -831,6 +854,7 @@ class AppSimpleRequest
      * @param string $encoding
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function acceptEncoding($encoding)
     {
         $this->setAcceptEncoding($encoding);
@@ -846,7 +870,7 @@ class AppSimpleRequest
      * @param string $encoding
      * @return void
      */
-    protected function setAcceptEncoding($encoding)
+    protected function setAcceptEncoding($encoding): void
     {
         $this->options[CURLOPT_ENCODING] = (string)$encoding;
     }
@@ -857,6 +881,7 @@ class AppSimpleRequest
      * @param string $userAgent
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function userAgent($userAgent)
     {
         $this->setUserAgent($userAgent);
@@ -870,7 +895,7 @@ class AppSimpleRequest
      * @param string $userAgent
      * @return void
      */
-    protected function setUserAgent($userAgent)
+    protected function setUserAgent($userAgent): void
     {
         $this->options[CURLOPT_USERAGENT] = (string)$userAgent;
         $this->setHeader("User-Agent: " . (string)$userAgent);
@@ -882,6 +907,7 @@ class AppSimpleRequest
      * @param string | array $str
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function accept($str)
     {
         $this->setAccept($str);
@@ -895,7 +921,7 @@ class AppSimpleRequest
      * @param string $str
      * @return void
      */
-    protected function setAccept($str)
+    protected function setAccept($str): void
     {
         if (is_array($str)) {
             foreach ($str as $accept) {
@@ -914,6 +940,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function autoReferer($flag)
     {
         $this->setAutoReferer($flag);
@@ -927,7 +954,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setAutoReferer($flag)
+    protected function setAutoReferer($flag): void
     {
         $this->options[CURLOPT_AUTOREFERER] = (boolean)$flag;
     }
@@ -940,6 +967,7 @@ class AppSimpleRequest
      * @param integer $seconds
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function connectTimeout($seconds)
     {
         $this->setConnectTimeout($seconds);
@@ -955,7 +983,7 @@ class AppSimpleRequest
      * @param integer $seconds
      * @return void
      */
-    protected function setConnectTimeout($seconds)
+    protected function setConnectTimeout($seconds): void
     {
         $this->options[CURLOPT_CONNECTTIMEOUT] = (int)$seconds;
     }
@@ -966,6 +994,7 @@ class AppSimpleRequest
      * @param integer $seconds
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function timeout($seconds)
     {
         $this->setTimeout($seconds);
@@ -979,7 +1008,7 @@ class AppSimpleRequest
      * @param integer $seconds
      * @return void
      */
-    protected function setTimeout($seconds)
+    protected function setTimeout($seconds): void
     {
         $this->options[CURLOPT_TIMEOUT] = (int)$seconds;
     }
@@ -992,6 +1021,7 @@ class AppSimpleRequest
      * @param integer $num
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function maxRedirect($num)
     {
         $this->setMaxRedirect($num);
@@ -1007,7 +1037,7 @@ class AppSimpleRequest
      * @param integer $num
      * @return void
      */
-    protected function setMaxRedirect($num)
+    protected function setMaxRedirect($num): void
     {
         $this->options[CURLOPT_MAXREDIRS] = (int)$num;
     }
@@ -1018,6 +1048,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function newSession($flag)
     {
         $this->setNewSession($flag);
@@ -1031,7 +1062,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setNewSession(bool $flag)
+    protected function setNewSession(bool $flag): void
     {
         $this->options[CURLOPT_COOKIESESSION] = (boolean)$flag;
     }
@@ -1042,6 +1073,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function freshConnect(bool $flag)
     {
         $this->setFreshConnect($flag);
@@ -1055,7 +1087,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setFreshConnect(bool $flag)
+    protected function setFreshConnect(bool $flag): void
     {
         $this->options[CURLOPT_FRESH_CONNECT] = (boolean)$flag;
     }
@@ -1066,6 +1098,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function forbidReUse(bool $flag)
     {
         $this->setForbidReUse($flag);
@@ -1079,7 +1112,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setForbidReUse(bool $flag)
+    protected function setForbidReUse(bool $flag): void
     {
         $this->options[CURLOPT_FORBID_REUSE] = (boolean)$flag;
     }
@@ -1090,6 +1123,7 @@ class AppSimpleRequest
      * @param string $name
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function customRequest(string $name)
     {
         $this->setCustomRequest($name);
@@ -1103,7 +1137,7 @@ class AppSimpleRequest
      * @param string $name
      * @return void
      */
-    protected function setCustomRequest(string $name)
+    protected function setCustomRequest(string $name): void
     {
         $this->options[CURLOPT_CUSTOMREQUEST] = strtoupper((string)$name);
     }
@@ -1117,6 +1151,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function sslValidation(bool $flag)
     {
         $this->setSslValidation($flag);
@@ -1130,7 +1165,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return void
      */
-    protected function setSslValidation(bool $flag)
+    protected function setSslValidation(bool $flag): void
     {
         $this->options[CURLOPT_SSL_VERIFYPEER] = (boolean)$flag;
     }
@@ -1143,6 +1178,7 @@ class AppSimpleRequest
      * @param integer $num
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function sslValidationHost(int $num)
     {
         $this->setSslValidationHost($num);
@@ -1158,7 +1194,7 @@ class AppSimpleRequest
      * @param integer $num
      * @return void
      */
-    protected function setSslValidationHost(int $num)
+    protected function setSslValidationHost(int $num): void
     {
         $this->options[CURLOPT_SSL_VERIFYHOST] = (int)$num;
     }
@@ -1169,6 +1205,7 @@ class AppSimpleRequest
      * @param boolean $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function sslChecks(bool $flag)
     {
         $this->setSslValidationHost($flag);
@@ -1178,8 +1215,9 @@ class AppSimpleRequest
 
     /**
      * @param bool $flag
+     * @return void
      */
-    protected function setSslChecks(bool $flag)
+    protected function setSslChecks(bool $flag): void
     {
         $this->sslChecks = (boolean)$flag;
     }

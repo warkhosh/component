@@ -75,6 +75,7 @@ class JsonDecode
      * @param int    $flags
      * @return static
      */
+    #[\ReturnTypeWillChange]
     static public function init(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0)
     {
         return new static($json, $associative, $depth, $flags);
@@ -86,6 +87,7 @@ class JsonDecode
      * @param bool $flag
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function simpleType(bool $flag)
     {
         $this->simpleType = boolval($flag);
@@ -139,6 +141,7 @@ class JsonDecode
      * @return $this
      * @throws Exception
      */
+    #[\ReturnTypeWillChange]
     public function exceptionInError(?string $customMessage = null)
     {
         if ($this->isFail() === true) {
@@ -154,6 +157,7 @@ class JsonDecode
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function getValue()
     {
         return $this->value;
@@ -165,7 +169,7 @@ class JsonDecode
      * @alias getJson method
      * @return string
      */
-    public function get()
+    public function get(): string
     {
         return $this->getValue();
     }
@@ -175,6 +179,7 @@ class JsonDecode
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function getJson()
     {
         return $this->json;

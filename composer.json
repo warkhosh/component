@@ -1,7 +1,7 @@
 {
   "name": "warkhosh/component",
   "type": "library",
-  "description": "Набор универсальных хелперов,классов,библиотек и т.д.",
+  "description": "Набор универсальных хелперов, классов, библиотек и т.д.",
   "keywords": [
     "php",
     "basic",
@@ -26,7 +26,7 @@
     }
   ],
   "require": {
-    "php": ">=7.1.16",
+    "php": ">=7.2.34",
     "ext-json": "*",
     "ext-curl": "*",
     "ext-iconv": "*",

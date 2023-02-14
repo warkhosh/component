@@ -29,7 +29,7 @@ class Dump
      * @param string $title = 'PRINT PARAM'
      * @return string
      */
-    static public function get($value = 'test', $title = 'PRINT PARAM')
+    static public function get($value = 'test', $title = 'PRINT PARAM'): string
     {
         if (is_bool($value)) {
             $value = ($value === true ? "TRUE" : "FALSE");

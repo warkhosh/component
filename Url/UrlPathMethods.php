@@ -43,7 +43,7 @@ trait UrlPathMethods
      *
      * @return void
      */
-    private function setPathResults()
+    private function setPathResults(): void
     {
         foreach ($this->data as $key => $row) {
             $this->pathResults[$key] = (trim($row) != '' &&
@@ -61,7 +61,7 @@ trait UrlPathMethods
      * @param int $offset - сдвиг
      * @return bool
      */
-    public function isCorrectPart($key = null, $limit = null, $offset = 0)
+    public function isCorrectPart($key = null, $limit = null, $offset = 0): bool
     {
         if (is_null($this->pathResults)) {
             $this->setPathResults();
@@ -123,6 +123,7 @@ trait UrlPathMethods
      * @param int      $offset - сдвиг
      * @return array|string
      */
+    #[\ReturnTypeWillChange]
     public function getTypes($key = null, $limit = null, $offset = 0)
     {
         if (! is_null($key) && $key > 0) {
@@ -170,6 +171,7 @@ trait UrlPathMethods
      * @param string   $default
      * @return array|string
      */
+    #[\ReturnTypeWillChange]
     public function get($key = null, $limit = null, $offset = 0, $default = '')
     {
         if (! is_null($key) && $key > 0) {
@@ -206,6 +208,7 @@ trait UrlPathMethods
      * @param null|string $glue - символ объединения строк
      * @return array|string
      */
+    #[\ReturnTypeWillChange]
     public function getPaths($glue = null)
     {
         $return = $this->get();
@@ -224,7 +227,7 @@ trait UrlPathMethods
      * @param int   $offset - сдвиг
      * @return bool
      */
-    public function checkingPaths($paths = [], $offset = 0)
+    public function checkingPaths($paths = [], $offset = 0): bool
     {
         if (($count = count($paths)) > 0) {
             $selectPaths = $this->get(null, $count, $offset);
@@ -298,7 +301,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function first(?string $type = null)
+    public function first(?string $type = null): string
     {
         $url = $this->get(1);
         $url = ! is_array($url) ? $url : '';
@@ -331,7 +334,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function firstIs($name = null)
+    public function firstIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[0]) && $this->data[0] === $name) {
             return true;
@@ -346,7 +349,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function second(?string $type = null)
+    public function second(?string $type = null): string
     {
         $url = $this->get(2);
         $url = ! is_array($url) ? $url : '';
@@ -379,7 +382,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function secondIs($name = null)
+    public function secondIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[1]) && $this->data[1] === $name) {
             return true;
@@ -394,7 +397,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function third(?string $type = null)
+    public function third(?string $type = null): string
     {
         $url = $this->get(3);
         $url = ! is_array($url) ? $url : '';
@@ -427,7 +430,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function thirdIs($name = null)
+    public function thirdIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[2]) && $this->data[2] === $name) {
             return true;
@@ -442,7 +445,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function fourth(?string $type = null)
+    public function fourth(?string $type = null): string
     {
         $url = $this->get(4);
         $url = ! is_array($url) ? $url : '';
@@ -475,7 +478,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function fourthIs($name = null)
+    public function fourthIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[3]) && $this->data[3] === $name) {
             return true;
@@ -490,7 +493,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function fifth(?string $type = null)
+    public function fifth(?string $type = null): string
     {
         $url = $this->get(5);
         $url = ! is_array($url) ? $url : '';
@@ -523,7 +526,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function fifthIs($name = null)
+    public function fifthIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[4]) && $this->data[4] === $name) {
             return true;
@@ -538,7 +541,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function sixth(?string $type = null)
+    public function sixth(?string $type = null): string
     {
         $url = $this->get(6);
         $url = ! is_array($url) ? $url : '';
@@ -571,7 +574,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function sixthIs($name = null)
+    public function sixthIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[5]) && $this->data[5] === $name) {
             return true;
@@ -586,7 +589,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function seventh(?string $type = null)
+    public function seventh(?string $type = null): string
     {
         $url = $this->get(7);
         $url = ! is_array($url) ? $url : '';
@@ -619,7 +622,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function seventhIs($name = null)
+    public function seventhIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[6]) && $this->data[6] === $name) {
             return true;
@@ -634,7 +637,7 @@ trait UrlPathMethods
      * @param string|null $type - признак типа возвращаемого значения
      * @return string
      */
-    public function last(?string $type = null)
+    public function last(?string $type = null): string
     {
         $url = $this->get(-1);
         $url = ! is_array($url) ? $url : '';
@@ -667,7 +670,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function lastIs($name = null)
+    public function lastIs($name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[(count($this->data) - 1)])) {
             return ($this->data[(count($this->data) - 1)] === $name);
@@ -682,7 +685,7 @@ trait UrlPathMethods
      * @param integer $equal
      * @return int
      */
-    public function amountIs($equal = null)
+    public function amountIs($equal = null): int
     {
         if ($equal === count($this->data)) {
             return true;
@@ -696,7 +699,7 @@ trait UrlPathMethods
      *
      * @return int
      */
-    public function getAmount()
+    public function getAmount(): int
     {
         return count($this->data);
     }
@@ -706,6 +709,7 @@ trait UrlPathMethods
      *
      * @return string|null
      */
+    #[\ReturnTypeWillChange]
     public function getFileName()
     {
         return empty($this->file) ? null : $this->file;
@@ -715,7 +719,7 @@ trait UrlPathMethods
      * @param string $name
      * @return bool
      */
-    public function fileIs($name = null)
+    public function fileIs($name = null): bool
     {
         if ($this->file === $name) {
             return true;
@@ -727,6 +731,7 @@ trait UrlPathMethods
     /**
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     private function reset()
     {
         $this->data = [];
@@ -737,6 +742,7 @@ trait UrlPathMethods
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function getData()
     {
         return $this->data;

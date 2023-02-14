@@ -31,6 +31,7 @@ class AppStorage
      * @param string|array $files - значение(я) которые нужно проверить на существование файла
      * @return string|null|array
      */
+    #[\ReturnTypeWillChange]
     public function getAvailableFile($files)
     {
         $list = is_array($files);
@@ -56,7 +57,7 @@ class AppStorage
      * @return bool
      * @throws Exception
      */
-    public function getHasDirectoryFiles(string $dir)
+    public function getHasDirectoryFiles(string $dir): bool
     {
         if (! is_dir($dir)) {
             throw new Exception("The non-existent directory {$dir} is specified");
@@ -113,6 +114,7 @@ class AppStorage
      * @param string $file
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function requireOnce(string $file)
     {
         require_once $file;
@@ -126,6 +128,7 @@ class AppStorage
      * @param int    $lock
      * @return int|false
      */
+    #[\ReturnTypeWillChange]
     public function put(string $path, string $contents = '', $lock = LOCK_EX)
     {
         return file_put_contents($path, $contents, $lock);
@@ -139,7 +142,7 @@ class AppStorage
      * @param int    $lock
      * @return bool
      */
-    public function create(string $path, string $contents = '', $lock = LOCK_EX)
+    public function create(string $path, string $contents = '', $lock = LOCK_EX): bool
     {
         return ($this->put($path, $contents, $lock) === false ? false : true);
     }
@@ -151,7 +154,7 @@ class AppStorage
      * @param string $contents
      * @return int
      */
-    public function prepend(string $path, string $contents)
+    public function prepend(string $path, string $contents): int
     {
         if ($this->exists($path)) {
             return $this->put($path, $contents . $this->get($path));
@@ -167,7 +170,7 @@ class AppStorage
      * @param string $contents
      * @return int
      */
-    public function append(string $path, string $contents)
+    public function append(string $path, string $contents): int
     {
         return file_put_contents($path, $contents, FILE_APPEND | LOCK_EX);
     }
@@ -181,6 +184,7 @@ class AppStorage
      * @param bool         $silent - признак тихого удаления без использования подавления ошибки
      * @return bool|array
      */
+    #[\ReturnTypeWillChange]
     public function delete($paths, $silent = true)
     {
         $list = is_array($paths);
@@ -289,8 +293,9 @@ class AppStorage
      * Получить MIME-Тип файла
      *
      * @param string $path
-     * @return string | boolean
+     * @return string|boolean
      */
+    #[\ReturnTypeWillChange]
     public function mimeType(string $path)
     {
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
@@ -358,7 +363,7 @@ class AppStorage
      * @param int    $flags
      * @return array
      */
-    public function glob(string $pattern, int $flags = 0)
+    public function glob(string $pattern, int $flags = 0): array
     {
         return glob($pattern, $flags);
     }
@@ -369,7 +374,7 @@ class AppStorage
      * @param string $directory
      * @return array
      */
-    public function files(string $directory)
+    public function files(string $directory): array
     {
         $glob = glob($directory . '/*');
 
@@ -394,7 +399,7 @@ class AppStorage
      * @param bool   $force     подавляет ошибку\исключеие при неудаче создания директории
      * @return bool
      */
-    public function makeDirectory(string $path, $mode = 0755, $recursive = false, $force = false)
+    public function makeDirectory(string $path, $mode = 0755, $recursive = false, $force = false): bool
     {
         if ($force) {
             try {
@@ -461,7 +466,7 @@ class AppStorage
      * @return array
      * @throws Exception
      */
-    public function getDirEssences($dir = null, $basePath = null, $options = [])
+    public function getDirEssences($dir = null, $basePath = null, $options = []): array
     {
         $dir = VarStr::getRemoveStart($basePath, $dir);
         $relative = rtrim($dir, '/');
@@ -559,10 +564,11 @@ class AppStorage
 
     /**
      * @param array $param
+     * @return void
      */
     public function removeOldFiles(
         $param = ['dir' => null, 'expire' => 86400, 'ignore' => ['.gitignore'], 'show' => false]
-    ) {
+    ): void {
         $dir = isset($param['dir']) ? $param['dir'] : null;
         $expire = isset($param['expire']) ? getNum($param['expire']) : ((60 * 60) * 24);
         $show = (isset($param['show']) && isTrue($param['show']));

@@ -44,6 +44,7 @@ trait Singleton
      *
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public static function getInstance()
     {
         $class = static::class;

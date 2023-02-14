@@ -20,7 +20,7 @@ class UrlHelper
      * @param bool   $toLower - признак перевода заглавных букв в строчные
      * @return string
      */
-    static public function getRemoveNoSemanticChar($str = '', $ignore = '', $toLower = true)
+    static public function getRemoveNoSemanticChar($str = '', $ignore = '', $toLower = true): string
     {
         $str = rawurldecode(VarStr::trim($str)); // преобразовывает символьные коды в символы. %20 - станет пробелом
         $str = $toLower ? strtolower($str) : $str;
@@ -36,6 +36,7 @@ class UrlHelper
      * @param string       $ignore - символы которые будут проигнорированы с ходе удаления
      * @return string|array
      */
+    #[\ReturnTypeWillChange]
     static public function getConvertToValid($str = '', $ignore = './')
     {
         if (is_array($str) && count($str)) {
@@ -62,7 +63,7 @@ class UrlHelper
      * @param boolean $clearBadPath
      * @return array
      */
-    static public function getPaths($str = '', $clearBadPath = false)
+    static public function getPaths($str = '', $clearBadPath = false): array
     {
         if (getEncoding($str) == 'windows-1251') {
             $str = @iconv('windows-1251', 'utf-8//ignore', $str);
@@ -101,7 +102,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getServerPort()
+    static public function getServerPort(): string
     {
         if (isset($_SERVER['CMF_SERVER_PORT'])) {
             return $_SERVER['CMF_SERVER_PORT'];
@@ -115,7 +116,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getServerName()
+    static public function getServerName(): string
     {
         if (isset($_SERVER['CMF_SERVER_NAME'])) {
             return $_SERVER['CMF_SERVER_NAME'];
@@ -129,7 +130,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getServerProtocol()
+    static public function getServerProtocol(): string
     {
         if ((! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
             (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
@@ -147,7 +148,7 @@ class UrlHelper
      * @return string
      * @throws \Exception
      */
-    static public function getRequestUri($query = true)
+    static public function getRequestUri($query = true): string
     {
         if ($query && isset($_SERVER['CMF_REQUEST_URI'])) {
             return $_SERVER['CMF_REQUEST_URI'];
@@ -194,7 +195,7 @@ class UrlHelper
      * @param string|null $uri
      * @return string
      */
-    static public function getPath(?string $uri)
+    static public function getPath(?string $uri): string
     {
         if ($uri !== "") {
             $uri = parse_url(rawurldecode(VarStr::trim((string)$uri)), PHP_URL_PATH);
@@ -222,6 +223,7 @@ class UrlHelper
      * @return mixed|string
      * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     static public function getReferer()
     {
         if (isset($_SERVER['CMF_REFERER'])) {
@@ -253,7 +255,7 @@ class UrlHelper
      * @return string
      * @throws \Exception
      */
-    static public function getUserAgent()
+    static public function getUserAgent(): string
     {
         if (isset($_SERVER['CMF_HTTP_USER_AGENT'])) {
             return $_SERVER['CMF_HTTP_USER_AGENT'];
@@ -281,7 +283,7 @@ class UrlHelper
      * @return string
      * @throws \Exception
      */
-    static public function getQueryString()
+    static public function getQueryString(): string
     {
         if (isset($_SERVER['CMF_QUERY_STRING'])) {
             return $_SERVER['CMF_QUERY_STRING'];
@@ -298,7 +300,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getUserIp()
+    static public function getUserIp(): string
     {
         if (array_key_exists('HTTP_CLIENT_IP', $_SERVER) && mb_strlen($_SERVER['HTTP_CLIENT_IP']) > 1) {
             return trim($_SERVER['HTTP_CLIENT_IP']);
@@ -334,7 +336,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getServerIp()
+    static public function getServerIp(): string
     {
         if (isset($_SERVER['CMF_SERVER_ADDR'])) {
             return trim($_SERVER['CMF_SERVER_ADDR']);
@@ -361,7 +363,7 @@ class UrlHelper
      * @param string|null $str
      * @return string
      */
-    static public function getFile(?string $str)
+    static public function getFile(?string $str): string
     {
         if (is_null($str) || $str === "") {
             return "";
@@ -391,7 +393,7 @@ class UrlHelper
      * @return array
      * @throws \Exception
      */
-    static public function getQueries(?string $str)
+    static public function getQueries(?string $str): array
     {
         if (is_null($str) || $str === "") {
             return [];
@@ -416,7 +418,7 @@ class UrlHelper
      * @return string
      * @throws \Exception
      */
-    static public function getRequestMethod()
+    static public function getRequestMethod(): string
     {
         static $requestMethod;
 
@@ -450,7 +452,7 @@ class UrlHelper
      * @param array $parts
      * @return string
      */
-    static public function getGenerated($parts = [])
+    static public function getGenerated($parts = []): string
     {
         $scheme = isset($parts['scheme']) ? VarStr::ending("://", $parts['scheme']) : 'http://';
         $host = isset($parts['host']) ? $parts['host'] : '';
@@ -488,7 +490,7 @@ class UrlHelper
      * @param int    $off
      * @return array
      */
-    static public function getQueryToggle($queries = [], $query = '', $on = 1, $off = null)
+    static public function getQueryToggle($queries = [], $query = '', $on = 1, $off = null): array
     {
         if (! is_array($queries)) {
             return [];

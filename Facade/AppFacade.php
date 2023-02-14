@@ -15,7 +15,9 @@ class AppFacade implements FacadeInterface
      * Возвращает название класса у фасада. Если его нет, инициализирует на основе константы класса обёртки.
      *
      * @return mixed
+     * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     static public function getAppName()
     {
         $className = get_called_class(); // с php 5.5 можно через static::class!
@@ -28,7 +30,7 @@ class AppFacade implements FacadeInterface
             return $className::APP_NAME;
         }
 
-        trigger_error("Unknown class {$className}", E_USER_ERROR);
+        throw new \Exception("Unknown class {$className}", E_USER_ERROR);
     }
 
 
@@ -38,6 +40,7 @@ class AppFacade implements FacadeInterface
      * @param string $className
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     static function getRealObject(string $className)
     {
         if (method_exists($className, 'getInstance')) {
@@ -55,7 +58,9 @@ class AppFacade implements FacadeInterface
      * @note https://www.php.net/manual/ru/language.oop5.overloading.php#object.callstatic
      *
      * @return static|mixed
+     * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     public static function __callStatic(string $method, array $args)
     {
         $className = static::getAppName();

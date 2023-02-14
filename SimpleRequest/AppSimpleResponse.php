@@ -42,9 +42,9 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * Возвращает значения указанного заголовка из ответа сервера
      *
      * @param string $name
-     * @return string[]
+     * @return array
      */
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         if (is_string($name) && ! empty($name)) {
             $name = trim(mb_strtolower($name));
@@ -62,11 +62,10 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * Checks if a header exists by the given case-insensitive name.
      *
      * @param string $name Case-insensitive header field name.
-     * @return bool Returns true if any header names match the given header
-     *                     name using a case-insensitive string comparison. Returns false if
-     *                     no matching header name is found in the message.
+     * @return bool Returns true if any header names match the given header name using a case-insensitive string comparison.
+     *              Returns false if no matching header name is found in the message.
      */
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         $name = trim(mb_strtolower($name));
         $name = str_replace(" ", "-", ucwords(str_replace("-", " ", $name)));
@@ -79,7 +78,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return is_array($this->response['headers']) ? $this->response['headers'] : [];
     }
@@ -88,11 +87,10 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * Retrieves a comma-separated string of the values for a single header.
      *
      * @param string $name Case-insensitive header field name.
-     * @return string A string of values as provided for the given header
-     *                     concatenated together using a comma. If the header does not appear in
-     *                     the message, this method MUST return an empty string.
+     * @return string A string of values as provided for the given header concatenated together using a comma.
+     *                If the header does not appear in the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         $header = $this->getHeader($name);
 
@@ -108,6 +106,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @throws \InvalidArgumentException for invalid header names or values.
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
+    #[\ReturnTypeWillChange]
     public function withHeader($name, $value)
     {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
@@ -122,6 +121,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @throws \InvalidArgumentException for invalid header names or values.
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
+    #[\ReturnTypeWillChange]
     public function withAddedHeader($name, $value)
     {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
@@ -135,6 +135,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @throws \Exception
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
+    #[\ReturnTypeWillChange]
     public function withoutHeader($name)
     {
         throw new \Exception("Этот метод не поддерживается в этой редакции кода");
@@ -146,23 +147,23 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @param int $code
      * @return bool
      */
-    public function getResult($code = 200)
+    public function getResult($code = 200): bool
     {
         return ($this->getErrno() === 0 && $this->getStatusCode() === $code);
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getErrorCode()
+    public function getErrorCode(): int
     {
         return $this->response['errno'];
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    public function getErrno()
+    public function getErrno(): int
     {
         return $this->response['errno'];
     }
@@ -170,7 +171,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     /**
      * @return string
      */
-    public function getError()
+    public function getError(): string
     {
         return $this->response['error'];
     }
@@ -181,6 +182,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @throws \Throwable
      * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
+    #[\ReturnTypeWillChange]
     public function getDocument($type = 'raw')
     {
         try {
@@ -211,6 +213,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @throws \Throwable
      * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
+    #[\ReturnTypeWillChange]
     public function getDocumentValue($key = '', $default = null)
     {
         static $cacheDocument, $data;
@@ -243,6 +246,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @return \Psr\Http\Message\StreamInterface
      * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     public function getBody()
     {
         if (! $this->stream) {
@@ -259,6 +263,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @return static
      * @throws \InvalidArgumentException When the body is not valid.
      */
+    #[\ReturnTypeWillChange]
     public function withBody(\Psr\Http\Message\StreamInterface $body)
     {
         if ($body === $this->stream) {
@@ -267,15 +272,16 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 
         $new = clone $this;
         $new->stream = $body;
+
         return $new;
     }
 
     /**
      * Возвращает код HTTP ответа который получаем используя curl_getinfo(resource).
      *
-     * @return integer
+     * @return int
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return isset($this->response['http_code']) ? intval($this->response['http_code']) : 0;
     }
@@ -285,7 +291,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      *
      * @return string HTTP protocol version.
      */
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return (string)VarArray::get("headers.http-version", $this->response, "");
     }
@@ -297,6 +303,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @return static
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
+    #[\ReturnTypeWillChange]
     public function withProtocolVersion($version)
     {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
@@ -315,6 +322,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
+    #[\ReturnTypeWillChange]
     public function withStatus($code, $reasonPhrase = '')
     {
         throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
@@ -329,6 +337,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     public function getReasonPhrase()
     {
         throw new \Exception("Этот метод не поддерживается в этой редакции кода");

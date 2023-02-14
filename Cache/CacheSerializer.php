@@ -30,16 +30,17 @@ class CacheSerializer implements CacheSerializerInterface
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
     /**
      * @param string $type
+     * @return void
      * @throws \Psr\SimpleCache\CacheException
      */
-    public function setType(string $type)
+    public function setType(string $type): void
     {
         if (! key_exists($type, static::$serializerMethods)) {
             throw new CacheException("Invalid serializer type");
@@ -54,7 +55,7 @@ class CacheSerializer implements CacheSerializerInterface
      * @param mixed $value
      * @return string
      */
-    public function getEncodeValue($value)
+    public function getEncodeValue($value): string
     {
         if ($this->type === static::SERIALIZE) {
             $value = serialize($value);
@@ -73,7 +74,7 @@ class CacheSerializer implements CacheSerializerInterface
      * @param mixed $value
      * @return string
      */
-    public function getDecodeValue($value)
+    public function getDecodeValue($value): string
     {
         if ($this->type === static::SERIALIZE) {
             $value = unserialize($value);

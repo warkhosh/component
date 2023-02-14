@@ -247,7 +247,7 @@ class AppServer
      * @param string $name
      * @return bool
      */
-    public function hasQueryInReferer($name = '')
+    public function hasQueryInReferer($name = ''): bool
     {
         if (is_string($name) && in_array($name, $this->referer_queries)) {
             return true;
@@ -278,7 +278,7 @@ class AppServer
      * @param string|array $name
      * @return bool
      */
-    public function hasQueryInRequest($name = null)
+    public function hasQueryInRequest($name = null): bool
     {
         if (is_string($name) && array_key_exists($name, $this->request_queries)) { // проверяем только наличие метода
             return true;
@@ -311,7 +311,7 @@ class AppServer
      * @param array $queries - список query параметров
      * @return array
      */
-    public function getModifiedQueryList($insert = [], $remove = [], $queries = [])
+    public function getModifiedQueryList($insert = [], $remove = [], $queries = []): array
     {
         $queries = VarArray::getItemsExtract($remove, $queries);
 
@@ -329,7 +329,7 @@ class AppServer
      * @param array $remove - список значений для удаления из query параметров
      * @return array
      */
-    static public function getModifyQueryInReferer($insert = [], $remove = [])
+    static public function getModifyQueryInReferer($insert = [], $remove = []): array
     {
         $queries = static::getInstance()->referer_queries;
         $queries = VarArray::getItemsExtract($remove, $queries);
@@ -348,7 +348,7 @@ class AppServer
      * @param array $remove - список значений для удаления из query параметров
      * @return array
      */
-    static public function getModifyQueryInRequest($insert = [], $remove = [])
+    static public function getModifyQueryInRequest($insert = [], $remove = []): array
     {
         $queries = static::getInstance()->referer_queries;
         $queries = VarArray::getItemsExtract($remove, $queries);

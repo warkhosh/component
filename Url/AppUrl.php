@@ -136,6 +136,7 @@ class AppUrl
      * @param bool        $strict - флаг вырезания лишних символов ( не корректных с точки зрения ЧПУ )
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function set(?string $url = null, bool $strict = false)
     {
         $this->originalUrl = VarStr::trim(VarStr::getMakeString($url));
@@ -159,6 +160,7 @@ class AppUrl
      * @param bool $withQuery
      * @return AppUrl
      */
+    #[\ReturnTypeWillChange]
     public function withQuery($withQuery)
     {
         $this->setWithQuery($withQuery);
@@ -170,8 +172,9 @@ class AppUrl
      * Установка флага для определения наличия query запросов в урле
      *
      * @param bool $withQuery
+     * @return void
      */
-    public function setWithQuery($withQuery)
+    public function setWithQuery($withQuery): void
     {
         $this->withQuery = isTrue($withQuery);
     }
@@ -182,7 +185,7 @@ class AppUrl
      * @param bool $filePresence
      * @return void
      */
-    public function setFilePresence($filePresence)
+    public function setFilePresence($filePresence): void
     {
         $this->filePresence($filePresence);
     }
@@ -193,6 +196,7 @@ class AppUrl
      * @param bool $filePresence
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function filePresence($filePresence)
     {
         $this->filePresence = isTrue($filePresence);
@@ -205,7 +209,7 @@ class AppUrl
      *
      * @return array
      */
-    public function getValidExtensions()
+    public function getValidExtensions(): array
     {
         return $this->validExtensions;
     }
@@ -216,7 +220,7 @@ class AppUrl
      * @param array $extensions
      * @return void
      */
-    public function setValidExtensions($extensions = [])
+    public function setValidExtensions($extensions = []): void
     {
         if (is_array($extensions)) {
             $this->validExtensions = $extensions;
@@ -232,6 +236,7 @@ class AppUrl
      * @param array $extensions
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function validExtensions($extensions = [])
     {
         $this->setValidExtensions($extensions);
@@ -244,7 +249,7 @@ class AppUrl
      *
      * @return string
      */
-    public function getIndexFileName()
+    public function getIndexFileName(): string
     {
         return $this->indexFileName;
     }
@@ -255,7 +260,7 @@ class AppUrl
      * @param string $fileName
      * @return string
      */
-    public function indexFileName(string $fileName)
+    public function indexFileName(string $fileName): string
     {
         $this->setIndexFileName($fileName);
 
@@ -268,7 +273,7 @@ class AppUrl
      * @param string $fileName
      * @return void
      */
-    public function setIndexFileName(string $fileName)
+    public function setIndexFileName(string $fileName): void
     {
         if (isEmpty($fileName)) {
             trigger_error("Invalid file name");
@@ -282,7 +287,7 @@ class AppUrl
      *
      * @return string
      */
-    public function getIndexFileExtension()
+    public function getIndexFileExtension(): string
     {
         return $this->indexFileExtension;
     }
@@ -293,6 +298,7 @@ class AppUrl
      * @param string $fileExtension
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function indexFileExtension(string $fileExtension)
     {
         $this->setIndexFileExtension($fileExtension);
@@ -306,7 +312,7 @@ class AppUrl
      * @param string $fileExtension
      * @return void
      */
-    public function setIndexFileExtension(string $fileExtension)
+    public function setIndexFileExtension(string $fileExtension): void
     {
         if (isEmpty($fileExtension)) {
             trigger_error("Invalid file extension name");
@@ -320,7 +326,7 @@ class AppUrl
      *
      * @return bool
      */
-    public function isSlashAtEnd()
+    public function isSlashAtEnd(): bool
     {
         return $this->slashAtEnd;
     }
@@ -331,6 +337,7 @@ class AppUrl
      * @param boolean | integer $slashAtEnd
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function slashAtEnd($slashAtEnd)
     {
         $this->setSlashAtEnd($slashAtEnd);
@@ -344,7 +351,7 @@ class AppUrl
      * @param boolean | integer $slashAtEnd
      * @return void
      */
-    public function setSlashAtEnd($slashAtEnd)
+    public function setSlashAtEnd($slashAtEnd): void
     {
         $this->slashAtEnd = isTrue($slashAtEnd);
     }
@@ -354,7 +361,7 @@ class AppUrl
      *
      * @return bool
      */
-    public function isStrict()
+    public function isStrict(): bool
     {
         return $this->strict;
     }
@@ -365,7 +372,7 @@ class AppUrl
      * @param boolean|integer $strict
      * @return void
      */
-    public function setStrict($strict)
+    public function setStrict($strict): void
     {
         $this->strict = isTrue($strict);
     }
@@ -376,6 +383,7 @@ class AppUrl
      * @param boolean|integer $strict
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function strict($strict)
     {
         $this->setStrict($strict);
@@ -390,6 +398,7 @@ class AppUrl
      * @param string  $basePath - базовый путь для прописывания его в начало урла
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function inRelative(bool $relative, string $basePath)
     {
         $this->relative = isTrue($relative);
@@ -403,7 +412,7 @@ class AppUrl
      *
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         if (! $this->prepareUrl) {
             $this->prepareUrl($this->originalUrl);
@@ -417,7 +426,7 @@ class AppUrl
      *
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         if (! $this->prepareUrl) {
             $this->prepareUrl($this->originalUrl);
@@ -431,7 +440,7 @@ class AppUrl
      *
      * @return string
      */
-    public function getFile()
+    public function getFile(): string
     {
         if (! $this->prepareUrl) {
             $this->prepareUrl($this->originalUrl);
@@ -445,6 +454,7 @@ class AppUrl
      *
      * @return array|string
      */
+    #[\ReturnTypeWillChange]
     public function get()
     {
         if (! $this->prepareUrl) {
@@ -485,7 +495,7 @@ class AppUrl
      * @param string $url
      * @return string
      */
-    protected function getRelative($url = '')
+    protected function getRelative($url = ''): string
     {
         $relativeUrl = VarStr::getRemoveStart($this->basePath, $url);
 
@@ -501,9 +511,9 @@ class AppUrl
      * Проверка и подготовка урл строки для работы с классом
      *
      * @param null $url
-     * @return string
+     * @return void
      */
-    protected function prepareUrl($url = null)
+    protected function prepareUrl($url = null): void
     {
         if ($this->isStrict()) {
             $url = preg_replace("/[^a-zA-Z0-9\/\.\-\_\?\=]/", "", $url);

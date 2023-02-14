@@ -58,7 +58,7 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
             }
 
             foreach ($config['options'] as $option => $value) {
-                return $this->client->setOption($option, $value);
+                $this->client->setOption($option, $value);
             }
 
         } else {
@@ -69,11 +69,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @param string $key     The unique key of this item in the cache
      * @param mixed  $default Default value to return if the key does not exist
-     *
      * @return mixed The value of the item from the cache, or $default in case of cache miss
-     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function get($key, $default = null)
     {
         try {
@@ -99,12 +98,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param null|int|\DateInterval $ttl   Optional. The TTL value of this item. If no value is sent and
      *                                      the driver supports TTL then the library may set a default value
      *                                      for it or let the driver take care of that
-     *
-     * @return bool True on success and false on failure.
-     *
+     * @return bool                         True on success and false on failure.
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         try {
             $this->validateKey($key);
@@ -131,12 +128,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param string $key The unique cache key of the item to delete
-     *
-     * @return bool True if the item was successfully removed. False if there was an error
-     *
+     * @return bool       True if the item was successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         $this->validateKey($key);
 
@@ -153,7 +148,7 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @return bool True on success and false on failure
      */
-    public function clear()
+    public function clear(): bool
     {
         try {
             if (empty($this->getScope())) {
@@ -172,11 +167,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @param iterable $keys    A list of keys that can obtained in a single operation
      * @param mixed    $default Default value to return for keys that do not exist
-     *
-     * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
-     *
+     * @return iterable         A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function getMultiple($keys, $default = null)
     {
         $this->validateKeys($keys);
@@ -219,12 +213,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param null|int|\DateInterval $ttl    Optional. The TTL value of this item. If no value is sent and
      *                                       the driver supports TTL then the library may set a default value
      *                                       for it or let the driver take care of that
-     *
-     * @return bool True on success and false on failure
-     *
+     * @return bool                          True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         $this->validateValues($values);
 
@@ -262,12 +254,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param iterable $keys A list of string-based keys to be deleted
-     *
-     * @return bool True if the items were successfully removed. False if there was an error
-     *
+     * @return bool          True if the items were successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $this->validateKeys($keys);
 
@@ -289,12 +279,10 @@ class RedisCache extends BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param string $key The cache item key
-     *
      * @return bool
-     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function has($key)
+    public function has($key): bool
     {
         $this->validateKey($key);
 

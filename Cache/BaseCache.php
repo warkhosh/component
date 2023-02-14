@@ -54,6 +54,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @return mixed|CacheHandler
      */
+    #[\ReturnTypeWillChange]
     public function getHandler()
     {
         if (empty($this->client)) {
@@ -66,7 +67,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @return string
      */
-    public function getDriver()
+    public function getDriver(): string
     {
         return $this->driver;
     }
@@ -74,7 +75,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @return int
      */
-    public function getCacheExpiry()
+    public function getCacheExpiry(): int
     {
         return $this->cacheExpiry;
     }
@@ -83,7 +84,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param int|null $expiry
      * @return void
      */
-    public function setCacheExpiry(?int $expiry)
+    public function setCacheExpiry(?int $expiry): void
     {
         $this->cacheExpiry = $expiry;
     }
@@ -92,7 +93,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param CacheSerializerInterface|null $serializer
      * @return void
      */
-    public function setSerializerObject(?CacheSerializerInterface $serializer)
+    public function setSerializerObject(?CacheSerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }
@@ -100,6 +101,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
     /**
      * @return CacheSerializerInterface|null
      */
+    #[\ReturnTypeWillChange]
     public function getSerializerObject()
     {
         return $this->serializer;
@@ -107,9 +109,10 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param string $key
+     * @return void
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function validateKey(string $key)
+    protected function validateKey(string $key): void
     {
         if (! is_string($key)) {
             throw new InvalidArgumentException(sprintf('key %s is not a string.', $key));
@@ -124,9 +127,10 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param iterable $keys
+     * @return void
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function validateKeys($keys)
+    protected function validateKeys($keys): void
     {
         if (! is_array($keys) && ! ($keys instanceof \Traversable)) {
             throw new InvalidArgumentException();
@@ -139,9 +143,10 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
 
     /**
      * @param iterable $values
+     * @return void
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function validateValues($values)
+    protected function validateValues($values): void
     {
         if (! is_array($values) && ! ($values instanceof \Traversable)) {
             throw new InvalidArgumentException('Values must be iterable');
@@ -152,9 +157,9 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * Creates a cache value
      *
      * @param mixed $value
-     * @return string Cache value
+     * @return string      Cache value
      */
-    protected function getEncodeValue($value)
+    protected function getEncodeValue($value): string
     {
         if (! is_null($this->serializer)) {
             return $this->serializer->getEncodeValue($value);
@@ -167,9 +172,9 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * Decodes cache values to initial value
      *
      * @param mixed $value
-     * @return string Cache value
+     * @return string      Cache value
      */
-    protected function getDecodeValue($value)
+    protected function getDecodeValue($value): string
     {
         if (! is_null($this->serializer)) {
             return $this->serializer->getDecodeValue($value);
@@ -183,6 +188,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      *
      * @return string|null
      */
+    #[\ReturnTypeWillChange]
     public function getScope()
     {
         return $this->scope;
@@ -194,7 +200,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param string|null $scope
      * @return void
      */
-    public function setScope(?string $scope)
+    public function setScope(?string $scope): void
     {
         $this->scope = $scope;
     }
@@ -203,7 +209,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param string $key
      * @return string
      */
-    protected function getUpdateKeyName(string $key)
+    protected function getUpdateKeyName(string $key): string
     {
         if (empty($this->getScope())) {
             return $key;
@@ -216,7 +222,7 @@ abstract class BaseCache implements \Psr\SimpleCache\CacheInterface
      * @param iterable $keys
      * @return array
      */
-    protected function getUpdateKeyNames($keys)
+    protected function getUpdateKeyNames($keys): array
     {
         if (empty($this->getScope())) {
             return (array)$keys;
