@@ -69,44 +69,48 @@ class AppConfig
      * @param string|null $key
      * @param mixed       $default
      * @return mixed
-     * @throws \Exception
      */
     #[\ReturnTypeWillChange]
     public function get($key = null, $default = null)
     {
-        if (is_null($key)) { // Без ключа отдаём все
-            return $this->data;
-        }
-
-        $keys = VarArray::explode('.', $key);
-
-        if (is_null($file = VarArray::getFirst($keys))) {
-            throw new \Exception("Bed config file: " . VarStr::getMakeString($key));
-        }
-
-        if (! (isset($this->files[$file]) && array_key_exists($file, $this->files))) {
-            $this->load($file);
-        }
-
-        if (count($keys) > 1) {
-            $array = $this->data;
-
-            foreach ($keys as $segment) {
-                if (! is_array($array) || ! array_key_exists($segment, $array)) {
-                    return $default;
-                }
-
-                $array = $array[$segment];
+        try {
+            if (is_null($key)) { // Без ключа отдаём все
+                return $this->data;
             }
 
-            return $array;
-        }
+            $keys = VarArray::explode('.', $key);
 
-        if (isset($this->data[$key]) && array_key_exists($key, $this->data)) {
-            return $this->data[$key];
-        }
+            if (is_null($file = VarArray::getFirst($keys))) {
+                throw new \Exception("Bed config file: " . VarStr::getMakeString($key));
+            }
 
-        return null;
+            if (! (isset($this->files[$file]) && array_key_exists($file, $this->files))) {
+                $this->load($file);
+            }
+
+            if (count($keys) > 1) {
+                $array = $this->data;
+
+                foreach ($keys as $segment) {
+                    if (! is_array($array) || ! array_key_exists($segment, $array)) {
+                        return $default;
+                    }
+
+                    $array = $array[$segment];
+                }
+
+                return $array;
+            }
+
+            if (isset($this->data[$key]) && array_key_exists($key, $this->data)) {
+                return $this->data[$key];
+            }
+
+            return $default;
+
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 
 
