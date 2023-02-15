@@ -58,7 +58,8 @@ class AppUrlPath
             reset($this->data);
 
             //if (is_null($this->file)) {
-            //    $this->file = getConfig('server.index.file');
+            //    $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
+            //    $this->file = (string)$appConfig->get('server.index.file');
             //}
         }
     }
