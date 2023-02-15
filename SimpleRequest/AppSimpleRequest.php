@@ -109,32 +109,35 @@ class AppSimpleRequest
      * Настройки приложения для большинства запросов
      *
      * @return $this
+     * @throws Throwable
      */
     #[\ReturnTypeWillChange]
     public function initDefault()
     {
         $this->url = '';
-        $this->method = getConfig("spider.setting.default.method", "GET");
+        $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
+
+        $this->method = $appConfig->get("spider.setting.default.method", "GET");
         $this->headers = $this->options = $this->cookies = $this->fields = $this->files = $this->accept = [];
         $this->result = ['errno' => 0, 'error' => '', 'document' => '', 'headers' => [], 'http_code' => 0];
-        $this->setSslChecks(getConfig("spider.setting.default.ssl_checks", false));
+        $this->setSslChecks($appConfig->get("spider.setting.default.ssl_checks", false));
 
-        $this->setReturnTransfer(getConfig("spider.setting.default.return_transfer", true));      // return web page
-        $this->setHeadersInOutput(getConfig("spider.setting.default.headers_in_output", true));   // return headers
-        $this->setFollowsAnyHeader(getConfig("spider.setting.default.follows_any_header", true)); // follow redirects
-        $this->setAcceptEncoding(getConfig("spider.setting.default.accept_encoding", ""));        // handle all encoding
-        $this->setAutoReferer(getConfig("spider.setting.default.auto_referer", true));        // set referer on redirect
-        $this->setConnectTimeout(getConfig("spider.setting.default.connect_timeout", 10));    // timeout on connect
-        $this->setTimeout(getConfig("spider.setting.default.timeout", 120));                  // timeout on response
-        $this->setMaxRedirect(getConfig("spider.setting.default.max_redirect", 10));          // stop after 10 redirects
-        $this->setFreshConnect(getConfig("spider.setting.default.fresh_connect", true));
-        $this->setForbidReUse(getConfig("spider.setting.default.forbid_re_use", true));
+        $this->setReturnTransfer($appConfig->get("spider.setting.default.return_transfer", true));      // return web page
+        $this->setHeadersInOutput($appConfig->get("spider.setting.default.headers_in_output", true));   // return headers
+        $this->setFollowsAnyHeader($appConfig->get("spider.setting.default.follows_any_header", true)); // follow redirects
+        $this->setAcceptEncoding($appConfig->get("spider.setting.default.accept_encoding", ""));        // handle all encoding
+        $this->setAutoReferer($appConfig->get("spider.setting.default.auto_referer", true));        // set referer on redirect
+        $this->setConnectTimeout($appConfig->get("spider.setting.default.connect_timeout", 10));    // timeout on connect
+        $this->setTimeout($appConfig->get("spider.setting.default.timeout", 120));                  // timeout on response
+        $this->setMaxRedirect($appConfig->get("spider.setting.default.max_redirect", 10));          // stop after 10 redirects
+        $this->setFreshConnect($appConfig->get("spider.setting.default.fresh_connect", true));
+        $this->setForbidReUse($appConfig->get("spider.setting.default.forbid_re_use", true));
 
-        if (is_array($headers = getConfig("spider.setting.default.headers", null))) {
+        if (is_array($headers = $appConfig->get("spider.setting.default.headers", null))) {
             $this->setHeader($headers);
         }
 
-        if (! is_null($userAgent = getConfig("spider.setting.default.user_agent", null))) {
+        if (! is_null($userAgent = $appConfig->get("spider.setting.default.user_agent", null))) {
             $this->setUserAgent($userAgent);
         }
 

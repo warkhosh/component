@@ -1,23 +1,29 @@
 <?php
 
-/* Пример для реализации в проектах
-if (! function_exists('getConfig')) {
-     *
+// Пример для реализации в проектах
+if (false && ! function_exists('getConfig')) {
+    /**
      * Короткий синтаксис обращения к конфигу
      *
      * @param string $name
      * @param mixed  $default
      * @return mixed
+     */
     function getConfig($name = null, $default = null)
     {
         try {
-            return \Warkhosh\Component\Config\AppConfig::getInstance()->get($name, $default);
+            $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
+            //$appConfig->setBasePath(app()->getBasePath() . '/Application/Configs');
 
-        } catch (\Throwable $e) {
-            return $default;
+            return $appConfig->get($name, $default);
+
+        } catch (Throwable $e) {
+            //Log::error($e);
         }
+
+        return $default;
     }
-} */
+}
 
 if (! function_exists('e')) {
     /**
