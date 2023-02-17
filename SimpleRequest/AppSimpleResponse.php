@@ -2,8 +2,6 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
-use Psr\Http\Message\MessageInterface;
-use Psr\Http\Message\StreamInterface;
 use Warkhosh\Variable\VarArray;
 
 class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
@@ -42,9 +40,10 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * Возвращает значения указанного заголовка из ответа сервера
      *
      * @param string $name
-     * @return array
+     * @return array|string|integer|float
      */
-    public function getHeader($name): array
+    #[\ReturnTypeWillChange]
+    public function getHeader($name)
     {
         if (is_string($name) && ! empty($name)) {
             $name = trim(mb_strtolower($name));
