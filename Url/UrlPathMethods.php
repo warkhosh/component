@@ -233,7 +233,7 @@ trait UrlPathMethods
 
         if (($count = count($paths)) > 0) {
             // Получаем реальное количество путей
-            $selectPaths = $this->get(null, null, $offset);
+            $selectPaths = $this->get(null, 999, $offset);
 
             // Сравниваем текущее количество путей с указанным,
             // так мы исключаем лишнею работу когда проверяется условие не под текущий маршрут
