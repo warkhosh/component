@@ -237,7 +237,7 @@ trait UrlPathMethods
 
             // Сравниваем текущее количество путей с указанным,
             // так мы исключаем лишнею работу когда проверяется условие не под текущий маршрут
-            if ((count($selectPaths) - $offset) !== count($paths)) {
+            if (count($selectPaths) !== count($paths)) {
                 return false;
             }
 
