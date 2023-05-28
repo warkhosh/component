@@ -161,7 +161,7 @@ trait UrlPathMethods
     }
 
     /**
-     * Возвращает список путей
+     * Возвращает конкретный путь если указали номер ключа в путях или список путей
      * Если передано число ищет значение по ключу в списке (отрицательное значение ищет с конца).
      * Если в $limit указано число возвращает не более этого количества записей
      *
@@ -189,7 +189,7 @@ trait UrlPathMethods
             return $default;
         }
 
-        // Если ключ не указали а запросили диапазон то воращаем массив.
+        // Если ключ не указали а запросили диапазон то возвращаем массив.
         // Массив будет иметь указанное число записей или меньший диапазон значений если в списке нет нужных значений.
         if (! is_null($limit) && getNum($limit) > 0) {
             return array_slice($this->data, $offset, $limit);
@@ -224,16 +224,20 @@ trait UrlPathMethods
      * Последовательная проверка указанных путей на наличие
      *
      * @param array $paths
-     * @param int   $offset - сдвиг
+     * @param int   $offset      - сдвиг
+     * @param bool  $strictLimit - флаг отвечающий за строгую проверку количества путей
      * @return bool
      */
-    public function checkingPaths($paths = [], $offset = 0): bool
+    public function checkingPaths(array $paths = [], int $offset = 0, bool $strictLimit = true): bool
     {
         $offset = $offset >= 0 ? $offset : 0;
 
         if (($count = count($paths)) > 0) {
+            // Максимально возможные пути или только количество что указали
+            $limit = $strictLimit ? 9999 : count($paths);
+
             // Получаем реальное количество путей
-            $selectPaths = $this->get(null, 999, $offset);
+            $selectPaths = $this->get(null, $limit, $offset);
 
             // Сравниваем текущее количество путей с указанным,
             // так мы исключаем лишнею работу когда проверяется условие не под текущий маршрут
