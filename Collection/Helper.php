@@ -311,17 +311,20 @@ class Helper
     #[\ReturnTypeWillChange]
     public static function arrayPull($key, &$array, $default = null)
     {
-        $value = $default;
+        if (is_array($key)) {
+            $value = [];
 
-        if (is_array($key) && is_array($value = [])) {
             foreach ($key as $keyStr) {
-                $value[] = static::arrayPull($keyStr, $array, $default);
+                $value[] = static::arrayPull((string)$keyStr, $array, $default);
+                static::arrayExcept((string)$keyStr, $array);
             }
 
-        } elseif (is_string($key)) {
-            $value = static::arrayGet($key, $array, $default);
-            static::arrayExcept($key, $array);
+            return count($value) > 0 ? $value : (array)$default;
+
         }
+
+        $value = static::arrayGet((string)$key, $array, $default);
+        static::arrayExcept((string)$key, $array);
 
         return $value;
     }
