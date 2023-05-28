@@ -101,7 +101,7 @@ class Helper
      * Получить элемент из массива или объекта с использованием нотации "точка".
      * Get an item from an array or object using "dot" notation.
      *
-     * @param mixed        $target
+     * @param mixed        $target  - данные из которых выбираются значения
      * @param string|array $key
      * @param mixed        $default
      * @return mixed
@@ -323,7 +323,7 @@ class Helper
 
         }
 
-        $value = static::arrayGet((string)$key, $array, $default);
+        $value = static::arrayGet($array, (string)$key, $default);
         static::arrayExcept((string)$key, $array);
 
         return $value;
