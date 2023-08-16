@@ -461,16 +461,19 @@ class AppStorage
      * Возвращает список сущностей в указанной директории
      *
      * @param string $dir
-     * @param string $basePath
+     * @param null|string $basePath
      * @param array  $options
      * @return array
      * @throws Exception
      */
-    public function getDirEssences($dir = null, $basePath = null, $options = []): array
+    public function getDirEssences(string $dir, ?string $basePath = null, array $options = []): array
     {
-        $dir = VarStr::getRemoveStart($basePath, $dir);
+        if (is_string($basePath)) {
+            $dir = VarStr::getRemoveStart($basePath, $dir);
+        }
+
         $relative = rtrim($dir, '/');
-        $dir = rtrim($basePath . $relative, '/');
+        $dir = rtrim((string)$basePath . $relative, '/');
         $limit = key_exists('limit', $options) ? $options['limit'] : 10000;
         $ignore = key_exists('ignore', $options) ? (array)$options['ignore'] : ['.gitignore'];
         $pictures = ['png', 'gif', 'jpg', 'jpeg', 'bmp', 'tiff'];
