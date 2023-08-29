@@ -33,6 +33,7 @@ use Warkhosh\Variable\VarArray;
  * @property string  protocol
  * @property string  name
  * @property string  port
+ * @property string  host               - протокол + домен
  * @property string  method
  * @property string  request_method
  * @property integer http_response_code - код ответа HTTP
@@ -194,6 +195,13 @@ class AppServer
             $this->port = UrlHelper::getServerPort();
 
             return $this->port;
+        }
+
+        if ($name === 'host') {
+            // @todo пока окончательно не разберусь можно ли использовать SERVER_PORT, порт использовать тут не буду
+            $this->host = UrlHelper::getServerProtocol() . UrlHelper::getServerName();
+
+            return $this->host;
         }
 
         if ($name === 'name') {

@@ -13,6 +13,11 @@ class UrlHelper
     const USER_AGENT_NOT_DEFINED = 'User agent not defined (undefined)';
 
     /**
+     * @var int
+     */
+    const DEFAULT_SERVER_PORT = "80";
+
+    /**
      * Удаление из строки символов которые не допустимы в семантических урлах
      *
      * @param string $str
@@ -37,8 +42,10 @@ class UrlHelper
      * @return string|array
      */
     #[\ReturnTypeWillChange]
-    static public function getConvertToValid($str = '', $ignore = './')
-    {
+    static public function getConvertToValid(
+        $str = '',
+        $ignore = './'
+    ) {
         if (is_array($str) && count($str)) {
             $return = [];
 
@@ -108,7 +115,7 @@ class UrlHelper
             return $_SERVER['CMF_SERVER_PORT'];
         }
 
-        return $_SERVER['CMF_SERVER_PORT'] = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 'ru';
+        return $_SERVER['CMF_SERVER_PORT'] = $_SERVER['SERVER_PORT'] ?? self::DEFAULT_SERVER_PORT;
     }
 
     /**
@@ -122,7 +129,7 @@ class UrlHelper
             return $_SERVER['CMF_SERVER_NAME'];
         }
 
-        return $_SERVER['CMF_SERVER_NAME'] = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'ru';
+        return $_SERVER['CMF_SERVER_NAME'] = $_SERVER['SERVER_NAME'] ?? 'ru';
     }
 
     /**
@@ -132,9 +139,9 @@ class UrlHelper
      */
     static public function getServerProtocol(): string
     {
-        if ((! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
-            (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
-            (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')) {
+        if ((! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https')
+            || (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+            || (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')) {
             return 'https://';
         }
 
@@ -305,8 +312,8 @@ class UrlHelper
         if (array_key_exists('HTTP_CLIENT_IP', $_SERVER) && mb_strlen($_SERVER['HTTP_CLIENT_IP']) > 1) {
             return trim($_SERVER['HTTP_CLIENT_IP']);
 
-        } elseif (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) &&
-            mb_strlen($_SERVER['HTTP_X_FORWARDED_FOR']) > 1) {
+        } elseif (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)
+            && mb_strlen($_SERVER['HTTP_X_FORWARDED_FOR']) > 1) {
             $tmp = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             $tmp = array_pop($tmp);
 
@@ -374,10 +381,10 @@ class UrlHelper
         $file = '';
 
         // если есть расширение файла то пытаемся отдельно установить параметры файла
-        if (isset($info['extension']) &&
-            isset($info['filename']) &&
-            ! isEmpty($info['extension']) &&
-            ! isEmpty($info['filename'])) {
+        if (isset($info['extension'])
+            && isset($info['filename'])
+            && ! isEmpty($info['extension'])
+            && ! isEmpty($info['filename'])) {
             $file = "{$info['filename']}.{$info['extension']}";
         }
 
