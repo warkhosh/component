@@ -74,6 +74,7 @@ class AppServer
             'protocol',
             'name',
             'port',
+            'host',
             'http_response_code',
         ];
 
