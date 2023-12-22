@@ -58,7 +58,7 @@ class Http
      * @return void
      * @throws HttpException
      */
-    function setHttpHeader(int $code)
+    static public function setHttpHeader(int $code): void
     {
         switch ($code) {
             // 200
@@ -220,7 +220,7 @@ class Http
                 throw new HttpException("Unknown http status code {$code}");
         }
 
-        $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0';
+        $protocol = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.0';
 
         header("{$protocol} {$code} {$text}");
         http_response_code($code);
@@ -232,7 +232,7 @@ class Http
      * @note не в окружении веб-сервера (например, в CLI), будет возвращено false
      * @return int|false
      */
-    function getHttpCode()
+    static public function getHttpCode()
     {
         return http_response_code();
     }
