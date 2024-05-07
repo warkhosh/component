@@ -226,11 +226,10 @@ class UrlHelper
     /**
      * Возвращает адрес страницы с которой пришли на страницу
      *
-     * @return mixed|string
+     * @return string
      * @throws Exception
      */
-    #[\ReturnTypeWillChange]
-    static public function getReferer()
+    static public function getReferer(): string
     {
         if (isset($_SERVER['CMF_REFERER'])) {
             return $_SERVER['CMF_REFERER'];

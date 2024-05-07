@@ -5,49 +5,54 @@ namespace Warkhosh\Component\Server;
 use Warkhosh\Component\Traits\Singleton;
 use Warkhosh\Component\Url\UrlHelper;
 use Warkhosh\Variable\VarArray;
+use Exception;
 
 /**
  * Class AppServer
  *
  * Класс для работы с переменной $_SERVER с расширенным функционалом по её значениям
  *
- * @property array   referer_queries    - список query параметров из referer!
- * @property string  referer_query      - строка с query параметрами из referer!
- * @property string  referer_path       - путь из referer без файла и query параметров!
- * @property string  referer_file       - только название файла ( если есть ) из referer!
- * @property string  referer_uri        - пути и query параметрами из referer без протокола и домена!
- * @property array   request_queries    - список query параметров текущего запроса!
- * @property string  request_query      - значение query параметров у текущего запроса!
- * @property string  request_path       - только путь текущего запроса без файла и query параметров!
- * @property string  request_first_path - только первая папка из пути у текущего запроса!
- * @property array   request_paths      - список папок у текущего пути в запросе!
- * @property string  request_file       - только название файла ( если есть ) из текущего запроса!
- * @property string  request_uri        - путь с query параметрами текущего запроса
- * @property string  user_agent
- * @property boolean has_user_agent     - флаг наличия агента в запросе к нам
- * @property string  referer            - путь + файл + query параметры из referer
- * @property string  client_ip
- * @property string  server_ip
- * @property string  remote_addr
- * @property string  request_scheme
- * @property string  protocol
- * @property string  name
- * @property string  port
- * @property string  host               - протокол + домен
- * @property string  method
- * @property string  request_method
+ * @version 2.0
+ *
+ * @property array referer_queries     - список query параметров из referer!
+ * @property string referer_query      - строка с query параметрами из referer!
+ * @property string referer_path       - путь из referer без файла и query параметров!
+ * @property string referer_file       - только название файла (если есть) из referer!
+ * @property string referer_uri        - пути и query параметрами из referer без протокола и домена!
+ * @property array request_queries     - список query параметров текущего запроса!
+ * @property string request_query      - значение query параметров у текущего запроса!
+ * @property string request_path       - только путь текущего запроса без файла и query параметров!
+ * @property string request_first_path - только первая папка из пути у текущего запроса!
+ * @property array request_paths       - список папок у текущего пути в запросе!
+ * @property string request_file       - только название файла (если есть) из текущего запроса!
+ * @property string request_uri        - путь с query параметрами текущего запроса
+ * @property string user_agent
+ * @property boolean has_user_agent    - флаг наличия агента в запросе к нам
+ * @property string referer            - путь + файл + query параметры из referer
+ * @property string client_ip
+ * @property string server_ip
+ * @property string remote_addr
+ * @property string request_scheme
+ * @property string protocol
+ * @property string name
+ * @property string port
+ * @property string host               - протокол + домен
+ * @property string method
+ * @property string request_method
  * @property integer http_response_code - код ответа HTTP
  */
 class AppServer
 {
     use Singleton;
 
+    private array $property = [];
+
     /**
-     * @param $name
+     * @param string $name
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         $permitted = [
             'referer_queries',
@@ -88,175 +93,220 @@ class AppServer
         }
 
         if ($name === 'referer_queries') {
-            $this->referer_queries = UrlHelper::getQueries($this->referer);
+            if (! key_exists('referer_queries', $this->property)) {
+                $this->property['referer_queries'] = UrlHelper::getQueries($this->referer);
+            }
 
-            return $this->referer_queries;
+            return $this->property['referer_queries'];
         }
 
         if ($name === 'referer_query') {
-            $this->referer_queries = UrlHelper::getQueries($this->referer);
-            $this->referer_query = '';
+            if (! key_exists('referer_query', $this->property)) {
+                $this->property['referer_query'] = '';
 
-            if (count($this->referer_queries)) {
-                $this->referer_query = "?" . http_build_query($this->referer_queries);
+                if (count($this->referer_queries)) {
+                    $this->property['referer_query'] = "?".http_build_query($this->referer_queries);
+                }
             }
 
-            return $this->referer_query;
+            return $this->property['referer_query'];
         }
 
         if ($name === 'referer_path') {
-            $this->referer_path = ! isEmpty($this->referer) ? UrlHelper::getPath($this->referer) : '';
+            if (! key_exists('referer_path', $this->property)) {
+                $this->property['referer_path'] = ! isEmpty($this->referer)
+                    ? UrlHelper::getPath($this->referer)
+                    : '';
+            }
 
-            return $this->referer_path;
+            return $this->property['referer_path'];
         }
 
         if ($name === 'referer_file') {
-            $this->referer_file = UrlHelper::getFile($this->referer);
+            if (! key_exists('referer_file', $this->property)) {
+                $this->property['referer_file'] = UrlHelper::getFile($this->referer);
+            }
 
-            return $this->referer_file;
+            return $this->property['referer_file'];
         }
 
         if ($name === 'referer_uri') {
-            $uri = '';
-
-            if ($this->referer_path != '') {
-                $uri = $this->referer_path;
-                $uri .= ($this->referer_file != '' && mb_substr($uri, -1) !== '/' ? "/" : '') . $this->referer_file;
-                $uri .= $this->referer_query;
+            if (! key_exists('referer_uri', $this->property)) {
+                $this->property['referer_uri'] = $this->referer_path;
+                $this->property['referer_uri'] .= ($this->referer_file !== ''
+                && mb_substr($this->property['referer_uri'], -1) !== '/' ? "/" : '');
+                $this->property['referer_uri'] .= $this->referer_file;
+                $this->property['referer_uri'] .= $this->referer_query;
             }
 
-            $this->referer_uri = $uri;
-
-            return $this->referer_uri;
+            return $this->property['referer_uri'];
         }
 
         if ($name === 'request_queries') {
-            $this->request_queries = UrlHelper::getQueries(UrlHelper::getRequestUri(true));
+            if (! key_exists('request_queries', $this->property)) {
+                $this->property['request_queries'] = UrlHelper::getQueries(
+                    UrlHelper::getRequestUri(true)
+                );
+            }
 
-            return $this->request_queries;
+            return $this->property['request_queries'];
         }
 
         if ($name === 'request_query') {
-            $this->request_query = '';
+            if (! key_exists('request_query', $this->property)) {
+                $this->property['request_query'] = '';
 
-            if (count($this->request_queries)) {
-                $this->request_query = "?" . http_build_query($this->request_queries);
+                if (count($this->request_queries)) {
+                    $this->property['request_query'] = "?".http_build_query($this->request_queries);
+                }
             }
 
-            return $this->request_query;
+            return $this->property['request_query'];
         }
 
         if ($name === 'request_path') {
-            $this->request_path = UrlHelper::getPath(UrlHelper::getRequestUri(false));
+            if (! key_exists('request_query', $this->property)) {
+                $this->property['request_path'] = UrlHelper::getPath(UrlHelper::getRequestUri(false));
+            }
 
-            return $this->request_path;
+            return $this->property['request_path'];
         }
 
         if ($name === 'request_paths') {
-            $this->request_path = UrlHelper::getPath(UrlHelper::getRequestUri(false));
-            $this->request_paths = array_values(VarArray::explode("/", $this->request_path, ['']));
+            if (! key_exists('request_paths', $this->property)) {
+                $this->property['request_paths'] = array_values(
+                    VarArray::explode("/", $this->request_path, [''])
+                );
+            }
 
-            return $this->request_paths;
+            return $this->property['request_paths'];
         }
 
         if ($name === 'request_first_path') {
-            $this->request_first_path = VarArray::getFirst($this->request_paths);
+            if (! key_exists('request_first_path', $this->property)) {
+                $this->property['request_first_path'] = VarArray::getFirst($this->request_paths);
+            }
 
-            return $this->request_first_path;
+            return $this->property['request_first_path'];
         }
 
         if ($name === 'request_file') {
-            $this->request_file = UrlHelper::getFile(UrlHelper::getRequestUri(false));
+            if (! key_exists('request_first_path', $this->property)) {
+                $this->property['request_file'] = UrlHelper::getFile(UrlHelper::getRequestUri(false));
+            }
 
-            return $this->request_file;
+            return $this->property['request_file'];
         }
 
         if ($name === 'request_uri') {
-            $uri = '';
+            if (! key_exists('request_uri', $this->property)) {
+                $this->property['request_uri'] = "";
 
-            if ($this->request_path != '') {
-                // $uri = $this->request_path;
-                // $uri .= ($this->request_file != '' && mb_substr($uri, -1) !== '/' ? "/" : '') . $this->request_file;
-                // $uri .= $this->request_query;
-                $uri = UrlHelper::getRequestUri(false) . $this->request_query;
+                if ($this->request_path != '') {
+                    $this->property['request_uri'] = UrlHelper::getRequestUri(false).$this->request_query;
+                }
             }
 
-            $this->request_uri = $uri;
-
-            return $this->request_uri;
+            return $this->property['request_uri'];
         }
 
         if ($name === 'request_scheme' || $name === 'protocol') {
-            $this->request_scheme = $this->protocol = UrlHelper::getServerProtocol();
+            if (! key_exists('protocol', $this->property)) {
+                $this->property['protocol'] = UrlHelper::getServerProtocol();
+            }
 
-            return $this->protocol;
+            $this->property['request_scheme'] = $this->property['protocol'];
+
+            return $this->property['protocol'];
         }
 
         if ($name === 'port') {
-            $this->port = UrlHelper::getServerPort();
+            if (! key_exists('port', $this->property)) {
+                $this->property['port'] = UrlHelper::getServerPort();
+            }
 
-            return $this->port;
+            return $this->property['port'];
         }
 
         if ($name === 'host') {
-            // @todo пока окончательно не разберусь можно ли использовать SERVER_PORT, порт использовать тут не буду
-            $this->host = UrlHelper::getServerProtocol() . UrlHelper::getServerName();
+            if (! key_exists('host', $this->property)) {
+                // @todo пока окончательно не разберусь можно ли использовать SERVER_PORT, порт использовать тут не буду
+                $this->property['host'] = UrlHelper::getServerProtocol().UrlHelper::getServerName();
+            }
 
-            return $this->host;
+            return $this->property['host'];
         }
 
         if ($name === 'name') {
-            $this->name = UrlHelper::getServerName();
+            if (! key_exists('name', $this->property)) {
+                $this->property['name'] = UrlHelper::getServerName();
+            }
 
-            return $this->name;
+            return $this->property['name'];
         }
 
         if ($name === 'has_user_agent') {
-            $this->user_agent = UrlHelper::getUserAgent();
+            if (! key_exists('has_user_agent', $this->property)) {
+                $this->property['has_user_agent'] = ($this->user_agent !== UrlHelper::USER_AGENT_NOT_DEFINED);
+            }
 
-            return ($this->user_agent !== UrlHelper::USER_AGENT_NOT_DEFINED);
+            return $this->property['has_user_agent'];
         }
 
         if ($name === 'user_agent') {
-            $this->user_agent = UrlHelper::getUserAgent();
+            if (! key_exists('user_agent', $this->property)) {
+                $this->property['user_agent'] = UrlHelper::getUserAgent();
+            }
 
-            return $this->user_agent;
+            return $this->property['user_agent'];
         }
 
         if ($name === 'referer') {
-            $this->referer = UrlHelper::getReferer();
+            if (! key_exists('referer', $this->property)) {
+                $this->property['referer'] = UrlHelper::getReferer();
+            }
 
-            return $this->referer;
+            return $this->property['referer'];
         }
 
         if ($name === 'client_ip' || $name === 'remote_addr') {
-            $this->client_ip = $this->remote_addr = UrlHelper::getUserIp();
+            if (! key_exists('client_ip', $this->property)) {
+                $this->property['client_ip'] = UrlHelper::getUserIp();
+            }
 
-            return $this->client_ip;
+            $this->property['remote_addr'] = $this->property['client_ip'];
+
+            return $this->property['client_ip'];
         }
 
         if ($name === 'server_ip') {
-            $this->server_ip = UrlHelper::getServerIp();
+            if (! key_exists('server_ip', $this->property)) {
+                $this->property['server_ip'] = UrlHelper::getServerIp();
+            }
 
-            return $this->server_ip;
+            return $this->property['server_ip'];
         }
 
         if ($name === 'method' || $name === 'request_method') {
-            $this->method = $this->request_method = UrlHelper::getRequestMethod();
+            if (! key_exists('request_method', $this->property)) {
+                $this->property['request_method'] = UrlHelper::getRequestMethod();
+            }
 
-            return $this->request_method;
+            $this->property['method'] = $this->property['request_method'];
+
+            return $this->property['request_method'];
         }
 
         return null;
     }
 
     /**
-     * Проверка наличия query значений в параметрах referer ( прошлого ) запроса
+     * Проверка наличия query значений в параметрах referer (прошлого) запроса
      *
-     * @param string $name
+     * @param array|string $name
      * @return bool
      */
-    public function hasQueryInReferer($name = ''): bool
+    public function hasQueryInReferer(string|array $name): bool
     {
         if (is_string($name) && in_array($name, $this->referer_queries)) {
             return true;
@@ -264,7 +314,7 @@ class AppServer
         } elseif (is_array($name) && count($name)) {
             foreach ($name as $key => $value) {
                 if (is_string($key)) { // проверка наличия метода и его значения
-                    $result = (VarArray::get("$key", $this->referer_queries) === $value);
+                    $result = (VarArray::get("{$key}", $this->referer_queries) === $value);
 
                 } else {
                     $result = in_array($value, $this->referer_queries); // проверяем только наличие метода
@@ -284,10 +334,10 @@ class AppServer
     /**
      * Проверка наличия query значений в текущем запросе
      *
-     * @param string|array $name
+     * @param array|string $name
      * @return bool
      */
-    public function hasQueryInRequest($name = null): bool
+    public function hasQueryInRequest(string|array $name): bool
     {
         if (is_string($name) && array_key_exists($name, $this->request_queries)) { // проверяем только наличие метода
             return true;
@@ -295,7 +345,7 @@ class AppServer
         } elseif (is_array($name) && count($name)) {
             foreach ($name as $key => $value) {
                 if (is_string($key)) { // проверка наличия метода и его значения
-                    $result = (VarArray::get("$key", $this->request_queries) === $value);
+                    $result = (VarArray::get("{$key}", $this->request_queries) === $value);
 
                 } else {
                     $result = in_array($value, $this->referer_queries); // проверяем только наличие метода
@@ -315,12 +365,12 @@ class AppServer
     /**
      * Модифицирует переданный список query значений
      *
-     * @param array $insert  - список значений для добавления к query параметрам
-     * @param array $remove  - список значений для удаления из query параметров
+     * @param array $insert - список значений для добавления к query параметрам
+     * @param array $remove - список значений для удаления из query параметров
      * @param array $queries - список query параметров
      * @return array
      */
-    public function getModifiedQueryList($insert = [], $remove = [], $queries = []): array
+    public function getModifiedQueryList(array $insert = [], array $remove = [], array $queries = []): array
     {
         $queries = VarArray::getItemsExtract($remove, $queries);
 
@@ -338,7 +388,7 @@ class AppServer
      * @param array $remove - список значений для удаления из query параметров
      * @return array
      */
-    static public function getModifyQueryInReferer($insert = [], $remove = []): array
+    public static function getModifyQueryInReferer(array $insert = [], array $remove = []): array
     {
         $queries = static::getInstance()->referer_queries;
         $queries = VarArray::getItemsExtract($remove, $queries);
@@ -357,7 +407,7 @@ class AppServer
      * @param array $remove - список значений для удаления из query параметров
      * @return array
      */
-    static public function getModifyQueryInRequest($insert = [], $remove = []): array
+    public static function getModifyQueryInRequest(array $insert = [], array $remove = []): array
     {
         $queries = static::getInstance()->referer_queries;
         $queries = VarArray::getItemsExtract($remove, $queries);
