@@ -11,7 +11,7 @@ use Exception;
  */
 trait Singleton
 {
-    private static $instances = [];
+    private static array $instances = [];
 
     /**
      * Защищаем от создания через new Singleton
@@ -45,12 +45,12 @@ trait Singleton
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public static function getInstance()
+    public static function getInstance(): static
     {
         $class = static::class;
 
         if (! isset(static::$instances[$class])) {
-            static::$instances[$class] = new static;
+            static::$instances[$class] = new static();
         }
 
         return static::$instances[$class];
