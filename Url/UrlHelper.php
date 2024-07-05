@@ -11,44 +11,42 @@ class UrlHelper
     /**
      * @var string
      */
-    const USER_AGENT_NOT_DEFINED = 'User agent not defined (undefined)';
+    public const USER_AGENT_NOT_DEFINED = 'User agent not defined (undefined)';
 
     /**
      * @var int
      */
-    const DEFAULT_SERVER_PORT = "80";
+    public const DEFAULT_SERVER_PORT = "80";
 
     /**
      * Удаление из строки символов которые не допустимы в семантических урлах
      *
      * @param string $str
-     * @param string $ignore - символы, которые будут проигнорированы в ходе удаления
-     * @param bool $toLower - признак перевода заглавных букв в строчные
+     * @param string $ignore символы, которые будут проигнорированы в ходе удаления
+     * @param bool $toLower признак перевода заглавных букв в строчные
      * @return string
      */
-    static public function getRemoveNoSemanticChar(string $str = '', string $ignore = '', bool $toLower = true): string
+    public static function getRemoveNoSemanticChar(string $str = '', string $ignore = '', bool $toLower = true): string
     {
         $str = rawurldecode(VarStr::trim($str)); // Преобразовывает символьные коды в символы. %20 - станет пробелом
         $str = $toLower ? strtolower($str) : $str;
-        $str = preg_replace("|[^a-zA-Z0-9\_\-" . preg_quote($ignore) . "]|ium", "", $str);
 
-        return $str;
+        return preg_replace("|[^a-zA-Z0-9\_\-".preg_quote($ignore)."]|ium", "", $str);
     }
 
     /**
      * Возвращает семантически корректный url без левых символов
      *
-     * @param string|array $str
-     * @param string $ignore - символы, которые будут проигнорированы в ходе удаления
-     * @return string|array
+     * @param array|string $str
+     * @param string $ignore символы, которые будут проигнорированы в ходе удаления
+     * @return array|string
      */
-    #[\ReturnTypeWillChange]
-    static public function getConvertToValid($str = '', $ignore = './')
+    public static function getConvertToValid(array|string $str = '', string $ignore = './'): array|string
     {
         if (is_array($str) && count($str)) {
             $return = [];
 
-            foreach ($str as $key => $row) {
+            foreach ($str as $row) {
                 $return[] = static::getRemoveNoSemanticChar($row, $ignore);
             }
 
@@ -66,10 +64,10 @@ class UrlHelper
      * @note: алгоритм подразумевает корректные ЧПУ без слешей и точек в названии директорий!
      *
      * @param string $str
-     * @param boolean $clearBadPath
+     * @param bool $clearBadPath
      * @return array
      */
-    static public function getPaths($str = '', $clearBadPath = false): array
+    public static function getPaths(string $str = '', bool $clearBadPath = false): array
     {
         if (getEncoding($str) == 'windows-1251') {
             $str = @iconv('windows-1251', 'utf-8//ignore', $str);
@@ -88,13 +86,11 @@ class UrlHelper
         }
 
         if (count($part) && $part = array_values($part)) {
-            reset($part);
-
             if ($clearBadPath) {
                 foreach ($part as $key => $path) {
                     // не удаляем плохие строчки, поскольку это нарушит логику проверки конкретной секции
                     if ($path != static::getRemoveNoSemanticChar($path, '.')) {
-                        $part[$key] = ''; // оставляем тип у значения прежний а вот данные удаляем
+                        $part[$key] = ''; // оставляем тип у значения прежний, а вот данные удаляем
                     }
                 }
             }
@@ -104,11 +100,11 @@ class UrlHelper
     }
 
     /**
-     * Возвращает порт на компьютере сервера, используемый веб-сервером для соединения.
+     * Возвращает порт на компьютере сервера, используемый веб-сервером для соединения
      *
      * @return string
      */
-    static public function getServerPort(): string
+    public static function getServerPort(): string
     {
         if (isset($_SERVER['CMF_SERVER_PORT'])) {
             return $_SERVER['CMF_SERVER_PORT'];
@@ -122,7 +118,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getServerName(): string
+    public static function getServerName(): string
     {
         if (isset($_SERVER['CMF_SERVER_NAME'])) {
             return $_SERVER['CMF_SERVER_NAME'];
@@ -132,15 +128,15 @@ class UrlHelper
     }
 
     /**
-     * Возвращает протокол с его префиксами для домена.
+     * Возвращает протокол с его префиксами для домена
      *
      * @return string
      */
-    static public function getServerProtocol(): string
+    public static function getServerProtocol(): string
     {
-        if ((!empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https')
-            || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
-            || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')) {
+        if ((! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https')
+            || (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+            || (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')) {
             return 'https://';
         }
 
@@ -150,16 +146,16 @@ class UrlHelper
     /**
      * Возвращает путь текущего запроса
      *
-     * @param bool $query - флаг для включения\выключения query параметров запроса
+     * @param bool $query флаг для включения\выключения query параметров запроса
      * @return string
      * @throws Exception
      */
-    static public function getRequestUri($query = true): string
+    public static function getRequestUri(bool $query = true): string
     {
         if ($query && isset($_SERVER['CMF_REQUEST_URI'])) {
             return $_SERVER['CMF_REQUEST_URI'];
 
-        } elseif (!$query && isset($_SERVER['CMF_REQUEST_URI_NO_QUERY'])) {
+        } elseif (! $query && isset($_SERVER['CMF_REQUEST_URI_NO_QUERY'])) {
             return $_SERVER['CMF_REQUEST_URI_NO_QUERY'];
         }
 
@@ -183,9 +179,9 @@ class UrlHelper
             $_SERVER['CMF_REQUEST_URI'] = "/{$uri}";
         }
 
-        if (!$query && $requestUri != '') {
+        if (! $query && $requestUri != '') {
             // Обязательно прописываем протокол и сервер иначе два первых слеша будут приняты за протокол!
-            $url = UrlHelper::getServerProtocol() . UrlHelper::getServerName() . $_SERVER['CMF_REQUEST_URI'];
+            $url = UrlHelper::getServerProtocol().UrlHelper::getServerName().$_SERVER['CMF_REQUEST_URI'];
             $_SERVER['CMF_REQUEST_URI_NO_QUERY'] = parse_url($url, PHP_URL_PATH);
 
             return $_SERVER['CMF_REQUEST_URI_NO_QUERY'];
@@ -198,10 +194,11 @@ class UrlHelper
      * Возвращает путь без файла и query параметров
      *
      * @note метод следит что-бы значения начинались со слэша
+     *
      * @param string|null $uri
      * @return string
      */
-    static public function getPath(?string $uri): string
+    public static function getPath(?string $uri): string
     {
         if ($uri !== "") {
             $uri = parse_url(rawurldecode(VarStr::trim((string)$uri)), PHP_URL_PATH);
@@ -229,7 +226,7 @@ class UrlHelper
      * @return string
      * @throws Exception
      */
-    static public function getReferer(): string
+    public static function getReferer(): string
     {
         if (isset($_SERVER['CMF_REFERER'])) {
             return $_SERVER['CMF_REFERER'];
@@ -260,7 +257,7 @@ class UrlHelper
      * @return string
      * @throws Exception
      */
-    static public function getUserAgent(): string
+    public static function getUserAgent(): string
     {
         if (isset($_SERVER['CMF_HTTP_USER_AGENT'])) {
             return $_SERVER['CMF_HTTP_USER_AGENT'];
@@ -288,7 +285,7 @@ class UrlHelper
      * @return string
      * @throws Exception
      */
-    static public function getQueryString(): string
+    public static function getQueryString(): string
     {
         if (isset($_SERVER['CMF_QUERY_STRING'])) {
             return $_SERVER['CMF_QUERY_STRING'];
@@ -305,7 +302,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getUserIp(): string
+    public static function getUserIp(): string
     {
         if (array_key_exists('HTTP_CLIENT_IP', $_SERVER) && mb_strlen($_SERVER['HTTP_CLIENT_IP']) > 1) {
             return trim($_SERVER['HTTP_CLIENT_IP']);
@@ -314,6 +311,7 @@ class UrlHelper
             && mb_strlen($_SERVER['HTTP_X_FORWARDED_FOR']) > 1) {
             $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             $ipList = array_map('trim', $ipList);
+
             return array_shift($ipList);
 
         } elseif (array_key_exists('HTTP_X_FORWARDED', $_SERVER) && mb_strlen($_SERVER['HTTP_X_FORWARDED']) > 1) {
@@ -340,7 +338,7 @@ class UrlHelper
      *
      * @return string
      */
-    static public function getServerIp(): string
+    public static function getServerIp(): string
     {
         if (isset($_SERVER['CMF_SERVER_ADDR'])) {
             return trim($_SERVER['CMF_SERVER_ADDR']);
@@ -367,21 +365,21 @@ class UrlHelper
      * @param string|null $str
      * @return string
      */
-    static public function getFile(?string $str): string
+    public static function getFile(?string $str): string
     {
         if (is_null($str) || $str === "") {
             return "";
         }
 
-        $str = parse_url(VarStr::trim((string)$str), PHP_URL_PATH);
+        $str = parse_url(VarStr::trim($str), PHP_URL_PATH);
         $info = pathinfo($str);
         $file = '';
 
-        // если есть расширение файла то пытаемся отдельно установить параметры файла
+        // если есть расширение файла, то пытаемся отдельно установить параметры файла
         if (isset($info['extension'])
             && isset($info['filename'])
-            && !isEmpty($info['extension'])
-            && !isEmpty($info['filename'])) {
+            && ! isEmpty($info['extension'])
+            && ! isEmpty($info['filename'])) {
             $file = "{$info['filename']}.{$info['extension']}";
         }
 
@@ -397,18 +395,18 @@ class UrlHelper
      * @return array
      * @throws Exception
      */
-    static public function getQueries(?string $str): array
+    public static function getQueries(?string $str): array
     {
         if (is_null($str) || $str === "") {
             return [];
         }
 
-        $str = VarStr::getMakeString(VarStr::trim((string)$str));
+        $str = VarStr::getMakeString(VarStr::trim($str));
         $str = VarStr::getUrlDecode($str);
 
         // если указали ссылку с путями, то выбираем из неё только query параметры
         if (mb_substr($str, 0, 1) === '/' || mb_substr($str, 0, 4) === 'http') {
-            $str = !is_null($tmp = parse_url($str, PHP_URL_QUERY)) ? $tmp : '';
+            $str = ! is_null($tmp = parse_url($str, PHP_URL_QUERY)) ? $tmp : '';
         }
 
         parse_str(VarStr::getRemoveStart("?", $str), $queries);
@@ -422,11 +420,11 @@ class UrlHelper
      * @return string
      * @throws Exception
      */
-    static public function getRequestMethod(): string
+    public static function getRequestMethod(): string
     {
         static $requestMethod;
 
-        if (!is_null($requestMethod)) {
+        if (! is_null($requestMethod)) {
             return $requestMethod;
         }
 
@@ -456,29 +454,29 @@ class UrlHelper
      * @param array $parts
      * @return string
      */
-    static public function getGenerated(array $parts = []): string
+    public static function getGenerated(array $parts = []): string
     {
         $scheme = isset($parts['scheme']) ? VarStr::ending("://", $parts['scheme']) : 'http://';
         $host = $parts['host'] ?? '';
-        $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
         $user = $parts['user'] ?? '';
-        $pass = isset($parts['pass']) ? ':' . $parts['pass'] : '';
-        $pass = ($user || $pass) ? "$pass@" : '';
+        $pass = isset($parts['pass']) ? ':'.$parts['pass'] : '';
+        $pass = ($user || $pass) ? "{$pass}@" : '';
 
         if (isEmpty($host)) {
             $scheme = $user = $pass = $host = $port = '';
         }
 
-        $server_name = $parts['server_name'] ?? $scheme . $user . $pass . $host . $port;
+        $server_name = $parts['server_name'] ?? $scheme.$user.$pass.$host.$port;
         $path = $parts['path'] ?? '';
 
         if (isset($parts['queries']) && is_array($parts['queries'])) {
-            $query = count($parts['queries']) ? "?" . http_build_query($parts['queries']) : '';
+            $query = count($parts['queries']) ? "?".http_build_query($parts['queries']) : '';
         } else {
-            $query = isset($parts['query']) && !isEmpty($parts['query']) ? VarStr::start("?", $parts['query']) : '';
+            $query = isset($parts['query']) && ! isEmpty($parts['query']) ? VarStr::start("?", $parts['query']) : '';
         }
 
-        $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+        $fragment = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';
 
         return "{$server_name}{$path}{$query}{$fragment}";
     }
@@ -490,12 +488,16 @@ class UrlHelper
      *
      * @param array $queries
      * @param string $query
-     * @param int $on
-     * @param int|null $off
+     * @param array|float|int|string $on
+     * @param array|float|int|string|null $off
      * @return array
      */
-    static public function getQueryToggle(array $queries = [], string $query = '', int $on = 1, ?int $off = null): array
-    {
+    public static function getQueryToggle(
+        array $queries = [],
+        string $query = '',
+        array|float|int|string $on = 1,
+        array|float|int|string|null $off = null
+    ): array {
         if (! is_array($queries)) {
             return [];
         }
@@ -520,7 +522,7 @@ class UrlHelper
 
                         // Переменная равна значению ON
                         case $vars[$key][0]:
-                            if (!is_null($vars[$key][1])) { // Есть значение OFF
+                            if (! is_null($vars[$key][1])) { // Есть значение OFF
                                 $queries[$name] = $vars[$key][1];
                             } else {
                                 unset($queries[$name]);
@@ -528,9 +530,9 @@ class UrlHelper
 
                             break;
 
-                        // Переменная равна значению OFF
+                            // Переменная равна значению OFF
                         case $vars[$key][1]:
-                            if (!is_null($vars[$key][0])) { // Есть значение ON
+                            if (! is_null($vars[$key][0])) { // Есть значение ON
                                 $queries[$name] = $vars[$key][0];
                             } else {
                                 unset($queries[$name]);
@@ -542,7 +544,7 @@ class UrlHelper
                             unset($queries[$name]);
                     }
 
-                } elseif (!is_null($vars[$key][0])) { // Есть значение ON
+                } elseif (! is_null($vars[$key][0])) { // Есть значение ON
                     $queries[$name] = $vars[$key][0];
                 }
             }
