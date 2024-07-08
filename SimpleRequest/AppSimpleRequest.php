@@ -2,7 +2,11 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
+use CURLFile;
+use DOMDocument;
+use SimpleXMLElement;
 use Throwable;
+use Warkhosh\Component\Config\AppConfig;
 
 /**
  * Class AppSimpleRequest
@@ -14,83 +18,84 @@ class AppSimpleRequest
     /**
      * @var string
      */
-    protected $url = '';
+    protected string $url = '';
 
     /**
      * @var string
      */
-    protected $method = "GET";
+    protected string $method = "GET";
 
     /**
-     * Содержит тип потоковой передачи с значением контента
+     * Содержит тип потоковой передачи со значением контента
      *
      * @var array
      */
-    protected $stream = [];
+    protected array $stream = [];
 
     /**
      * Флаг получения заголовков в ответе
      *
      * @var bool
      */
-    protected $headerInResponse = false;
+    protected bool $headerInResponse = false;
 
     /**
      * @var array
      */
-    protected $headers = [];
+    protected array $headers = [];
 
     /**
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * @var array
      */
-    protected $cookies = [];
+    protected array $cookies = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $sslChecks = false;
+    protected bool $sslChecks = false;
 
     /**
      * Поля со значениями которые указали для передачи.
      *
      * @var array
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
-     * файлы которые указали для передачи.
+     * Файлы, которые указали для передачи.
      *
      * @var array
      */
-    protected $files = [];
+    protected array $files = [];
 
     /**
-     *
      * @var array
      */
-    protected $accept = [];
+    protected array $accept = [];
 
     /**
      * Результат выполнения.
      *
      * @var array
      */
-    protected $result = [
-        'errno'     => 0,
-        'error'     => '',
-        'document'  => '',
-        'stream'    => null,
-        'headers'   => [],
+    protected array $result = [
+        'errno' => 0,
+        'error' => '',
+        'document' => '',
+        'stream' => null,
+        'headers' => [],
         'http_code' => 0,
     ];
 
     /**
-     * AppSimpleRequest constructor.
+     * AppSimpleRequest constructor
+     *
+     * @throws Throwable
      */
     public function __construct()
     {
@@ -100,22 +105,21 @@ class AppSimpleRequest
     /**
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public static function init() {
+    public static function init(): static
+    {
         return new static();
     }
 
     /**
      * Настройки приложения для большинства запросов
      *
-     * @return $this
+     * @return static
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function initDefault()
+    public function initDefault(): static
     {
         $this->url = '';
-        $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
+        $appConfig = AppConfig::getInstance();
 
         $this->method = $appConfig->get("spider.setting.default.method", "GET");
         $this->headers = $this->options = $this->cookies = $this->fields = $this->files = $this->accept = [];
@@ -145,12 +149,11 @@ class AppSimpleRequest
     }
 
     /**
-     * @param string $uri
+     * @param string|null $uri
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function get($uri = null)
+    public function get(string $uri = null): AppSimpleResponse
     {
         try {
             if (! is_null($uri)) {
@@ -167,14 +170,13 @@ class AppSimpleRequest
     }
 
     /**
-     * @param array  $fields
-     * @param string $uri
-     * @param string $referer
+     * @param array $fields
+     * @param string|null $uri
+     * @param string|null $referer
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function post($fields = [], $uri = null, $referer = null)
+    public function post(array $fields = [], ?string $uri = null, ?string $referer = null): AppSimpleResponse
     {
         try {
             if (! is_null($uri)) {
@@ -196,13 +198,12 @@ class AppSimpleRequest
     }
 
     /**
-     * @param array  $fields
-     * @param string $uri
+     * @param array $fields
+     * @param string|null $uri
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function put($fields = [], $uri = null)
+    public function put(array $fields = [], ?string $uri = null): AppSimpleResponse
     {
         try {
             if (! is_null($uri)) {
@@ -221,13 +222,12 @@ class AppSimpleRequest
     }
 
     /**
-     * @param array  $fields
-     * @param string $uri
+     * @param array $fields
+     * @param string|null $uri
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function patch($fields = [], $uri = null)
+    public function patch(array $fields = [], ?string $uri = null): AppSimpleResponse
     {
         try {
             if (! is_null($uri)) {
@@ -246,13 +246,12 @@ class AppSimpleRequest
     }
 
     /**
-     * @param array  $fields
-     * @param string $uri
+     * @param array $fields
+     * @param string|null $uri
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function delete($fields = [], $uri = null)
+    public function delete(array $fields = [], ?string $uri = null): AppSimpleResponse
     {
         try {
             if (! is_null($uri)) {
@@ -271,12 +270,11 @@ class AppSimpleRequest
     }
 
     /**
-     * @param string $uri
+     * @param string|null $uri
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function head($uri = null)
+    public function head(?string $uri = null): AppSimpleResponse
     {
         try {
             if (! is_null($uri)) {
@@ -296,12 +294,11 @@ class AppSimpleRequest
     /**
      * Устанавливает значения для передачи и урл если передали
      *
-     * @param array  $fields
-     * @param string $uri
-     * @return $this
+     * @param array $fields
+     * @param string|null $uri
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function fields($fields = [], $uri = null)
+    public function fields(array $fields = [], ?string $uri = null): static
     {
         if (! is_null($uri)) {
             $this->setUrl($uri);
@@ -322,13 +319,12 @@ class AppSimpleRequest
      * @return AppSimpleResponse
      * @throws Throwable
      */
-    #[\ReturnTypeWillChange]
-    public function request()
+    public function request(): AppSimpleResponse
     {
         try {
             $ch = curl_init();
 
-            // Если указали передачу файла но метод не POST, меняем его!
+            // Если указали передачу файла, но метод не POST, меняем его!
             if (count($this->files) > 0 && $this->method !== "POST") {
                 $this->setMethod("POST");
             }
@@ -372,7 +368,7 @@ class AppSimpleRequest
             }
 
             if (count($this->accept) > 0) {
-                $this->setHeader("Accept: " . trim(join(", ", $this->accept)));
+                $this->setHeader("Accept: ".trim(join(", ", $this->accept)));
             }
 
             if (count($this->headers) > 0) {
@@ -399,7 +395,7 @@ class AppSimpleRequest
                 $result['headers'] = $headerSize > 0 ? explode("\n", $result['headers']) : [];
                 $result['document'] = substr($result['document'], $headerSize);
 
-                // перебираем все заголовки и старые удаляем а добавляем на их основе новые с буквеными ключами
+                // перебираем все заголовки и старые удаляем, а добавляем на их основе новые с буквенными ключами
                 foreach ($result['headers'] as $key => $row) {
                     $row = trim($row);
 
@@ -463,14 +459,13 @@ class AppSimpleRequest
     }
 
     /**
-     * HTTP-авторизация.
+     * HTTP-авторизация
      *
      * @param string $user
      * @param string $password
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function httpAuth($user, $password)
+    public function httpAuth(string $user, string $password): static
     {
         $this->setHttpAuth($user, $password);
 
@@ -478,70 +473,74 @@ class AppSimpleRequest
     }
 
     /**
-     * HTTP-авторизация.
+     * HTTP-авторизация
      *
      * @param string $user
      * @param string $password
      * @return void
      */
-    protected function setHttpAuth($user, $password): void
+    protected function setHttpAuth(string $user, string $password): void
     {
-        $encodedAuth = base64_encode($user . ":" . $password);
+        $encodedAuth = base64_encode($user.":".$password);
 
-        $this->setHeader("Authentication : Basic " . $encodedAuth);
-        $this->options[CURLOPT_USERPWD] = $user . ":" . $password;
+        $this->setHeader("Authentication : Basic ".$encodedAuth);
+        $this->options[CURLOPT_USERPWD] = $user.":".$password;
         $this->options[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
     }
 
     /**
-     * Устанавливает для передачи указанный файл.
+     * Устанавливает для передачи указанный файл
      *
-     * @param string            $path     - путь до файла на диске
-     * @param null|string|array $name     - Имя файла в данных для загрузки
-     * @param string            $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
-     * @return $this
+     * @param string $path - путь до файла на диске
+     * @param array|string|null $name - Имя файла в данных для загрузки
+     * @param string $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function file($path, $name = null, $mimeType = 'application/octet-stream')
-    {
+    public function file(
+        string $path,
+        array|string|null $name = null,
+        string $mimeType = 'application/octet-stream'
+    ): static {
         $this->setFile($path, $name, $mimeType);
 
         return $this;
     }
 
     /**
-     * Устанавливает для передачи указанный файл.
+     * Устанавливает для передачи указанный файл
      *
-     * @param string            $path     - путь до файла на диске
-     * @param null|string|array $name     - Имя файла в данных для загрузки
-     * @param string            $mimeType - MIME-тип файла ( по умолчанию это application/octet-stream )
+     * @param string|null $path путь до файла на диске
+     * @param array|string|null $name Имя файла в данных для загрузки
+     * @param string $mimeType MIME-тип файла (по умолчанию это application/octet-stream)
      * @return void
      */
-    protected function setFile($path = null, $name = null, $mimeType = 'application/octet-stream'): void
-    {
+    protected function setFile(
+        ?string $path = null,
+        array|string|null $name = null,
+        string $mimeType = 'application/octet-stream'
+    ): void {
         if (! is_null($path) && file_exists($path)) {
             if (is_array($name)) {
                 $field = array_shift($name);
                 $name = (string)array_shift($name);
-                $field = empty($field) ? "file_" . (count($this->files) + 1) : $field;
-                $name = empty($name) ? "file_" . (count($this->files) + 1) : $name;
-                $this->files[$field] = new \CURLFile($path, $mimeType, $name);
+                $field = empty($field) ? "file_".(count($this->files) + 1) : $field;
+                $name = empty($name) ? "file_".(count($this->files) + 1) : $name;
+                $this->files[$field] = new CURLFile($path, $mimeType, $name);
 
             } else {
-                $name = is_null($name) ? "file_" . (count($this->files) + 1) : $name;
-                $this->files[$name] = new \CURLFile($path, $mimeType, $name);
+                $name = is_null($name) ? "file_".(count($this->files) + 1) : $name;
+                $this->files[$name] = new CURLFile($path, $mimeType, $name);
             }
         }
     }
 
     /**
-     * Устанавливает содержимое заголовка "Cookie", который будет отправлен с HTTP запросом.
+     * Устанавливает содержимое заголовка "Cookie", который будет отправлен с HTTP запросом
      *
      * @param array $cookies
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function cookies($cookies)
+    public function cookies(array $cookies): static
     {
         $this->setCookies($cookies);
 
@@ -549,29 +548,26 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает содержимое заголовка "Cookie", который будет отправлен с HTTP запросом.
+     * Устанавливает содержимое заголовка "Cookie", который будет отправлен с HTTP запросом
      *
      * @param array $cookies
      * @return void
      */
-    protected function setCookies($cookies): void
+    protected function setCookies(array $cookies): void
     {
-        if (is_array($cookies)) {
-            $this->cookies = array_merge($this->cookies, $cookies);
-        }
+        $this->cookies = array_merge($this->cookies, $cookies);
     }
 
     /**
-     * Передать указанный массив как поток данных в формате JSON.
+     * Передать указанный массив как поток данных в формате JSON
      *
      * @note метод устанавливает дополнительные параметры для передачи!
      *
-     * @param array | string $data
-     * @param string         $uri
-     * @return $this
+     * @param array|string $data
+     * @param string|null $uri
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function streamJson($data, $uri = null)
+    public function streamJson(array|string $data, ?string $uri = null): static
     {
         $this->setStreamJson($data, $uri);
 
@@ -579,15 +575,15 @@ class AppSimpleRequest
     }
 
     /**
-     * Передать указанный массив как поток данных в формате JSON.
+     * Передать указанный массив как поток данных в формате JSON
      *
      * @note метод устанавливает дополнительные параметры для передачи!
      *
-     * @param array | string $data
-     * @param string         $uri
+     * @param array|string $data
+     * @param string|null $uri
      * @return void
      */
-    protected function setStreamJson($data, $uri = null): void
+    protected function setStreamJson(array|string $data, ?string $uri = null): void
     {
         if (! is_null($uri)) {
             $this->setUrl($uri);
@@ -603,21 +599,20 @@ class AppSimpleRequest
         $this->setMethod("POST");
         $this->setCustomRequest("POST");
         $this->setReturnTransfer(true);
-        $this->setHeader(['Content-Type: application/json', 'Content-Length: ' . strlen($data)]);
+        $this->setHeader(['Content-Type: application/json', 'Content-Length: '.strlen($data)]);
         $this->accept('application/json');
     }
 
     /**
-     * Передать указанный массив как поток данных в формате XML.
+     * Передать указанный массив как поток данных в формате XML
      *
      * @note метод устанавливает дополнительные параметры для передачи!
      *
-     * @param array | string $data
-     * @param string         $uri
-     * @return $this
+     * @param array|string $data
+     * @param string|null $uri
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function streamXml($data, $uri = null)
+    public function streamXml(array|string $data, ?string $uri = null): static
     {
         $this->setStreamXml($data, $uri);
 
@@ -625,25 +620,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Передать указанный массив как поток данных в формате XML.
+     * Передать указанный массив как поток данных в формате XML
      *
      * @note метод устанавливает дополнительные параметры для передачи!
      *
-     * @param array | string $data
-     * @param null           $uri
-     * @param string         $rootNode
+     * @param array|string $data
+     * @param string|null $uri
+     * @param string $rootNode
      * @return void
      */
-    protected function setStreamXml($data, $uri = null, $rootNode = 'root'): void
+    protected function setStreamXml(array|string $data, ?string $uri = null, string $rootNode = 'root'): void
     {
         if (! is_null($uri)) {
             $this->setUrl($uri);
         }
 
         if (is_array($data)) {
-            $dom = new \DOMDocument;
+            $dom = new DOMDocument();
             $dom->preserveWhiteSpace = false;
-            $dom->loadXML($xml = array_to_xml($data, new \SimpleXMLElement("<{$rootNode}/>"))->asXML());
+            $dom->loadXML($xml = array_to_xml($data, new SimpleXMLElement("<{$rootNode}/>"))->asXML());
             $dom->formatOutput = true;
             $data = $dom->saveXml();
         }
@@ -654,18 +649,17 @@ class AppSimpleRequest
         $this->setMethod("POST");
         $this->setCustomRequest("POST");
         $this->setReturnTransfer(true);
-        $this->setHeader(['Content-Type: application/xml', 'Content-Length: ' . strlen($data)]);
+        $this->setHeader(['Content-Type: application/xml', 'Content-Length: '.strlen($data)]);
         $this->accept('application/xml');
     }
 
     /**
-     * Устанавливает метод был использования в запросе.
+     * Устанавливает метод был использования в запросе
      *
      * @param string $str
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function method($str)
+    public function method(string $str): static
     {
         $this->setMethod($str);
 
@@ -673,26 +667,23 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает метод был использования в запросе.
+     * Устанавливает метод был использования в запросе
      *
      * @param string $str
      * @return void
      */
-    protected function setMethod($str): void
+    protected function setMethod(string $str): void
     {
-        if (is_string($str)) {
-            $this->method = in_array($str, ["GET", "POST", "PUT", "PATCH", "DELETE"]) ? $str : "GET";
-        }
+        $this->method = in_array($str, ["GET", "POST", "PUT", "PATCH", "DELETE"]) ? $str : "GET";
     }
 
     /**
-     * Устанавливает URI для текущего сеанса.
+     * Устанавливает URI для текущего сеанса
      *
      * @param string $str
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function url($str)
+    public function url(string $str): static
     {
         $this->setUrl($str);
 
@@ -700,19 +691,19 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает URI для текущего сеанса.
+     * Устанавливает URI для текущего сеанса
      *
      * @param string $str
      * @return void
      */
-    protected function setUrl($str): void
+    protected function setUrl(string $str): void
     {
-        $this->url = $this->options[CURLOPT_URL] = (string)$str;
+        $this->url = $this->options[CURLOPT_URL] = $str;
         $this->settingsForURI($str);
     }
 
     /**
-     * Возвращает URI текущего сеанса.
+     * Возвращает URI текущего сеанса
      *
      * @return string
      */
@@ -723,10 +714,9 @@ class AppSimpleRequest
 
     /**
      * @param string $uri
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    protected function settingsForURI($uri)
+    protected function settingsForURI(string $uri): static
     {
         if (strtolower((substr($uri, 0, 5)) === 'https')) {
             if ($this->sslChecks) {
@@ -742,11 +732,10 @@ class AppSimpleRequest
     }
 
     /**
-     * @param string|array $headers
-     * @return $this
+     * @param array|string $headers
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function header($headers)
+    public function header(array|string $headers): static
     {
         $this->setHeader($headers);
 
@@ -754,10 +743,10 @@ class AppSimpleRequest
     }
 
     /**
-     * @param string|array $headers
+     * @param array|string $headers
      * @return void
      */
-    protected function setHeader($headers): void
+    protected function setHeader(array|string $headers): void
     {
         if (is_array($headers)) {
             foreach ($headers as $row) {
@@ -773,13 +762,12 @@ class AppSimpleRequest
     /**
      * Установка флага как отдать результат передачи в качестве строки из curl_exec()
      *
-     * @note если указать false то результат будет напрямую выведен в браузер
+     * @note если указать false, то результат будет напрямую выведен в браузер
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function returnTransfer($flag)
+    public function returnTransfer(bool $flag): static
     {
         $this->setReturnTransfer($flag);
 
@@ -789,24 +777,23 @@ class AppSimpleRequest
     /**
      * Установка флага как отдать результат передачи в качестве строки из curl_exec()
      *
-     * @note если указать false то результат будет напрямую выведен в браузер
+     * @note если указать false, то результат будет напрямую выведен в браузер
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
-    protected function setReturnTransfer($flag): void
+    protected function setReturnTransfer(bool $flag): void
     {
-        $this->options[CURLOPT_RETURNTRANSFER] = (boolean)$flag;
+        $this->options[CURLOPT_RETURNTRANSFER] = $flag;
     }
 
     /**
-     * Включение\выключение заголовков в выводе результата запроса.
+     * Включение\выключение заголовков в выводе результата запроса
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function headersInOutput($flag)
+    public function headersInOutput(bool $flag): static
     {
         $this->setHeadersInOutput($flag);
 
@@ -814,24 +801,23 @@ class AppSimpleRequest
     }
 
     /**
-     * Включение\выключение заголовков в выводе результата запроса.
+     * Включение\выключение заголовков в выводе результата запроса
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
-    protected function setHeadersInOutput($flag): void
+    protected function setHeadersInOutput(bool $flag): void
     {
-        $this->options[CURLOPT_HEADER] = $this->headerInResponse = (boolean)$flag;
+        $this->options[CURLOPT_HEADER] = $this->headerInResponse = $flag;
     }
 
     /**
-     * Определение следования любому заголовку "Location" в ответе.
+     * Определение следования любому заголовку "Location" в ответе
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function followsAnyHeader($flag)
+    public function followsAnyHeader(bool $flag): static
     {
         $this->setFollowsAnyHeader($flag);
 
@@ -839,14 +825,14 @@ class AppSimpleRequest
     }
 
     /**
-     * Определение следования любому заголовку "Location" в ответе.
+     * Определение следования любому заголовку "Location" в ответе
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
-    protected function setFollowsAnyHeader($flag): void
+    protected function setFollowsAnyHeader(bool $flag): void
     {
-        $this->options[CURLOPT_FOLLOWLOCATION] = (boolean)$flag;
+        $this->options[CURLOPT_FOLLOWLOCATION] = $flag;
     }
 
     /**
@@ -855,10 +841,9 @@ class AppSimpleRequest
      * @note поддерживаемыми кодировками являются "identity", "deflate" и "gzip".
      *
      * @param string $encoding
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function acceptEncoding($encoding)
+    public function acceptEncoding(string $encoding): static
     {
         $this->setAcceptEncoding($encoding);
 
@@ -873,19 +858,18 @@ class AppSimpleRequest
      * @param string $encoding
      * @return void
      */
-    protected function setAcceptEncoding($encoding): void
+    protected function setAcceptEncoding(string $encoding): void
     {
-        $this->options[CURLOPT_ENCODING] = (string)$encoding;
+        $this->options[CURLOPT_ENCODING] = $encoding;
     }
 
     /**
      * Задает значение HTTP заголовка: User-Agent:...
      *
      * @param string $userAgent
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function userAgent($userAgent)
+    public function userAgent(string $userAgent): static
     {
         $this->setUserAgent($userAgent);
 
@@ -898,20 +882,19 @@ class AppSimpleRequest
      * @param string $userAgent
      * @return void
      */
-    protected function setUserAgent($userAgent): void
+    protected function setUserAgent(string $userAgent): void
     {
-        $this->options[CURLOPT_USERAGENT] = (string)$userAgent;
-        $this->setHeader("User-Agent: " . (string)$userAgent);
+        $this->options[CURLOPT_USERAGENT] = $userAgent;
+        $this->setHeader("User-Agent: {$userAgent}");
     }
 
     /**
      * Задает MIME тип.
      *
-     * @param string | array $str
-     * @return $this
+     * @param array|string $str
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function accept($str)
+    public function accept(array|string $str): static
     {
         $this->setAccept($str);
 
@@ -919,12 +902,12 @@ class AppSimpleRequest
     }
 
     /**
-     * Задает MIME тип.
+     * Задает MIME тип
      *
-     * @param string $str
+     * @param array|string $str
      * @return void
      */
-    protected function setAccept($str): void
+    protected function setAccept(array|string $str): void
     {
         if (is_array($str)) {
             foreach ($str as $accept) {
@@ -938,13 +921,12 @@ class AppSimpleRequest
     }
 
     /**
-     * Включает\выключает установку поля Referer: в перенаправленных запросах.
+     * Включает\выключает установку поля Referer: в перенаправленных запросах
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function autoReferer($flag)
+    public function autoReferer(bool $flag): static
     {
         $this->setAutoReferer($flag);
 
@@ -952,26 +934,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Включает\выключает установку поля Referer: в перенаправленных запросах.
+     * Включает\выключает установку поля Referer: в перенаправленных запросах
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
-    protected function setAutoReferer($flag): void
+    protected function setAutoReferer(bool $flag): void
     {
-        $this->options[CURLOPT_AUTOREFERER] = (boolean)$flag;
+        $this->options[CURLOPT_AUTOREFERER] = $flag;
     }
 
     /**
-     * Устанавливает таймаут соединения в секундах, которые ожидаются при попытке подключения.
+     * Устанавливает таймаут соединения в секундах, которые ожидаются при попытке подключения
      *
-     * @note используйте 0 чтобы ждать бесконечно.
+     * @note используйте 0, чтобы ждать бесконечно
      *
-     * @param integer $seconds
-     * @return $this
+     * @param int $seconds
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function connectTimeout($seconds)
+    public function connectTimeout(int $seconds): static
     {
         $this->setConnectTimeout($seconds);
 
@@ -979,26 +960,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает таймаут соединения в секундах, которые ожидаются при попытке подключения.
+     * Устанавливает таймаут соединения в секундах, которые ожидаются при попытке подключения
      *
-     * @note используйте 0 чтобы ждать бесконечно.
+     * @note используйте 0, чтобы ждать бесконечно
      *
-     * @param integer $seconds
+     * @param int $seconds
      * @return void
      */
-    protected function setConnectTimeout($seconds): void
+    protected function setConnectTimeout(int $seconds): void
     {
-        $this->options[CURLOPT_CONNECTTIMEOUT] = (int)$seconds;
+        $this->options[CURLOPT_CONNECTTIMEOUT] = $seconds;
     }
 
     /**
-     * Устанавливает таймаут ответа в секундах, которое отводятся для работы CURL-функций.
+     * Устанавливает таймаут ответа в секундах, которое отводятся для работы CURL-функций
      *
-     * @param integer $seconds
-     * @return $this
+     * @param int $seconds
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function timeout($seconds)
+    public function timeout(int $seconds): static
     {
         $this->setTimeout($seconds);
 
@@ -1006,26 +986,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает таймаут ответа в секундах, которое отводятся для работы CURL-функций.
+     * Устанавливает таймаут ответа в секундах, которое отводятся для работы CURL-функций
      *
-     * @param integer $seconds
+     * @param int $seconds
      * @return void
      */
-    protected function setTimeout($seconds): void
+    protected function setTimeout(int $seconds): void
     {
-        $this->options[CURLOPT_TIMEOUT] = (int)$seconds;
+        $this->options[CURLOPT_TIMEOUT] = $seconds;
     }
 
     /**
-     * Устанавливает максимальное количество принимаемых редиректов.
+     * Устанавливает максимальное количество принимаемых редиректов
      *
      * @note Используйте этот параметр вместе с параметром CURLOPT_FOLLOWLOCATION
      *
-     * @param integer $num
-     * @return $this
+     * @param int $num
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function maxRedirect($num)
+    public function maxRedirect(int $num): static
     {
         $this->setMaxRedirect($num);
 
@@ -1033,26 +1012,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает максимальное количество принимаемых редиректов.
+     * Устанавливает максимальное количество принимаемых редиректов
      *
      * @note Используйте этот параметр вместе с параметром CURLOPT_FOLLOWLOCATION
      *
-     * @param integer $num
+     * @param int $num
      * @return void
      */
-    protected function setMaxRedirect($num): void
+    protected function setMaxRedirect(int $num): void
     {
-        $this->options[CURLOPT_MAXREDIRS] = (int)$num;
+        $this->options[CURLOPT_MAXREDIRS] = $num;
     }
 
     /**
-     * Устанавливает флаг начать новую "сессию" cookies.
+     * Устанавливает флаг начать новую "сессию" cookies
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function newSession($flag)
+    public function newSession(bool $flag): static
     {
         $this->setNewSession($flag);
 
@@ -1060,24 +1038,23 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает флаг начать новую "сессию" cookies.
+     * Устанавливает флаг начать новую "сессию" cookies
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
     protected function setNewSession(bool $flag): void
     {
-        $this->options[CURLOPT_COOKIESESSION] = (boolean)$flag;
+        $this->options[CURLOPT_COOKIESESSION] = $flag;
     }
 
     /**
-     * Устанавливает флаг принудительного использования нового соединения вместо закешированного.
+     * Устанавливает флаг принудительного использования нового соединения вместо закешированного
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function freshConnect(bool $flag)
+    public function freshConnect(bool $flag): static
     {
         $this->setFreshConnect($flag);
 
@@ -1085,24 +1062,23 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает флаг принудительного использования нового соединения вместо закешированного.
+     * Устанавливает флаг принудительного использования нового соединения вместо закешированного
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
     protected function setFreshConnect(bool $flag): void
     {
-        $this->options[CURLOPT_FRESH_CONNECT] = (boolean)$flag;
+        $this->options[CURLOPT_FRESH_CONNECT] = $flag;
     }
 
     /**
      * Устанавливает флаг принудительного закрытия соединения после завершения его обработки так, чтобы его нельзя было использовать повторно
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function forbidReUse(bool $flag)
+    public function forbidReUse(bool $flag): static
     {
         $this->setForbidReUse($flag);
 
@@ -1112,22 +1088,21 @@ class AppSimpleRequest
     /**
      * Устанавливает флаг принудительного закрытия соединения после завершения его обработки так, чтобы его нельзя было использовать повторно
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
     protected function setForbidReUse(bool $flag): void
     {
-        $this->options[CURLOPT_FORBID_REUSE] = (boolean)$flag;
+        $this->options[CURLOPT_FORBID_REUSE] = $flag;
     }
 
     /**
-     * Устанавливает название специального метода, который будет использован в HTTP запросе вместо GET или HEAD.
+     * Устанавливает название специального метода, который будет использован в HTTP запросе вместо GET или HEAD
      *
      * @param string $name
-     * @return $this
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function customRequest(string $name)
+    public function customRequest(string $name): static
     {
         $this->setCustomRequest($name);
 
@@ -1135,27 +1110,26 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает название специального метода, который будет использован в HTTP запросе вместо GET или HEAD.
+     * Устанавливает название специального метода, который будет использован в HTTP запросе вместо GET или HEAD
      *
      * @param string $name
      * @return void
      */
     protected function setCustomRequest(string $name): void
     {
-        $this->options[CURLOPT_CUSTOMREQUEST] = strtoupper((string)$name);
+        $this->options[CURLOPT_CUSTOMREQUEST] = strtoupper($name);
     }
 
     /**
-     * Устанавливает флаг проверки сертификата удаленного сервера.
+     * Устанавливает флаг проверки сертификата удаленного сервера
      *
      * @note начиная с curl 7.10, по умолчанию этот параметр имеет значение TRUE
      * @note если CURLOPT_SSL_VERIFYPEER установлен в FALSE, возможно потребуется установить CURLOPT_SSL_VERIFYHOST в TRUE или FALSE
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function sslValidation(bool $flag)
+    public function sslValidation(bool $flag): static
     {
         $this->setSslValidation($flag);
 
@@ -1163,26 +1137,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает флаг принудительного использования нового соединения вместо закешированного.
+     * Устанавливает флаг принудительного использования нового соединения вместо закешированного
      *
-     * @param boolean $flag
+     * @param bool $flag
      * @return void
      */
     protected function setSslValidation(bool $flag): void
     {
-        $this->options[CURLOPT_SSL_VERIFYPEER] = (boolean)$flag;
+        $this->options[CURLOPT_SSL_VERIFYPEER] = $flag;
     }
 
     /**
-     * Устанавливает проверку имени, указанного в сертификате удаленного сервера, при установлении SSL соединения.
+     * Устанавливает проверку имени, указанного в сертификате удаленного сервера, при установлении SSL соединения
      *
-     * @note значение 1 означает проверку существования имени, значение 2 - кроме того, и проверку соответствия имени хоста.
+     * @note значение 1 означает проверку существования имени, значение 2 - кроме того, и проверку соответствия имени хоста
      *
-     * @param integer $num
-     * @return $this
+     * @param int $num
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function sslValidationHost(int $num)
+    public function sslValidationHost(int $num): static
     {
         $this->setSslValidationHost($num);
 
@@ -1190,26 +1163,25 @@ class AppSimpleRequest
     }
 
     /**
-     * Устанавливает проверку имени, указанного в сертификате удаленного сервера, при установлении SSL соединения.
+     * Устанавливает проверку имени, указанного в сертификате удаленного сервера, при установлении SSL соединения
      *
-     * @note значение 1 означает проверку существования имени, значение 2 - кроме того, и проверку соответствия имени хоста.
+     * @note значение 1 означает проверку существования имени, значение 2 - кроме того, и проверку соответствия имени хоста
      *
-     * @param integer $num
+     * @param int $num
      * @return void
      */
     protected function setSslValidationHost(int $num): void
     {
-        $this->options[CURLOPT_SSL_VERIFYHOST] = (int)$num;
+        $this->options[CURLOPT_SSL_VERIFYHOST] = $num;
     }
 
     /**
      * Установка флага включения или выключения SSL сертификата урла если тот https
      *
-     * @param boolean $flag
-     * @return $this
+     * @param bool $flag
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function sslChecks(bool $flag)
+    public function sslChecks(bool $flag): static
     {
         $this->setSslValidationHost($flag);
 
@@ -1222,6 +1194,6 @@ class AppSimpleRequest
      */
     protected function setSslChecks(bool $flag): void
     {
-        $this->sslChecks = (boolean)$flag;
+        $this->sslChecks = $flag;
     }
 }

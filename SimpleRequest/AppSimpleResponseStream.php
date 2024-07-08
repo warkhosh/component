@@ -2,7 +2,11 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
+use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 use Warkhosh\Variable\VarArray;
+use Throwable;
 
 class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 {
@@ -13,37 +17,51 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     private const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
     private const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
 
-    /** @var resource */
+    /**
+     * @var resource
+     */
     private $stream;
 
-    /** @var int|null */
-    private $size;
-
-    /** @var bool */
-    private $seekable;
-
-    /** @var bool */
-    private $readable;
-
-    /** @var bool */
-    private $writable;
-
-    /** @var string|null */
-    private $uri;
-
-    /** @var mixed[] */
-    private $metaData;
+    /**
+     * @var int|null
+     */
+    private ?int $size;
 
     /**
-     * @param string|resource $resource
+     * @var bool
+     */
+    private bool $seekable;
+
+    /**
+     * @var bool
+     */
+    private bool $readable;
+
+    /**
+     * @var bool
+     */
+    private bool $writable;
+
+    /**
+     * @var string|null
+     */
+    private ?string $uri;
+
+    /**
+     * @var mixed
+     */
+    private mixed $metaData;
+
+    /**
+     * @param resource|string $resource
      * @param array{size?: int, meta_Data?: array} $options Associative
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $resource, array $options = [])
+    public function __construct($resource, array $options = [])
     {
         if (! (is_string($resource) || is_resource($resource))) {
-            throw new \RuntimeException('Invalid resource type');
+            throw new RuntimeException('Invalid resource type');
         }
 
         if (is_string($resource)) {
@@ -92,9 +110,9 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
     /**
      * @return string
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             if ($this->isSeekable()) {
@@ -103,23 +121,23 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
             return $this->getContents();
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }
 
     /**
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getContents(): string
     {
         if (! isset($this->stream)) {
-            throw new \RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached');
         }
 
         if (! $this->readable) {
-            throw new \RuntimeException('Cannot read from non-readable stream');
+            throw new RuntimeException('Cannot read from non-readable stream');
         }
 
         return static::tryToGetContents($this->stream);
@@ -146,7 +164,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     public function detach()
     {
         if (! isset($this->stream)) {
-            return null;
+            return;
         }
 
         $result = $this->stream;
@@ -161,7 +179,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return int|null
      */
     #[\ReturnTypeWillChange]
-    public function getSize()
+    public function getSize(): ?int
     {
         if ($this->size !== null) {
             return $this->size;
@@ -216,7 +234,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     public function eof(): bool
     {
         if (! isset($this->stream)) {
-            throw new \RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached');
         }
 
         return feof($this->stream);
@@ -224,18 +242,18 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
     /**
      * @return int
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function tell(): int
     {
         if (! isset($this->stream)) {
-            throw new \RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached');
         }
 
         $result = ftell($this->stream);
 
         if ($result === false) {
-            throw new \RuntimeException('Unable to determine stream position');
+            throw new RuntimeException('Unable to determine stream position');
         }
 
         return $result;
@@ -245,7 +263,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * Устанавливает смещение к началу потока
      *
      * @return void
-     * @throws \RuntimeException on failure.
+     * @throws RuntimeException on failure.
      * @link http://www.php.net/manual/en/function.fseek.php
      * @see  seek()
      */
@@ -261,21 +279,21 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @param int $offset
      * @param int $whence
      * @return void
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
-        $whence = (int)$whence;
-
         if (! isset($this->stream)) {
-            throw new \RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached');
         }
+
         if (! $this->seekable) {
-            throw new \RuntimeException('Stream is not seekable');
+            throw new RuntimeException('Stream is not seekable');
         }
+
         if (fseek($this->stream, $offset, $whence) === -1) {
-            throw new \RuntimeException("Unable to seek to stream position {$offset} with whence "
-                . var_export($whence, true));
+            throw new RuntimeException("Unable to seek to stream position {$offset} with whence "
+                .var_export($whence, true));
         }
     }
 
@@ -284,18 +302,20 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      *
      * @param int $length
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    public function read($length): string
+    public function read(int $length): string
     {
         if (! isset($this->stream)) {
-            throw new \RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached');
         }
+
         if (! $this->readable) {
-            throw new \RuntimeException('Cannot read from non-readable stream');
+            throw new RuntimeException('Cannot read from non-readable stream');
         }
+
         if ($length < 0) {
-            throw new \RuntimeException('Length parameter cannot be negative');
+            throw new RuntimeException('Length parameter cannot be negative');
         }
 
         if (0 === $length) {
@@ -304,12 +324,12 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
         try {
             $string = fread($this->stream, $length);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Unable to read from stream', 0, $e);
+        } catch (Exception $e) {
+            throw new RuntimeException('Unable to read from stream', 0, $e);
         }
 
         if (false === $string) {
-            throw new \RuntimeException('Unable to read from stream');
+            throw new RuntimeException('Unable to read from stream');
         }
 
         return $string;
@@ -318,15 +338,16 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @param string $string
      * @return int
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
-    public function write($string): int
+    public function write(string $string): int
     {
         if (! isset($this->stream)) {
-            throw new \RuntimeException('Stream is detached');
+            throw new RuntimeException('Stream is detached');
         }
+
         if (! $this->writable) {
-            throw new \RuntimeException('Cannot write to a non-writable stream');
+            throw new RuntimeException('Cannot write to a non-writable stream');
         }
 
         // We can't know the size after writing anything
@@ -334,7 +355,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         $result = fwrite($this->stream, $string);
 
         if ($result === false) {
-            throw new \RuntimeException('Unable to write to stream');
+            throw new RuntimeException('Unable to write to stream');
         }
 
         return $result;
@@ -342,11 +363,11 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
     /**
      * @link http://php.net/manual/en/function.stream-get-meta-data.php
-     * @param string $key
+     * @param string|null $key
      * @return array|mixed|null
      */
     #[\ReturnTypeWillChange]
-    public function getMetadata($key = null)
+    public function getMetadata(?string $key = null)
     {
         if (! isset($this->stream)) {
             return $key ? null : [];
@@ -364,12 +385,12 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     }
 
     /**
-     * @param resource|string|int|float|bool|null $resource
+     * @param bool|float|int|string|null $resource
      * @return resource
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     #[\ReturnTypeWillChange]
-    public static function stream($resource = '')
+    public static function stream(bool|float|int|string|null $resource = '')
     {
         if (is_scalar($resource)) {
             $stream = static::tryFopen('php://temp', 'r+');
@@ -396,21 +417,21 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
             return static::tryFopen('php://temp', 'r+');
         }
 
-        throw new \InvalidArgumentException('Invalid resource type: ' . gettype($resource));
+        throw new InvalidArgumentException('Invalid resource type: '.gettype($resource));
     }
 
     /**
      * @param string $filename
      * @param string $mode
      * @return resource
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     #[\ReturnTypeWillChange]
     public static function tryFopen(string $filename, string $mode)
     {
         $ex = null;
         set_error_handler(static function (int $errno, string $errstr) use ($filename, $mode, &$ex) {
-            $ex = new \RuntimeException(sprintf(
+            $ex = new RuntimeException(sprintf(
                 'Unable to open "%s" using mode "%s": %s',
                 $filename,
                 $mode,
@@ -423,8 +444,8 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         try {
             /** @var resource $handle */
             $handle = fopen($filename, $mode);
-        } catch (\Throwable $e) {
-            $ex = new \RuntimeException(sprintf(
+        } catch (Throwable $e) {
+            $ex = new RuntimeException(sprintf(
                 'Unable to open "%s" using mode "%s": %s',
                 $filename,
                 $mode,
@@ -435,7 +456,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         restore_error_handler();
 
         if ($ex) {
-            /** @var $ex \RuntimeException */
+            /** @var $ex RuntimeException */
             throw $ex;
         }
 
@@ -445,13 +466,13 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @param resource $stream
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public static function tryToGetContents($stream): string
     {
         $ex = null;
         set_error_handler(static function (int $errno, string $errstr) use (&$ex) {
-            $ex = new \RuntimeException(sprintf(
+            $ex = new RuntimeException(sprintf(
                 'Unable to read stream contents: %s',
                 $errstr
             ));
@@ -460,14 +481,14 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         });
 
         try {
-            /** @var string|false $contents */
+            /** @var false|string $contents */
             $contents = stream_get_contents($stream);
 
             if ($contents === false) {
-                $ex = new \RuntimeException('Unable to read stream contents');
+                $ex = new RuntimeException('Unable to read stream contents');
             }
-        } catch (\Throwable $e) {
-            $ex = new \RuntimeException(sprintf(
+        } catch (Throwable $e) {
+            $ex = new RuntimeException(sprintf(
                 'Unable to read stream contents: %s',
                 $e->getMessage()
             ), 0, $e);
@@ -476,7 +497,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         restore_error_handler();
 
         if ($ex) {
-            /** @var $ex \RuntimeException */
+            /** @var $ex RuntimeException */
             throw $ex;
         }
 

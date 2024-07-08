@@ -2,22 +2,28 @@
 
 namespace Warkhosh\Component\SimpleRequest;
 
+use Exception;
+use InvalidArgumentException;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Throwable;
 use Warkhosh\Variable\VarArray;
 
 class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 {
-    protected $response = [
-        'errno'     => 0,
-        'error'     => '',
-        'document'  => '',
-        'headers'   => [],
+    protected array $response = [
+        'errno' => 0,
+        'error' => '',
+        'document' => '',
+        'headers' => [],
         'http_code' => 0,
     ];
 
     /**
      * @var AppSimpleResponseStream
      */
-    protected $stream;
+    protected AppSimpleResponseStream $stream;
 
     /**
      * AppSimpleResponse constructor.
@@ -40,12 +46,11 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * Возвращает значения указанного заголовка из ответа сервера
      *
      * @param string $name
-     * @return array|string|integer|float
+     * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function getHeader($name)
+    public function getHeader(string $name): array
     {
-        if (is_string($name) && ! empty($name)) {
+        if (! empty($name)) {
             $name = trim(mb_strtolower($name));
             $name = str_replace(" ", "-", ucwords(str_replace("-", " ", $name)));
 
@@ -64,7 +69,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @return bool Returns true if any header names match the given header name using a case-insensitive string comparison.
      *              Returns false if no matching header name is found in the message.
      */
-    public function hasHeader($name): bool
+    public function hasHeader(string $name): bool
     {
         $name = trim(mb_strtolower($name));
         $name = str_replace(" ", "-", ucwords(str_replace("-", " ", $name)));
@@ -89,41 +94,39 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @return string A string of values as provided for the given header concatenated together using a comma.
      *                If the header does not appear in the message, this method MUST return an empty string.
      */
-    public function getHeaderLine($name): string
+    public function getHeaderLine(string $name): string
     {
         $header = $this->getHeader($name);
 
-        return is_array($header) ? join(",", $header) : strval($header);
+        return join(",", $header);
     }
 
     /**
      * Return an instance with the provided value replacing the specified header.
      *
-     * @param string          $name  Case-insensitive header field name.
+     * @param string $name Case-insensitive header field name.
      * @param string|string[] $value Header value(s).
      * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header names or values.
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    #[\ReturnTypeWillChange]
-    public function withHeader($name, $value)
+    public function withHeader(string $name, $value): MessageInterface
     {
-        throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
+        throw new InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
      * Return an instance with the specified header appended with the given value.
      *
-     * @param string          $name  Case-insensitive header field name to add.
+     * @param string $name Case-insensitive header field name to add.
      * @param string|string[] $value Header value(s).
      * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @throws InvalidArgumentException for invalid header names or values.
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    #[\ReturnTypeWillChange]
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader(string $name, $value): MessageInterface
     {
-        throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
+        throw new InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
@@ -131,13 +134,12 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      *
      * @param string $name Case-insensitive header field name to remove.
      * @return static
-     * @throws \Exception
+     * @throws Exception
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    #[\ReturnTypeWillChange]
-    public function withoutHeader($name)
+    public function withoutHeader(string $name): MessageInterface
     {
-        throw new \Exception("Этот метод не поддерживается в этой редакции кода");
+        throw new Exception("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
@@ -146,7 +148,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @param int $code
      * @return bool
      */
-    public function getResult($code = 200): bool
+    public function getResult(int $code = 200): bool
     {
         return ($this->getErrno() === 0 && $this->getStatusCode() === $code);
     }
@@ -177,12 +179,11 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 
     /**
      * @param string $type
-     * @return string|array|\stdClass
-     * @throws \Throwable
+     * @return array|\stdClass|string
+     * @throws Throwable
      * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
-    #[\ReturnTypeWillChange]
-    public function getDocument($type = 'raw')
+    public function getDocument(string $type = 'raw')
     {
         try {
             // Если тип ответа в формате JSON нужно превратить в массив
@@ -198,7 +199,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 
             return $this->getBody()->getContents();
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }
@@ -207,13 +208,12 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * Обращение за данными в JSON ответе по ключу.
      *
      * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      * @return mixed|null
-     * @throws \Throwable
+     * @throws Throwable
      * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
-    #[\ReturnTypeWillChange]
-    public function getDocumentValue($key = '', $default = null)
+    public function getDocumentValue(string $key = '', mixed $default = null): mixed
     {
         static $cacheDocument, $data;
 
@@ -229,12 +229,12 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
             if ($this->getHeader('Content-Type') === 'json') {
                 $data = $cached ? $data : json_decode($this->response['document'], true);
 
-                return \Warkhosh\Variable\VarArray::get($key, $data, $default);
+                return VarArray::get($key, $data, $default);
             }
 
             return $default;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }
@@ -242,11 +242,10 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     /**
      * Получает тело сообщения в виде потока
      *
-     * @return \Psr\Http\Message\StreamInterface
-     * @throws \Exception
+     * @return StreamInterface
+     * @throws Exception
      */
-    #[\ReturnTypeWillChange]
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         if (! $this->stream) {
             $this->stream = AppSimpleResponseStream::stream('');
@@ -258,12 +257,11 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     /**
      * Вернуть экземпляр с указанным телом сообщения
      *
-     * @param \Psr\Http\Message\StreamInterface $body Body.
-     * @return static
-     * @throws \InvalidArgumentException When the body is not valid.
+     * @param StreamInterface $body Body.
+     * @return MessageInterface
+     * @throws InvalidArgumentException When the body is not valid.
      */
-    #[\ReturnTypeWillChange]
-    public function withBody(\Psr\Http\Message\StreamInterface $body)
+    public function withBody(StreamInterface $body): MessageInterface
     {
         if ($body === $this->stream) {
             return $this;
@@ -302,29 +300,27 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @return static
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    #[\ReturnTypeWillChange]
-    public function withProtocolVersion($version)
+    public function withProtocolVersion(string $version): MessageInterface
     {
-        throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
+        throw new InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
      * Return an instance with the specified status code and, optionally, reason phrase.
      *
-     * @param int    $code         The 3-digit integer result code to set.
+     * @param int $code The 3-digit integer result code to set.
      * @param string $reasonPhrase The reason phrase to use with the
      *                             provided status code; if none is provided, implementations MAY
      *                             use the defaults as suggested in the HTTP specification.
-     * @return static
-     * @throws \InvalidArgumentException For invalid status code arguments.
+     * @return ResponseInterface
+     * @throws InvalidArgumentException For invalid status code arguments.
      * @link http://tools.ietf.org/html/rfc7231#section-6
      * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      */
-    #[\ReturnTypeWillChange]
-    public function withStatus($code, $reasonPhrase = '')
+    public function withStatus(int $code, string $reasonPhrase = ''): ResponseInterface
     {
-        throw new \InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
+        throw new InvalidArgumentException("Этот метод не поддерживается в этой редакции кода");
     }
 
     /**
@@ -334,11 +330,10 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
      * @return string Reason phrase; must return an empty string if none present.
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
-     * @throws \Exception
+     * @throws Exception
      */
-    #[\ReturnTypeWillChange]
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
-        throw new \Exception("Этот метод не поддерживается в этой редакции кода");
+        throw new Exception("Этот метод не поддерживается в этой редакции кода");
     }
 }
