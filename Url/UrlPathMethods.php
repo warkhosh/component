@@ -10,34 +10,6 @@ use Warkhosh\Variable\VarStr;
 trait UrlPathMethods
 {
     /**
-     * Список путей полученные из урла для будущих параметров
-     *
-     * @var array
-     */
-    protected array $data = [];
-
-    /**
-     * Список типов переменных от $this->data для сложных проверок
-     *
-     * @var array
-     */
-    protected array $types = [];
-
-    /**
-     * Список путей из перебора $this->data, но значения каждого пути подверглось проверки на реальность и корректность
-     *
-     * @var array
-     */
-    protected array $pathResults;
-
-    /**
-     * Название файла если оно присутствует в пути урла
-     *
-     * @var string
-     */
-    protected string $file;
-
-    /**
      * Проверяет пути на корректность и записывает результат в $this->correct с результатами от проверок
      *
      * @note: пустые пути являются не корректными
@@ -61,6 +33,7 @@ trait UrlPathMethods
      * @param int|null $limit если указано без $key, включает проверку по диапазону (отрицательное значение делает проверку с обратной стороны списка)
      * @param int $offset сдвиг
      * @return bool
+     * @throws Exception
      */
     public function isCorrectPart(?int $key = null, ?int $limit = null, int $offset = 0): bool
     {
@@ -122,6 +95,7 @@ trait UrlPathMethods
      * @param int|null $limit ограничение
      * @param int $offset сдвиг
      * @return array|string
+     * @throws Exception
      */
     public function getTypes(?int $key = null, ?int $limit = null, int $offset = 0): array|string
     {
@@ -169,6 +143,7 @@ trait UrlPathMethods
      * @param int $offset сдвиг
      * @param string $default
      * @return array|string
+     * @throws Exception
      */
     public function get(?int $key = null, ?int $limit = null, int $offset = 0, string $default = ''): array|string
     {
@@ -201,6 +176,7 @@ trait UrlPathMethods
      *
      * @param string|null $glue символ объединения строк
      * @return array|string
+     * @throws Exception
      */
     public function getPaths(?string $glue = null): array|string
     {
@@ -220,6 +196,7 @@ trait UrlPathMethods
      * @param int $offset сдвиг
      * @param bool $strictLimit флаг отвечающий за строгую проверку количества путей
      * @return bool
+     * @throws Exception
      */
     public function checkingPaths(array $paths = [], int $offset = 0, bool $strictLimit = true): bool
     {

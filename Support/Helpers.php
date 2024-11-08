@@ -61,12 +61,12 @@ if (! function_exists('getNum')) {
     /**
      * Проверка значения на положительное целое цело (в случае неудачи вернет установленное значение)
      *
-     * @param int $num проверяемое значение
+     * @param mixed $num проверяемое значение
      * @param int $default значение при неудачной проверке
      * @return int
      * @throws Exception
      */
-    function getNum(int $num = 0, int $default = 0): int
+    function getNum(mixed $num = 0, int $default = 0): int
     {
         return VarInt::getMakePositiveInteger($num, $default);
     }

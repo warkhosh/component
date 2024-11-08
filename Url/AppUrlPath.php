@@ -18,6 +18,34 @@ class AppUrlPath
     use UrlPathMethods;
 
     /**
+     * Список путей полученные из урла для будущих параметров
+     *
+     * @var array
+     */
+    protected array $data = [];
+
+    /**
+     * Список типов переменных от $this->data для сложных проверок
+     *
+     * @var array
+     */
+    protected array $types = [];
+
+    /**
+     * Список путей из перебора $this->data, но значения каждого пути подверглось проверки на реальность и корректность
+     *
+     * @var array
+     */
+    protected array $pathResults = [];
+
+    /**
+     * Название файла если оно присутствует в пути урла
+     *
+     * @var string|null
+     */
+    protected ?string $file = null;
+
+    /**
      * При разборе важно не удалять не допустимые символы или пустоты между слешами как: //,
      * иначе потом в проверках не поймем что урл не допустимый.
      *
@@ -26,11 +54,34 @@ class AppUrlPath
     public function __construct(?string $url = null)
     {
         $url = empty($url) ? server()->request_uri : $url;
+        $this->configuring($url);
+    }
+
+    /**
+     * Устанавливает значений переменных объекта по указанному урлу
+     *
+     * @note этот метод кеширует в рамках php процесса значения и не приводит к повторному срабатыванию
+     *
+     * @param string|null $url
+     * @return void
+     */
+    private function configuring(?string $url = null): void
+    {
+        static $data = [];
+        $slug = md5($url);
+
+        if (key_exists($slug, $data)) {
+            $this->data = $data[$slug]['data'];
+            $this->types = $data[$slug]['types'];
+            $this->pathResults = $data[$slug]['pathResults'];
+            $this->file = $data[$slug]['file'];
+
+            return;
+        }
+
         $url = parse_url(rawurldecode($url));
 
         if (isset($url['path']) && array_key_exists('path', $url)) {
-            // $url['path'] = preg_replace("/[^a-zA-Z0-9\.\_\-\/]/", "", $url['path']);
-
             $paths = VarStr::explode('/', $url['path'], ['', ' ']);
             $types = [];
 
@@ -56,10 +107,18 @@ class AppUrlPath
 
             reset($this->data);
 
+            // Если значения ещё не были установлены
             //if (is_null($this->file)) {
             //    $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
             //    $this->file = (string)$appConfig->get('server.index.file');
             //}
         }
+
+        $data[$slug] = [
+            'data' => $this->data,
+            'types' => $this->types,
+            'pathResults' => $this->pathResults,
+            'file' => $this->file,
+        ];
     }
 }
