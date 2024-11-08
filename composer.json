@@ -38,8 +38,7 @@
     "psr/http-client": "^1.0",
     "ext-dom": "*",
     "ext-simplexml": "*",
-    "laravel/pint": "^1.13",
-    "ext-zend-opcache": "*"
+    "laravel/pint": "^1.13"
   },
   "autoload": {
     "psr-4": {
