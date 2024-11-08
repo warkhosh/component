@@ -332,7 +332,7 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
     }
 
     /**
-     * @param integer|string $index
+     * @param int|string $index
      * @return mixed
      *
      * public function get($index)

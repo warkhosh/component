@@ -39,7 +39,7 @@ use Exception;
  * @property string host               - протокол + домен
  * @property string method
  * @property string request_method
- * @property integer http_response_code - код ответа HTTP
+ * @property int http_response_code - код ответа HTTP
  */
 class AppServer
 {

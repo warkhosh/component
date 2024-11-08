@@ -1,19 +1,26 @@
 <?php
 
 // Пример для реализации в проектах
+use Warkhosh\Component\Collection\Collection;
+use Warkhosh\Component\Config\AppConfig;
+use Warkhosh\Component\Server\AppServer;
+use Warkhosh\Variable\VarArray;
+use Warkhosh\Variable\VarFloat;
+use Warkhosh\Variable\VarInt;
+use Warkhosh\Variable\VarStr;
+
 if (false && ! function_exists('getConfig')) {
     /**
      * Короткий синтаксис обращения к конфигу
      *
-     * @param string $name
+     * @param string|null $name
      * @param mixed $default
      * @return mixed
      */
-    function getConfig($name = null, $default = null)
+    function getConfig(string $name = null, mixed $default = null): mixed
     {
         try {
-            $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
-
+            $appConfig = AppConfig::getInstance();
             //$appConfig->setBasePath(app()->getBasePath() . '/Application/Configs');
 
             return $appConfig->get($name, $default);
@@ -30,22 +37,23 @@ if (! function_exists('e')) {
     /**
      * Escape HTML entities in a string.
      *
-     * @param string $value
+     * @param string|null $value
+     * @return string
      */
-    function e($value): string
+    function e(?string $value): string
     {
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
+        return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8', false);
         // return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
     }
 }
 
 if (! function_exists('server')) {
     /**
-     * @return Warkhosh\Component\Server\AppServer
+     * @return AppServer
      */
-    function server()
+    function server(): AppServer
     {
-        return Warkhosh\Component\Server\AppServer::getInstance();
+        return AppServer::getInstance();
     }
 }
 
@@ -53,13 +61,14 @@ if (! function_exists('getNum')) {
     /**
      * Проверка значения на положительное целое цело (в случае неудачи вернет установленное значение)
      *
-     * @param int $num - проверяемое значение
-     * @param int $default - значение при неудачной проверке
+     * @param int $num проверяемое значение
+     * @param int $default значение при неудачной проверке
      * @return int
+     * @throws Exception
      */
-    function getNum($num = 0, $default = 0)
+    function getNum(int $num = 0, int $default = 0): int
     {
-        return \Warkhosh\Variable\VarInt::getMakePositiveInteger($num, $default);
+        return VarInt::getMakePositiveInteger($num, $default);
     }
 }
 
@@ -68,16 +77,11 @@ if (! function_exists('collection')) {
      * Создайте коллекцию из заданного значения
      *
      * @param array|float|int|string $input
-     * @return \Warkhosh\Component\Collection\Collection
+     * @return Collection
      */
-    function collection($input = [])
+    function collection(array|float|int|string $input = []): Collection
     {
-        try {
-            return new \Warkhosh\Component\Collection\Collection($input);
-
-        } catch (Throwable $e) {
-            trigger_error($e->getMessage());
-        }
+        return new Collection($input);
     }
 }
 
@@ -85,10 +89,11 @@ if (! function_exists('getArrayWrap')) {
     /**
      * Быстрое преобразование значения в массив
      *
+     * @param $items
      * @param bool $strict - флаг соответствия типа
      * @return array
      */
-    function getArrayWrap($items, $strict = true)
+    function getArrayWrap($items, bool $strict = true): array
     {
         return $strict ? (is_array($items) ? $items : []) : (array)$items;
     }
@@ -98,11 +103,12 @@ if (! function_exists('isTrue')) {
     /**
      * Проверка истинности значения;
      *
-     * @param null $var
+     * @param mixed $var
      * @param bool $strict
      * @return bool
+     * @throws Exception
      */
-    function isTrue($var = null, $strict = false)
+    function isTrue(mixed $var = null, bool $strict = false): bool
     {
         if ($var === true) {
             return true;
@@ -113,7 +119,7 @@ if (! function_exists('isTrue')) {
         }
 
         if ($strict === false) {
-            if ((int)$var === 1 || \Warkhosh\Variable\VarStr::getLower(trim($var)) === 'true') {
+            if ((int)$var === 1 || VarStr::getLower(trim($var)) === 'true') {
                 return true;
             }
         }
@@ -126,11 +132,12 @@ if (! function_exists('isFalse')) {
     /**
      * Проверка истинности значения;
      *
-     * @param null $var
+     * @param mixed $var
      * @param bool $strict
      * @return bool
+     * @throws Exception
      */
-    function isFalse($var = null, $strict = false)
+    function isFalse(mixed $var = null, bool $strict = false): bool
     {
         if ($var === false) {
             return true;
@@ -141,7 +148,7 @@ if (! function_exists('isFalse')) {
         }
 
         if ($strict === false) {
-            if (((int)$var === 0 || \Warkhosh\Variable\VarStr::getLower(trim($var)) === 'false')) {
+            if (((int)$var === 0 || VarStr::getLower(trim($var)) === 'false')) {
                 return true;
             }
         }
@@ -154,10 +161,10 @@ if (! function_exists('itZero')) {
     /**
      * Проверка указанного значения на равенство нулю;
      *
-     * @param int $var
+     * @param mixed $var
      * @return bool
      */
-    function itZero($var = 0)
+    function itZero(mixed $var): bool
     {
         if (is_numeric($var) && intval($var) === 0) {
             return true;
@@ -176,7 +183,7 @@ if (! function_exists('getEncoding')) {
     {
         $cp_list = ['utf-8', 'windows-1251'];
         $encoding = mb_detect_encoding($str, mb_detect_order(), false);
-        $clean_str = $str = \Warkhosh\Variable\VarStr::getMake($str);
+        $clean_str = $str = VarStr::getMake($str);
 
         if ($encoding === 'UTF-8') {
             $clean_str = mb_convert_encoding($str, 'UTF-8');
@@ -202,7 +209,7 @@ if (! function_exists('convertToUTF')) {
      */
     function convertToUTF(?string $text = ''): string
     {
-        return \Warkhosh\Variable\VarStr::getTransformToEncoding($text, 'UTF-8');
+        return VarStr::getTransformToEncoding($text, 'UTF-8');
         //        $encoding = mb_detect_encoding($text, mb_detect_order(), false);
         //
         //        if ($encoding === "UTF-8") {
@@ -224,7 +231,7 @@ if (! function_exists('convert_entity')) {
      * @param bool $destroy
      * @return string
      */
-    function convert_entity($matches = [], $destroy = true)
+    function convert_entity(array $matches = [], bool $destroy = true): string
     {
         static $table = [
             'quot' => '&#34;',
@@ -508,7 +515,7 @@ if (! function_exists('isEmpty')) {
             return true;
         }
 
-        $str = \Warkhosh\Variable\VarStr::getMake($value);
+        $str = VarStr::getMake($value);
         $str = str_replace(["\n", "\t", "\r", '&nbsp;'], ['', '', '', ' '], $str);
         $str = trim($str, "\x00..\x1F");
         $str = trim($str, chr(194).chr(160));
@@ -544,7 +551,7 @@ if (! function_exists('emptyStringTo')) {
             return $default;
         }
 
-        $str = \Warkhosh\Variable\VarStr::getMake($value);
+        $str = VarStr::getMake($value);
         $str = str_replace(["\n", "\t", "\r", '&nbsp;'], ['', '', '', ' '], $str);
         $str = trim($str, "\x00..\x1F");
         $str = trim($str, chr(194).chr(160));
@@ -573,7 +580,7 @@ if (! function_exists('itBlank')) {
             return false;
         }
 
-        $value = \Warkhosh\Variable\VarStr::getMake($value);
+        $value = VarStr::getMake($value);
         $value = str_replace(["\n", "\t", "\r", '&nbsp;'], ['', '', '', ' '], $value);
         $value = trim($value, "\x00..\x1F");
 
@@ -640,7 +647,7 @@ if (! function_exists('addFieldFirst')) {
      * @param array $row
      * @return array
      */
-    function addFieldFirst(array $row)
+    function addFieldFirst(array $row): array
     {
         return array_merge($row, ['first_child' => 1]);
     }
@@ -727,14 +734,18 @@ if (! function_exists('getPriceFormat')) {
     /**
      * Форматирует число с разделением групп
      *
-     * @param float|int|string $number - число
+     * @param float|int|string $number число
      * @param int $decimals
      * @param string $dec_point
      * @param string $thousands_sep
      * @return string
      */
-    function getPriceFormat($number, $decimals = 0, $dec_point = ' ', $thousands_sep = ' ')
-    {
+    function getPriceFormat(
+        float|int|string $number,
+        int $decimals = 0,
+        string $dec_point = ' ',
+        string $thousands_sep = ' '
+    ): string {
         return number_format($number, $decimals, $dec_point, $thousands_sep);
     }
 }
@@ -749,8 +760,12 @@ if (! function_exists('getPhoneFormat')) {
      * @param int $second_part_length
      * @return string
      */
-    function getPhoneFormat($phone = '', $code_length = 3, $first_part_length = 3, $second_part_length = 2)
-    {
+    function getPhoneFormat(
+        string $phone = '',
+        int $code_length = 3,
+        int $first_part_length = 3,
+        int $second_part_length = 2
+    ): string {
         $str = '';
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
@@ -777,7 +792,7 @@ if (! function_exists('toSnakeCase')) {
      * @param string $input
      * @return string
      */
-    function toSnakeCase($input = '')
+    function toSnakeCase(string $input = ''): string
     {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
@@ -795,12 +810,13 @@ if (! function_exists('toCamelCase')) {
      *
      * @param string $input
      * @return string
+     * @throws Exception
      */
-    function toCamelCase($input = '')
+    function toCamelCase(string $input = ''): string
     {
-        $input = str_replace('-', '_', strval($input));
+        $input = str_replace('-', '_', $input);
 
-        return implode('', \Warkhosh\Variable\VarArray::ucfirst(explode('_', $input)));
+        return implode('', VarArray::ucfirst(explode('_', $input)));
     }
 }
 
@@ -808,15 +824,15 @@ if (! function_exists('round_up')) {
     /**
      * Округление в большую сторону
      *
-     * @note в идеале использовать BC Math Функции ( http://php.net/manual/ru/ref.bc.php )
+     * @note в идеале использовать BC Math Функции (http://php.net/manual/ru/ref.bc.php)
      *
-     * @param float|number|string $number
+     * @param mixed $number
      * @param int $precision
      * @return float
      */
-    function round_up($number, $precision = 2)
+    function round_up(mixed $number, int $precision = 2): float
     {
-        return \Warkhosh\Variable\VarFloat::getMake($number, $precision, 'upward');
+        return VarFloat::getMake($number, $precision, 'upward');
     }
 }
 
@@ -824,37 +840,37 @@ if (! function_exists('round_down')) {
     /**
      * Округление в меньшую сторону
      *
-     * @note в идеале использовать BC Math Функции ( http://php.net/manual/ru/ref.bc.php )
+     * @note в идеале использовать BC Math Функции (http://php.net/manual/ru/ref.bc.php)
      *
-     * @param float|number|string $number
+     * @param mixed $number
      * @param int $precision
      * @return float
      */
-    function round_down($number, $precision = 2)
+    function round_down(mixed $number, int $precision = 2): float
     {
-        return \Warkhosh\Variable\VarFloat::getMake($number, $precision, 'downward');
+        return VarFloat::getMake($number, $precision, 'downward');
     }
 }
 
 if (! function_exists('base64url_encode')) {
     /**
-     * @param string $data
+     * @param string|null $data
      * @return string
      */
-    function base64url_encode($data = '')
+    function base64url_encode(?string $data = ''): string
     {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        return rtrim(strtr(base64_encode((string)$data), '+/', '-_'), '=');
     }
 }
 
 if (! function_exists('base64url_decode')) {
     /**
-     * @param string $data
+     * @param string|null $data
      * @return string
      */
-    function base64url_decode($data = '')
+    function base64url_decode(?string $data = ''): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen((string)$data) % 4, '=', STR_PAD_RIGHT));
     }
 }
 
@@ -864,15 +880,17 @@ if (! function_exists('str_replace_once')) {
      *
      * @param array|string $search
      * @param array|string $replace
+     * @param string $text
+     * @return string
      */
-    function str_replace_once($search, $replace, string $text): string
+    function str_replace_once(array|string $search, array|string $replace, string $text): string
     {
         if (is_string($search)) {
             $pos = mb_strpos($text, $search);
 
             if ($pos !== false) {
                 // return substr_replace($text, (string)$replace, $pos, strlen($search)); шалит!
-                return mb_substr($text, 0, $pos).(string)$replace.mb_substr($text, $pos + mb_strlen($search));
+                return mb_substr($text, 0, $pos).$replace.mb_substr($text, $pos + mb_strlen($search));
             }
 
             return $text;
@@ -899,15 +917,17 @@ if (! function_exists('str_replace_last')) {
      *
      * @param array|string $search
      * @param array|string $replace
+     * @param string $text
+     * @return string
      */
-    function str_replace_last($search, $replace, string $text): string
+    function str_replace_last(array|string $search, array|string $replace, string $text): string
     {
         if (is_string($search)) {
             $pos = strrpos($text, $search);
 
             if ($pos !== false) {
                 // return substr_replace($text, (string)$replace, $pos, strlen($search)); шалит!
-                return mb_substr($text, 0, $pos).(string)$replace.mb_substr($text, $pos + mb_strlen($search));
+                return mb_substr($text, 0, $pos).$replace.mb_substr($text, $pos + mb_strlen($search));
             }
 
             return $text;
@@ -930,12 +950,12 @@ if (! function_exists('str_replace_last')) {
 
 if (! function_exists('getObjectToArray')) {
     /**
-     * Преобразование объектов stdClass в многомерные массивы.
+     * Преобразование объектов stdClass в многомерные массивы
      *
      * @param array|stdClass $data
      * @return array
      */
-    function getObjectToArray($data)
+    function getObjectToArray(array|stdClass $data): array
     {
         if (is_object($data)) {
             $data = get_object_vars($data);
@@ -945,7 +965,7 @@ if (! function_exists('getObjectToArray')) {
             return array_map(__FUNCTION__, $data);
 
         } else {
-            return $data;
+            return (array)$data;
         }
     }
 }
@@ -954,10 +974,10 @@ if (! function_exists('getArrayToObject')) {
     /**
      * Функция преобразования многомерных массивов в объекты stdClass.
      *
-     * @param array $data
+     * @param array|stdClass $data
      * @return array|stdClass
      */
-    function getArrayToObject($data)
+    function getArrayToObject(array|stdClass $data): array|stdClass
     {
         if (is_array($data)) {
             return (object)array_map(__FUNCTION__, $data);
@@ -969,14 +989,14 @@ if (! function_exists('getArrayToObject')) {
 
 if (! function_exists('getAmountMemory')) {
     /**
-     * Возвращает размер памяти в к указанной единице измерения.
+     * Возвращает размер памяти в указанной единице измерения.
      *
      * @param int $size
      * @param string $unit
      * @param bool $designation
      * @return float|int|string
      */
-    function getAmountMemory($size, $unit = 'b', $designation = true)
+    function getAmountMemory(int $size, string $unit = 'b', bool $designation = true): float|int|string
     {
         if ($unit == 'kb') {
             return round($size / 1024, 2).($designation ? ' Kb' : '');
@@ -991,14 +1011,14 @@ if (! function_exists('getAmountMemory')) {
 
 if (! function_exists('getFileSize')) {
     /**
-     * Возвращает размер файла в к указанной единице измерения.
+     * Возвращает размер файла в указанной единице измерения.
      *
      * @param int $size
      * @param string $unit
      * @param bool $designation
      * @return string
      */
-    function getFileSize($size, $unit = 'b', $designation = true)
+    function getFileSize(int $size, string $unit = 'b', bool $designation = true): string
     {
         return getAmountMemory($size, $unit, $designation);
     }
@@ -1010,15 +1030,15 @@ if (! function_exists('getMemoryPeakUsage')) {
      *
      * @note при указании единицы измерения будет возвращен результат с преобразованием
      *
-     * @param string $unit
+     * @param string|null $unit
      * @param bool $designation
      * @return int|string
      */
-    function getMemoryPeakUsage($unit = null, $designation = false)
+    function getMemoryPeakUsage(string $unit = null, bool $designation = false): int|string
     {
         $memory_usage = function_exists('memory_get_peak_usage') ? memory_get_peak_usage(true) : 0;
 
-        if (is_string($unit) && ($unit === 'mb' || $unit === 'kb' || $unit === 'byte')) {
+        if ($unit === 'mb' || $unit === 'kb' || $unit === 'byte') {
             return getAmountMemory($memory_usage, $unit, $designation);
         }
 
@@ -1028,6 +1048,8 @@ if (! function_exists('getMemoryPeakUsage')) {
 
 if (! function_exists('array_to_xml')) {
     /**
+     * @param array $arr
+     * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      *
      * @example
@@ -1037,7 +1059,7 @@ if (! function_exists('array_to_xml')) {
      * $dom->formatOutput = TRUE;
      * echo $dom->saveXml();
      */
-    function array_to_xml(array $arr, SimpleXMLElement $xml)
+    function array_to_xml(array $arr, SimpleXMLElement $xml): SimpleXMLElement
     {
         foreach ($arr as $k => $v) {
 
