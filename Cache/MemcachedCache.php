@@ -2,8 +2,12 @@
 
 namespace Warkhosh\Component\Cache;
 
-
 use Warkhosh\Component\Cache\Exception\InvalidArgumentException;
+use Closure;
+use DateInterval;
+use DateTime;
+use Throwable;
+use Exception;
 
 /**
  * Class MemcachedCache
@@ -13,24 +17,24 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     /**
      * @var string
      */
-    protected $driver = "memcached";
+    protected string $driver = "memcached";
 
     /**
      * Cache expiration in seconds
      *
-     * @var null|int
+     * @var int|null
      */
-    protected $cacheExpiry = 86400;
+    protected int $cacheExpiry = 86400;
 
     /**
      * @var \Memcached
      */
-    protected $client;
+    protected mixed $client;
 
     /**
      * MemcachedCache constructor
      *
-     * @param \Memcached|iterable $config
+     * @param iterable|\Memcached $config
      * @throws \Psr\SimpleCache\CacheException
      */
     public function __construct($config)
@@ -53,13 +57,12 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     }
 
     /**
-     * @param string $key     The unique key of this item in the cache
-     * @param mixed  $default Default value to return if the key does not exist
-     * @return mixed          The value of the item from the cache, or $default in case of cache miss
+     * @param string $key The unique key of this item in the cache
+     * @param mixed $default Default value to return if the key does not exist
+     * @return mixed The value of the item from the cache, or $default in case of cache miss
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    #[\ReturnTypeWillChange]
-    public function get($key, $default = null)
+    public function get($key, $default = null): mixed
     {
         try {
             $this->validateKey($key);
@@ -71,7 +74,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
                 $resultCode = $this->client->getResultCode();
 
                 if ($resultCode === \Memcached::RES_NOTFOUND) {
-                    return $default instanceof \Closure ? $default() : $default;
+                    return $default instanceof Closure ? $default() : $default;
                 }
 
                 $this->checkException($resultCode, $key);
@@ -79,18 +82,18 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             return $this->getDecodeValue($result);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
-     * @param string                 $key   The key of the item to store
-     * @param mixed                  $value The value of the item to store. Must be serializable
-     * @param null|int|\DateInterval $ttl   Optional. The TTL value of this item. If no value is sent and
-     *                                      the driver supports TTL then the library may set a default value
-     *                                      for it or let the driver take care of that
-     * @return bool                         True on success and false on failure
+     * @param string $key The key of the item to store
+     * @param mixed $value The value of the item to store. Must be serializable
+     * @param DateInterval|int|null $ttl Optional. The TTL value of this item. If no value is sent and
+     *                                   the driver supports TTL then the library may set a default value
+     *                                   for it or let the driver take care of that
+     * @return bool True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function set($key, $value, $ttl = null): bool
@@ -98,14 +101,14 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
         try {
             $this->validateKey($key);
 
-            if ($ttl instanceof \DateInterval) {
-                $ttl = (new \DateTime('now'))->add($ttl)->getTimeStamp() - time();
+            if ($ttl instanceof DateInterval) {
+                $ttl = (new DateTime('now'))->add($ttl)->getTimeStamp() - time();
             }
 
             $ttl = is_null($ttl) && $this->getCacheExpiry() > 0 ? $this->getCacheExpiry() : (int)$ttl;
 
             $key = $this->getUpdateKeyName($key);
-            $cacheValue = $this->getEncodeValue($value instanceof \Closure ? $value() : $value);
+            $cacheValue = $this->getEncodeValue($value instanceof Closure ? $value() : $value);
 
             $result = $this->client->set($key, $cacheValue, $ttl);
 
@@ -115,14 +118,14 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             return $result;
 
-        } catch (\Throwable | \Psr\SimpleCache\CacheException $e) {
+        } catch (Throwable|\Psr\SimpleCache\CacheException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
      * @param string $key The unique cache key of the item to delete
-     * @return bool       True if the item was successfully removed. False if there was an error
+     * @return bool True if the item was successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function delete($key): bool
@@ -134,7 +137,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             return $this->client->delete($key);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -147,18 +150,18 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
         try {
             return $this->client->flush();
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return false;
         }
     }
 
     /**
-     * @param iterable $keys    A list of keys that can obtained in a single operation
-     * @param mixed    $default Default value to return for keys that do not exist
-     * @return iterable         A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
+     * @param iterable $keys A list of keys that can obtained in a single operation
+     * @param mixed $default Default value to return for keys that do not exist
+     * @return iterable A list of key => value pairs. Cache keys that do not exist or are stale will have $default as value
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $this->validateKeys($keys);
 
@@ -181,30 +184,30 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
             $result = array_map(function ($item) use ($default) {
                 try {
                     if ($item === false) {
-                        return $default instanceof \Closure ? $default() : $default;
+                        return $default instanceof Closure ? $default() : $default;
                     }
 
                     return $this->getDecodeValue($item);
 
-                } catch (\Throwable $e) {
-                    return $default instanceof \Closure ? $default() : $default;
+                } catch (Throwable $e) {
+                    return $default instanceof Closure ? $default() : $default;
                 }
 
             }, $result);
 
             return $result;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
-     * @param iterable               $values A list of key => value pairs for a multiple-set operation
-     * @param null|int|\DateInterval $ttl    Optional. The TTL value of this item. If no value is sent and
-     *                                       the driver supports TTL then the library may set a default value
-     *                                       for it or let the driver take care of that
-     * @return bool                          True on success and false on failure
+     * @param iterable $values A list of key => value pairs for a multiple-set operation
+     * @param DateInterval|int|null $ttl Optional. The TTL value of this item. If no value is sent and
+     *                                   the driver supports TTL then the library may set a default value
+     *                                   for it or let the driver take care of that
+     * @return bool True on success and false on failure
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function setMultiple($values, $ttl = null): bool
@@ -212,8 +215,8 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
         $this->validateValues($values);
 
         try {
-            if ($ttl instanceof \DateInterval) {
-                $ttl = (new \DateTime('now'))->add($ttl)->getTimeStamp() - time();
+            if ($ttl instanceof DateInterval) {
+                $ttl = (new DateTime('now'))->add($ttl)->getTimeStamp() - time();
             }
 
             $ttl = is_null($ttl) && $this->getCacheExpiry() > 0 ? $this->getCacheExpiry() : (int)$ttl;
@@ -223,10 +226,10 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             foreach ($values as $key => $value) {
                 $key = $this->getUpdateKeyName($key);
-                $insertValues[$key] = $this->getEncodeValue($value instanceof \Closure ? $value() : $value);
+                $insertValues[$key] = $this->getEncodeValue($value instanceof Closure ? $value() : $value);
             }
 
-            $result = $this->client->setMulti((array)$insertValues, $ttl);
+            $result = $this->client->setMulti($insertValues, $ttl);
 
             if ($result === false) {
                 $resultCode = $this->client->getResultCode();
@@ -235,14 +238,14 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             return $result;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
      * @param iterable $keys A list of string-based keys to be deleted
-     * @return bool          True if the items were successfully removed. False if there was an error
+     * @return bool True if the items were successfully removed. False if there was an error
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function deleteMultiple($keys): bool
@@ -272,7 +275,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             return true;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -296,7 +299,7 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
 
             return true;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -304,12 +307,12 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
     /**
      * Checks the result of memcached for a bad key provided, this must be used after a memcached operation
      *
-     * @param int         $resultCode
+     * @param int $resultCode
      * @param string|null $key
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    private function checkException($resultCode, ?string $key = null): void
+    private function checkException(int $resultCode, ?string $key = null): void
     {
         switch ($resultCode) {
             case \Memcached::RES_BAD_KEY_PROVIDED:
@@ -320,6 +323,6 @@ class MemcachedCache extends BaseCache implements \Psr\SimpleCache\CacheInterfac
                 $message = sprintf('Message: %s', $this->client->getResultMessage());
         }
 
-        throw new \Exception($message);
+        throw new Exception($message);
     }
 }

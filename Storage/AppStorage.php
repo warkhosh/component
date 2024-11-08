@@ -24,15 +24,14 @@ class AppStorage
 
     /**
      * Проверка существования файла
-     * Вернет переданный список но с значениями которые были проверены и подтверждены как файлы.
+     * Вернёт переданный список, но со значениями которые были проверены и подтверждены как файлы.
      *
      * @note еЕсли передали аргумент как строку, то в случае наличия файла она будет возращена иначе вернется NULL
      *
-     * @param string|array $files - значение(я) которые нужно проверить на существование файла
-     * @return string|null|array
+     * @param array|string $files - значение(я) которые нужно проверить на существование файла
+     * @return array|string|null
      */
-    #[\ReturnTypeWillChange]
-    public function getAvailableFile($files)
+    public function getAvailableFile(array|string $files): array|string|null
     {
         $list = is_array($files);
         $files = $list ? $files : (array)$files;
@@ -66,7 +65,7 @@ class AppStorage
         try {
             if ($dh = opendir($dir)) {
                 while (($file = readdir($dh)) !== false) {
-                    if (is_file($dir . $file)) {
+                    if (is_file($dir.$file)) {
                         $return = true;
                         break;
                     }
@@ -75,20 +74,20 @@ class AppStorage
                 closedir($dh);
             }
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (isset($dh)) {
                 closedir($dh);
             }
         }
 
-        return isset($return) ? (bool)$return : false;
+        return isset($return) && $return;
     }
 
     /**
      * Чтение файла
      *
      * @param string $path
-     * @param bool   $silent - признак тихого ответа без использования trigger_error()
+     * @param bool $silent - признак тихого ответа без использования trigger_error()
      * @return string
      */
     public function get(string $path, bool $silent = true): string
@@ -112,10 +111,9 @@ class AppStorage
      * Требовать данный файл один раз
      *
      * @param string $file
-     * @return mixed
+     * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function requireOnce(string $file)
+    public function requireOnce(string $file): void
     {
         require_once $file;
     }
@@ -125,11 +123,10 @@ class AppStorage
      *
      * @param string $path
      * @param string $contents
-     * @param int    $lock
-     * @return int|false
+     * @param int $lock
+     * @return false|int
      */
-    #[\ReturnTypeWillChange]
-    public function put(string $path, string $contents = '', $lock = LOCK_EX)
+    public function put(string $path, string $contents = '', int $lock = LOCK_EX): false|int
     {
         return file_put_contents($path, $contents, $lock);
     }
@@ -139,12 +136,12 @@ class AppStorage
      *
      * @param string $path
      * @param string $contents
-     * @param int    $lock
+     * @param int $lock
      * @return bool
      */
-    public function create(string $path, string $contents = '', $lock = LOCK_EX): bool
+    public function create(string $path, string $contents = '', int $lock = LOCK_EX): bool
     {
-        return ($this->put($path, $contents, $lock) === false ? false : true);
+        return ! ($this->put($path, $contents, $lock) === false);
     }
 
     /**
@@ -157,7 +154,7 @@ class AppStorage
     public function prepend(string $path, string $contents): int
     {
         if ($this->exists($path)) {
-            return $this->put($path, $contents . $this->get($path));
+            return $this->put($path, $contents.$this->get($path));
         }
 
         return $this->put($path, $contents);
@@ -178,14 +175,13 @@ class AppStorage
     /**
      * Удалить файл по заданному пути
      *
-     * @note если передали 1 параметр но массивом в результате будет такой-же массив где значения будут ключами а значения будут содержать результат операции
+     * @note если передали 1 параметр, но массивом в результате будет такой-же массив, где значения будут ключами, а значения будут содержать результат операции
      *
-     * @param string|array $paths  - путь к файлу
-     * @param bool         $silent - признак тихого удаления без использования подавления ошибки
-     * @return bool|array
+     * @param array|string $paths путь к файлу
+     * @param bool $silent признак тихого удаления без использования подавления ошибки
+     * @return array|bool
      */
-    #[\ReturnTypeWillChange]
-    public function delete($paths, $silent = true)
+    public function delete(array|string $paths, bool $silent = true): array|bool
     {
         $list = is_array($paths);
         $paths = $list ? $paths : (array)$paths;
@@ -293,10 +289,9 @@ class AppStorage
      * Получить MIME-Тип файла
      *
      * @param string $path
-     * @return string|boolean
+     * @return false|string
      */
-    #[\ReturnTypeWillChange]
-    public function mimeType(string $path)
+    public function mimeType(string $path): false|string
     {
         return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
     }
@@ -346,7 +341,7 @@ class AppStorage
     }
 
     /**
-     * DОпределить, если данный путь файл
+     * Определить, если данный путь файл
      *
      * @param string $file
      * @return bool
@@ -360,7 +355,7 @@ class AppStorage
      * Найти имена путей, соответствующие заданному шаблону
      *
      * @param string $pattern
-     * @param int    $flags
+     * @param int $flags
      * @return array
      */
     public function glob(string $pattern, int $flags = 0): array
@@ -376,7 +371,7 @@ class AppStorage
      */
     public function files(string $directory): array
     {
-        $glob = glob($directory . '/*');
+        $glob = glob($directory.'/*');
 
         if ($glob === false) {
             return [];
@@ -385,7 +380,7 @@ class AppStorage
         // To get the appropriate files, we'll simply glob the directory and filter
         // out any "files" that are not truly files so we do not end up with any
         // directories in our list, but only true files within the directory.
-        return array_filter($glob, function($file) {
+        return array_filter($glob, function ($file) {
             return filetype($file) == 'file';
         });
     }
@@ -394,12 +389,12 @@ class AppStorage
      * Создание каталога
      *
      * @param string $path
-     * @param int    $mode      права для создаваемой директории
-     * @param bool   $recursive Разрешает создание вложенных директорий, указанных в pathname
-     * @param bool   $force     подавляет ошибку\исключеие при неудаче создания директории
+     * @param int $mode права для создаваемой директории
+     * @param bool $recursive Разрешает создание вложенных директорий, указанных в pathname
+     * @param bool $force подавляет ошибку\исключение при неудаче создания директории
      * @return bool
      */
-    public function makeDirectory(string $path, $mode = 0755, $recursive = false, $force = false): bool
+    public function makeDirectory(string $path, int $mode = 0755, bool $recursive = false, bool $force = false): bool
     {
         if ($force) {
             try {
@@ -416,9 +411,9 @@ class AppStorage
     /**
      * Очистить указанный каталог от всех файлов и папок и подпапок
      *
-     * @param string $directory - папка
-     * @param int    $depth     - количество вложенных итераций для удаления данных в дочерних папках (0 = no limit)
-     * @param bool   $silent    - признак тихого удаления без использования подавления ошибки
+     * @param string $directory папка
+     * @param int $depth количество вложенных итераций для удаления данных в дочерних папках (0 = no limit)
+     * @param bool $silent признак тихого удаления без использования подавления ошибки
      * @return bool
      * @throws Throwable
      */
@@ -461,8 +456,8 @@ class AppStorage
      * Возвращает список сущностей в указанной директории
      *
      * @param string $dir
-     * @param null|string $basePath
-     * @param array  $options
+     * @param string|null $basePath
+     * @param array $options
      * @return array
      * @throws Exception
      */
@@ -473,7 +468,7 @@ class AppStorage
         }
 
         $relative = rtrim($dir, '/');
-        $dir = rtrim((string)$basePath . $relative, '/');
+        $dir = rtrim((string)$basePath.$relative, '/');
         $limit = key_exists('limit', $options) ? $options['limit'] : 10000;
         $ignore = key_exists('ignore', $options) ? (array)$options['ignore'] : ['.gitignore'];
         $pictures = ['png', 'gif', 'jpg', 'jpeg', 'bmp', 'tiff'];
@@ -518,33 +513,33 @@ class AppStorage
 
                 if (is_dir($essence)) {
                     $dirs[] = [
-                        "name"      => $str,
-                        "path"      => $dir,
-                        "dir"       => $essence,
-                        "relative"  => $relative,
-                        "type"      => 'dir',
-                        "owner"     => isset($owner['name']) ? $owner['name'] : '',
-                        "perm"      => $permission,
+                        "name" => $str,
+                        "path" => $dir,
+                        "dir" => $essence,
+                        "relative" => $relative,
+                        "type" => 'dir',
+                        "owner" => $owner['name'] ?? '',
+                        "perm" => $permission,
                         "date_time" => $dateTime,
-                        "size"      => 0,
-                        "info"      => $info,
+                        "size" => 0,
+                        "info" => $info,
                     ];
 
                 } elseif (is_file($essence)) {
                     $picture = isset($info["extension"]) && in_array($info["extension"], $pictures);
 
                     $files[] = [
-                        "name"      => $str,
-                        "path"      => $dir,
-                        "file"      => $essence,
-                        "relative"  => $relative,
-                        "type"      => 'file',
-                        "picture"   => $picture,
-                        "owner"     => isset($owner['name']) ? $owner['name'] : '',
-                        "perm"      => $permission,
+                        "name" => $str,
+                        "path" => $dir,
+                        "file" => $essence,
+                        "relative" => $relative,
+                        "type" => 'file',
+                        "picture" => $picture,
+                        "owner" => $owner['name'] ?? '',
+                        "perm" => $permission,
                         "date_time" => $dateTime,
-                        "size"      => getAmountMemory(filesize($essence), 'mb', true),
-                        "info"      => $info,
+                        "size" => getAmountMemory(filesize($essence), 'mb', true),
+                        "info" => $info,
                     ];
                 }
             }
@@ -570,17 +565,17 @@ class AppStorage
      * @return void
      */
     public function removeOldFiles(
-        $param = ['dir' => null, 'expire' => 86400, 'ignore' => ['.gitignore'], 'show' => false]
+        array $param = ['dir' => null, 'expire' => 86400, 'ignore' => ['.gitignore'], 'show' => false]
     ): void {
-        $dir = isset($param['dir']) ? $param['dir'] : null;
+        $dir = $param['dir'] ?? null;
         $expire = isset($param['expire']) ? getNum($param['expire']) : ((60 * 60) * 24);
         $show = (isset($param['show']) && isTrue($param['show']));
         $ignore = isset($param['ignore']) && is_array($param['ignore']) && count($param['ignore']) > 0
             ? $param['ignore'] : ['.gitignore'];
 
         if (! is_null($dir)) {
-            $dir = trim(VarStr::getMakeString($dir));
-            $dir = mb_substr($dir, -1) === '/' ? $dir : $dir . '/';
+            $dir = trim(VarStr::getMake($dir));
+            $dir = mb_substr($dir, -1) === '/' ? $dir : $dir.'/';
 
             if (is_dir($dir)) {
                 if ($dh = opendir($dir)) {
@@ -596,12 +591,12 @@ class AppStorage
                         $time_sec = time();
 
                         // время изменения файла
-                        $time_file = filemtime($dir . $file);
+                        $time_file = filemtime($dir.$file);
 
                         // теперь узнаем сколько прошло времени (в секундах)
                         $time = $time_sec - $time_file;
 
-                        $unlink = $dir . $file;
+                        $unlink = $dir.$file;
 
                         if (is_file($unlink) && ! in_array($file, $ignore)) {
                             if ($time > $expire) {

@@ -6,8 +6,12 @@ use Warkhosh\Component\Collection\Interfaces\Arrayable;
 use Warkhosh\Component\Collection\Interfaces\BaseCollection;
 use Warkhosh\Component\Collection\Interfaces\Jsonable;
 use Warkhosh\Component\Traits\CollectionMethod;
+use Warkhosh\Variable\VarArray;
 use JsonSerializable;
 use Traversable;
+use ArrayAccess;
+use Countable;
+use Iterator;
 use Throwable;
 use Closure;
 
@@ -17,7 +21,7 @@ use Closure;
  * @package Warkhosh\Component\Collection
  * @link    http://laravel.su/docs/5.5/collections#method-flatmap
  */
-class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable, Arrayable, Jsonable, JsonSerializable
+class Collection implements BaseCollection, Iterator, ArrayAccess, Countable, Arrayable, Jsonable, JsonSerializable
 {
     use CollectionMethod;
 
@@ -26,14 +30,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      *
      * @var array
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
      * Значения несуществующей переменной.
      *
-     * @var null
+     * @var mixed
      */
-    protected $default = null;
+    protected mixed $default = null;
 
     /**
      * Флаг использования значения переменной по умолчанию.
@@ -41,24 +45,25 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @note системный флаг и не меняется методами!
      * @var bool
      */
-    protected $useDefault = true;
+    protected bool $useDefault = true;
 
     /**
      * App constructor
      *
-     * @param array $input
+     * @param mixed $input
      */
-    public function __construct($input = [])
+    public function __construct(mixed $input = [])
     {
         $this->data = $this->getArrayableItems($input);
     }
 
     /**
-     * @note Что-бы заработал array_pop()
+     * @note что-бы заработал array_pop()
+     *
      * @param array|null $data
      * @return array
      */
-    public function __invoke(array $data = null)
+    public function __invoke(?array $data = null): array
     {
         if (is_null($data)) {
             return $this->data;
@@ -69,7 +74,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Преобразуйте коллекцию в ее строковое представление.
+     * Преобразуйте коллекцию в ее строковое представление
      *
      * @return string
      */
@@ -79,25 +84,23 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Вернет новый экземпляр коллекции с указаными значениями.
+     * Вернет новый экземпляр коллекции с указанными значениями
      *
      * @param mixed $items
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public static function make($items = [])
+    public static function make(mixed $items = []): static
     {
         return new static($items);
     }
 
     /**
-     * Вернет коллекцию с указаным значением, если это применимо.
+     * Вернет коллекцию с указанным значением, если это применимо
      *
      * @param mixed $value
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public static function wrap($value)
+    public static function wrap(mixed $value): static
     {
         return $value instanceof self
             ? new static($value)
@@ -111,12 +114,12 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получить базовые элементы из данной коллекции, если это применимо.
+     * Получить базовые элементы из данной коллекции, если это применимо
      *
      * @param array|static $value
      * @return array
      */
-    public static function unwrap($value): array
+    public static function unwrap(array|BaseCollection $value): array
     {
         return $value instanceof self ? $value->all() : $value;
     }
@@ -125,8 +128,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param mixed $default
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function setDefault($default)
+    public function setDefault(mixed $default): static
     {
         $this->default = $default;
 
@@ -144,7 +146,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     // public static function times($number, callable $callback = null)
 
     /**
-     * Получить все элементы в коллекции.
+     * Получить все элементы в коллекции
      *
      * @return array
      */
@@ -156,11 +158,10 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     /**
      * Получить среднее значение элементов.
      *
-     * @param string $key - ключ в значениях которых вычесляем среднее значение
-     * @return mixed
+     * @param callable|string|null $key ключ в значениях которых вычисляем среднее значение
+     * @return float|int
      */
-    #[\ReturnTypeWillChange]
-    public function avg($key = null)
+    public function avg(callable|string|null $key = null): float|int
     {
         if ($count = $this->count()) {
             return $this->sum($key) / $count;
@@ -170,13 +171,12 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Alias for the "avg" method.
+     * Alias for the "avg" method
      *
-     * @param callable|string $callback
-     * @return mixed
+     * @param callable|string|null $callback
+     * @return float|int
      */
-    #[\ReturnTypeWillChange]
-    public function average($callback = null)
+    public function average(callable|string|null $callback = null): float|int
     {
         return $this->avg($callback);
     }
@@ -186,8 +186,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function collapse()
+    public function collapse(): static
     {
         $results = [];
 
@@ -211,8 +210,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param mixed $value
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function push($value)
+    public function push(mixed $value): static
     {
         $this->offsetSet(null, $value);
 
@@ -225,8 +223,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param Traversable $source
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function concat(Traversable $source)
+    public function concat(Traversable $source): static
     {
         $result = new static($this);
 
@@ -241,11 +238,11 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * Получить медиану.
      *
      * @link https://en.wikipedia.org/wiki/Median
-     * @param string $key - ключ в значениях которых вычесляем медиану
-     * @return mixed
+     *
+     * @param array|string|null $key ключ в значениях которых вычисляем медиану
+     * @return float|int|null
      */
-    #[\ReturnTypeWillChange]
-    public function median($key = null)
+    public function median(array|string|null $key = null): float|int|null
     {
         $count = $this->count();
 
@@ -268,15 +265,15 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получить режим заданного ключа.
+     * Получить режим заданного ключа
      *
      * @link https://laravel.com/docs/5.6/collections#method-mode
      * @link https://en.wikipedia.org/wiki/Mode_(statistics)
-     * @param mixed $key
+     *
+     * @param array|string|null $key
      * @return array|null
      */
-    #[\ReturnTypeWillChange]
-    public function mode($key = null)
+    public function mode(array|string|null $key = null): array|null
     {
         $count = $this->count();
 
@@ -286,7 +283,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
 
         $collection = isset($key) ? $this->pluck($key) : $this;
 
-        $counts = new self;
+        $counts = new self();
 
         $collection->each(function ($value) use ($counts) {
             $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
@@ -314,16 +311,11 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      *
      * @return void
      */
+    #[\JetBrains\PhpStorm\NoReturn]
     public function dd(): void
     {
         $value = $this->all();
-
-        if (is_bool($value)) {
-            $value = ($value === true ? "TRUE" : "FALSE");
-        }
-
         $valueType = gettype($value);
-        $value = (is_null($value) ? "Null" : $value);
         $value = print_r($value, true);
         $value = htmlentities($value, ENT_QUOTES, 'UTF-8');
         $style = "border:1px solid #900; margin:5px; padding:3px; font-size:10pt; white-space: pre;";
@@ -331,7 +323,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
         $valueType = "<div style=\"padding:5px; text-align: left;\">[<b>{$valueType}</b>]</div>";
         $value = "<div style=\"padding:5px; text-align: left;\">{$value}</div>";
 
-        echo sprintf(PHP_EOL . "<pre style=\"{$style}\">%s%s</pre>" . PHP_EOL, $title, $valueType . $value);
+        echo sprintf(PHP_EOL."<pre style=\"{$style}\">%s%s</pre>".PHP_EOL, $title, $valueType.$value);
         die;
     }
 
@@ -351,8 +343,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param callable $callback
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function each(callable $callback)
+    public function each(callable $callback): static
     {
         foreach ($this->data as $key => $item) {
             if ($callback($item, $key) === false) {
@@ -369,8 +360,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param callable $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function eachSpread(callable $callback)
+    public function eachSpread(callable $callback): static
     {
         return $this->each(function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
@@ -382,12 +372,12 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     /**
      * Метод для проверки того, что все элементы коллекции проходят заданный тест истинности
      *
-     * @param string|callable $key
-     * @param mixed           $operator
-     * @param mixed           $value
+     * @param callable|string $key
+     * @param mixed $operator
+     * @param mixed $value
      * @return bool
      */
-    public function every($key, $operator = null, $value = null): bool
+    public function every(callable|string $key, mixed $operator = null, mixed $value = null): bool
     {
         if (func_num_args() == 1) {
             $callback = $this->valueRetriever($key);
@@ -416,8 +406,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param array|string $keys
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function except($keys)
+    public function except(array|string $keys): static
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
@@ -430,8 +419,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param callable|null $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null): static
     {
         if ($callback) {
             return new static(Helper::getWhere($this->data, $callback));
@@ -441,16 +429,17 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Выполнит $callback функцию если указаное значение будет правда
+     * Выполнит $callback функцию если указанное значение будет правда
+     *
+     * @note функция $callback должна вернуть эту-же коллекцию
      *
      * @link https://laravel.com/docs/5.6/collections#method-when
-     * @param bool          $value
-     * @param callable      $callback
+     * @param bool $value
+     * @param callable $callback
      * @param callable|null $default
-     * @return mixed
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function when($value, callable $callback, callable $default = null)
+    public function when(bool $value, callable $callback, callable $default = null): static
     {
         if ($value) {
             return $callback($this);
@@ -463,22 +452,23 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Выполнит $callback функцию если указаное значение будет ложь.
+     * Выполнит $callback функцию если указанное значение будет ложь
+     *
+     * @note функция $callback должна вернуть эту-же коллекцию
      *
      * @link https://laravel.com/docs/5.6/collections#method-unless
-     * @param bool          $value
-     * @param callable      $callback
+     * @param bool $value
+     * @param callable $callback
      * @param callable|null $default
-     * @return mixed
+     * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function unless($value, callable $callback, callable $default = null)
+    public function unless(bool $value, callable $callback, callable $default = null): static
     {
         return $this->when(! $value, $callback, $default);
     }
 
     /**
-     * Возвращает новую коллекцию после фильтрации элементов по заданной паре значений.
+     * Возвращает новую коллекцию после фильтрации элементов по заданной паре значений
      *
      * @link https://laravel.com/docs/5.6/collections#method-where
      * @note Метод использует «свободные» сравнения при проверке значений элементов.
@@ -486,16 +476,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      *       Используйте метод whereStrict для фильтрации с использованием «строгих» сравнений.
      *
      * @param string $key
-     * @param mixed  $operator
-     * @param mixed  $value
+     * @param mixed $operator
+     * @param mixed $value
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function where($key, $operator, $value = null)
+    public function where(string $key, mixed $operator, mixed $value = null): static
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             $value = $operator;
-
             $operator = '=';
         }
 
@@ -503,15 +491,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Get an operator checker callback.
+     * Get an operator checker callback
      *
      * @param string $key
      * @param string $operator
-     * @param mixed  $value
+     * @param mixed $value
      * @return Closure
      */
-    #[\ReturnTypeWillChange]
-    protected function operatorForWhere($key, $operator, $value)
+    protected function operatorForWhere(string $key, string $operator, mixed $value): Closure
     {
         return function ($item) use ($key, $operator, $value) {
             $retrieved = Helper::arrayGet($item, $key);
@@ -549,11 +536,10 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * Filter items by the given key value pair using strict comparison.
      *
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function whereStrict($key, $value)
+    public function whereStrict(string $key, mixed $value): static
     {
         return $this->where($key, '===', $value);
     }
@@ -562,12 +548,11 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * Фильтрует коллекцию по заданным ключу/значению, содержащимся в данном массиве
      *
      * @param string $key
-     * @param mixed  $values
-     * @param bool   $strict
+     * @param mixed $values
+     * @param bool $strict
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function whereIn($key, $values, $strict = false)
+    public function whereIn(string $key, mixed $values, bool $strict = false): static
     {
         $values = $this->getArrayableItems($values);
 
@@ -577,17 +562,16 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Фильтрует коллекцию по строгому сравнениею в заданным ключу/значению, содержащимся в данном массиве
+     * Фильтрует коллекцию по строгому сравнению в заданным ключу/значению, содержащимся в данном массиве
      *
      * все значения сравниваются с использованием строгого сравнения
      * Filter items by the given key value pair using strict comparison.
      *
      * @param string $key
-     * @param mixed  $values
+     * @param mixed $values
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function whereInStrict($key, $values)
+    public function whereInStrict(string $key, mixed $values): static
     {
         return $this->whereIn($key, $values, true);
     }
@@ -596,12 +580,11 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * Фильтрует коллекцию по заданным ключу/значению, которые не содержатся в данном массиве
      *
      * @param string $key
-     * @param mixed  $values
-     * @param bool   $strict
+     * @param mixed $values
+     * @param bool $strict
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function whereNotIn($key, $values, $strict = false)
+    public function whereNotIn(string $key, mixed $values, bool $strict = false): static
     {
         $values = $this->getArrayableItems($values);
 
@@ -611,40 +594,37 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Фильтрует коллекцию по строгому сравнениею в заданном ключу/значению, которые не содержатся в данном массиве
+     * Фильтрует коллекцию по строгому сравнению в заданном ключу/значению, которые не содержатся в данном массиве
      *
      * @param string $key
-     * @param mixed  $values
+     * @param mixed $values
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function whereNotInStrict($key, $values)
+    public function whereNotInStrict(string $key, mixed $values): static
     {
         return $this->whereNotIn($key, $values, true);
     }
 
     /**
-     * Возвращает первый элемент в коллекции.
+     * Возвращает первый элемент в коллекции
      *
-     * @param callable $callback
-     * @param mixed    $default
+     * @param callable|null $callback
+     * @param mixed $default
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function first(callable $callback = null, $default = null)
+    public function first(callable $callback = null, mixed $default = null): mixed
     {
         return Helper::arrayFirst($this->data, $callback, $default);
     }
 
     /**
-     * Возвращает коллекцию в которой многомерная коллекцию сплющенный в одно измерение.
+     * Возвращает коллекцию в которой многомерная коллекция сплющенный в одно измерение
      *
      * @link https://laravel.com/docs/5.6/collections#method-flatten
      * @param int $depth
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function flatten($depth = INF)
+    public function flatten(int $depth = INF): static
     {
         if (count($this->data) === 0) {
             return new static([]);
@@ -658,8 +638,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function flip()
+    public function flip(): static
     {
         return new static(array_flip($this->data));
     }
@@ -667,11 +646,10 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     /**
      * Удаление элемента из коллекции по ключу.
      *
-     * @param string|array $keys
+     * @param mixed $keys
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function forget($keys)
+    public function forget(mixed $keys): static
     {
         foreach ((array)$keys as $key) {
             $this->offsetUnset($key);
@@ -681,14 +659,13 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получить элементы из коллекции по ключу.
+     * Получить элементы из коллекции по ключу
      *
-     * @param mixed $key     - указанный ключ в колекции
-     * @param mixed $default - значение если ключ не найден
+     * @param float|int|string $key указанный ключ в коллекции
+     * @param mixed $default значение если ключ не найден
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function get($key, $default = null)
+    public function get(float|int|string $key, mixed $default = null): mixed
     {
         if ($this->offsetExists($key)) {
             return $this->data[$key];
@@ -698,15 +675,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возвращает коллекцию сгруппированную по указанному ключу с использованием обратного вызова.
+     * Возвращает коллекцию, сгруппированную по указанному ключу с использованием обратного вызова
      *
      * @link https://laravel.com/docs/5.6/collections#method-groupby
      * @param callable|string $groupBy
-     * @param bool            $preserveKeys - признак сохранения ключей
+     * @param bool $preserveKeys - признак сохранения ключей
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function groupBy($groupBy, $preserveKeys = false)
+    public function groupBy(callable|string $groupBy, bool $preserveKeys = false): static
     {
         $groupBy = $this->valueRetriever($groupBy);
 
@@ -723,7 +699,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
                 $groupKey = is_bool($groupKey) ? (int)$groupKey : $groupKey;
 
                 if (! array_key_exists($groupKey, $results)) {
-                    $results[$groupKey] = new static;
+                    $results[$groupKey] = new static();
                 }
 
                 $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
@@ -734,15 +710,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возвращает коллекцию сгруппированную по указанному ключу
+     * Возвращает коллекцию, сгруппированную по указанному ключу
      *
      * @link https://laravel.com/docs/5.6/collections#method-keyby
      * @note Если несколько элементов имеют один и тот же ключ, в новой коллекции будет отображаться только последний.
-     * @param callable | string $keyBy
+     * @param callable|string $keyBy
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function keyBy($keyBy)
+    public function keyBy(callable|string $keyBy): static
     {
         $keyBy = $this->valueRetriever($keyBy);
 
@@ -762,12 +737,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Определяет, существует ли элемент в коллекции по ключу.
+     * Определяет, существует ли элемент(ы) в коллекции по ключу
      *
-     * @param mixed $key
+     * @note если передан список ключей, то система при первой неудачной проверке вернет false
+     *
+     * @param array|float|int|string $key
      * @return bool
      */
-    public function has($key): bool
+    public function has(array|float|int|string $key): bool
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -781,14 +758,13 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Concatenate values of a given key as a string.
+     * Соединяет элементы в коллекции
      *
      * @param string $value
-     * @param string $glue
+     * @param string|null $glue
      * @return string
      */
-    #[\ReturnTypeWillChange]
-    public function implode($value, $glue = null)
+    public function implode(string $value, string $glue = null): string
     {
         $first = $this->first();
 
@@ -800,14 +776,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * удаляет любые значения из исходной коллекции, которых нет в переданном массиве или коллекции
+     * Удаляет любые значения из исходной коллекции, которых нет в переданном массиве или коллекции
      *
      * @note Полученная коллекция сохранит ключи исходной коллекции
+     *
      * @param mixed $items
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function intersect($items)
+    public function intersect(mixed $items): static
     {
         return new static(array_intersect($this->data, $this->getArrayableItems($items)));
     }
@@ -818,14 +794,13 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param mixed $items
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function intersectByKeys($items)
+    public function intersectByKeys(mixed $items): static
     {
         return new static(array_intersect_key($this->data, $this->getArrayableItems($items)));
     }
 
     /**
-     * Возвращает результат проверки: не является ли коллекция пустой.
+     * Возвращает результат проверки: не является ли коллекция пустой
      *
      * @return bool
      */
@@ -835,7 +810,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возвращает результат проверки: является ли коллекция пустой или нет.
+     * Возвращает результат проверки: является ли коллекция пустой или нет
      *
      * @return bool
      */
@@ -845,68 +820,66 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Определите, является ли данное значение не строкой а исполняемой функцией
+     * Определите, является ли данное значение не строкой, а исполняемой функцией
      *
      * @param mixed $value
      * @return bool
      */
-    protected function useAsCallable($value): bool
+    protected function useAsCallable(mixed $value): bool
     {
         return ! is_string($value) && is_callable($value);
     }
 
     /**
-     * Получите коллекцию с ключами от предметов коллекции.
+     * Получите коллекцию с ключами от предметов коллекции
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function keys()
+    public function keys(): static
     {
         return new static(array_keys($this->data));
     }
 
     /**
-     * Возвращает последний элемент в массиве.
+     * Возвращает последний элемент в массиве
      *
      * @link https://laravel.com/docs/5.6/collections#method-last
      * @note Если указан $callback вернет последний элемент в коллекции, который проходит данный тест истины
+     *
      * @param callable|null $callback
-     * @param mixed         $default
+     * @param mixed $default
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function last(callable $callback = null, $default = null)
+    public function last(callable $callback = null, mixed $default = null): mixed
     {
         return Helper::arrayLast($this->data, $callback, $default);
     }
 
     /**
-     * Получить колекцию со значениями из массива текущей коллекции.
+     * Получить коллекцию со значениями из массива текущей коллекции
      *
-     * @note можно указать конкретный ключь в массиве для использования в новом массиве
+     * @note можно указать конкретный ключ в массиве для использования в новом массиве
      * @link https://laravel.com/docs/5.6/collections#method-pluck
-     * @param string      $value
+     *
+     * @param string $value
      * @param string|null $key
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function pluck($value, $key = null)
+    public function pluck(string $value, ?string $key = null): static
     {
         return new static(Helper::arrayPluck($this->data, $value, $key));
     }
 
     /**
-     * Перебирает коллекцию и передаёт каждое значению в функцию обратного вызова.
+     * Перебирает коллекцию и передаёт каждое значению в функцию обратного вызова
      *
-     * @note Метод выполняет итерацию по коллекции и передает каждое значение заданному обратному вызову.
+     * @note Метод выполняет итерацию по коллекции и передает каждое значение заданному обратному вызову
      * @note Обратный вызов может изменять элемент и возвращать его, тем самым формируя новую коллекцию измененных элементов
      *
      * @param callable $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function map(callable $callback)
+    public function map(callable $callback): static
     {
         $keys = array_keys($this->data);
         $items = array_map($callback, $this->data, $keys);
@@ -920,8 +893,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param callable $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function mapSpread(callable $callback)
+    public function mapSpread(callable $callback): static
     {
         return $this->map(function ($chunk, $key) use ($callback) {
             $chunk[] = $key;
@@ -939,8 +911,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param callable $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function flatMap(callable $callback)
+    public function flatMap(callable $callback): static
     {
         return $this->map($callback)->collapse();
     }
@@ -954,8 +925,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param callable $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function mapWithKeys(callable $callback)
+    public function mapWithKeys(callable $callback): static
     {
         $result = [];
 
@@ -971,32 +941,32 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получить максимальное значение данного ключа.
+     * Получить максимальное значение данного ключа
      *
-     * @note без ключа делает поиск по всему массиву
      * @link https://laravel.com/docs/5.6/collections#method-max
+     * @note без ключа делает поиск по всему массиву
+     *
      * @param string|null $key
-     * @return mixed
+     * @return float|int
      */
-    #[\ReturnTypeWillChange]
-    public function max($key = null)
+    public function max(?string $key = null): float|int
     {
-        return $this->reduce(function ($result, $item) use ($key) {
-            $value = Helper::arrayGet($item, $key);
+        return $this->reduce(function (int $carry, $item) use ($key) {
+            $item = is_null($key) ? $item : VarArray::get($key, $item, 0);
+            $item = is_float($item) ? $item : intval($item);
 
-            return is_null($result) || $value > $result ? $value : $result;
-        });
+            return max($item, $carry);
+        }, 0);
     }
 
     /**
-     * Вернуть коллекцию после объединения с заданными элементами.
+     * Вернуть коллекцию после объединения с заданными элементами
      *
      * @note если заданные ключи в массиве числовые, то значения будут добавляться в конец коллекции
      * @param mixed $items
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function merge($items)
+    public function merge(mixed $items): static
     {
         return new static(array_merge($this->data, $this->getArrayableItems($items)));
     }
@@ -1004,48 +974,47 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     /**
      * Получить минимальное значение по указанному ключу.
      *
-     * @note без ключа делает поиск по всему массиву
      * @link https://laravel.com/docs/5.6/collections#method-min
+     * @note без ключа делает поиск по всему массиву
+     *
      * @param string|null $key
-     * @return mixed
+     * @return float|int
      */
-    #[\ReturnTypeWillChange]
-    public function min($key = null)
+    public function min(?string $key = null): float|int
     {
-        return $this->reduce(function ($result, $item) use ($key) {
-            $value = Helper::arrayGet($item, $key);
+        return $this->reduce(function ($carry, $item) use ($key) {
+            $item = is_null($key) ? $item : VarArray::get($key, $item, 0);
+            $item = is_float($item) ? $item : intval($item);
 
-            return is_null($result) || $value < $result ? $value : $result;
+            return min($item, $carry);
         });
     }
 
     /**
-     * Получить коллекцию только с указанными ключами из текущих значений.
+     * Получить коллекцию только с указанными ключами из текущих значений
      *
-     * @param mixed $keys
+     * @param array $keys
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function only($keys)
+    public function only(array $keys): static
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = count($keys) > 0 ? $keys : func_get_args();
 
         return new static(Helper::arrayOnly($keys, $this->data));
     }
 
     /**
-     * Получить и удалить последний элемент из текущей коллекции.
+     * Получить и удалить последний элемент из текущей коллекции
      *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function pop()
+    public function pop(): mixed
     {
         return array_pop($this->data);
     }
 
     /**
-     * Добавить элемент в начало коллекции.
+     * Добавить элемент в начало коллекции
      *
      * @note вторым аргументом вы можете передать ключ добавляемого элемента
      *
@@ -1053,8 +1022,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param mixed $key
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function prepend($value, $key = null)
+    public function prepend(mixed $value, mixed $key = null): static
     {
         $this->data = Helper::arrayPrepend($this->data, $value, $key);
 
@@ -1062,27 +1030,25 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получение и удаление элемента из коллекции.
+     * Получение и удаление элемента из коллекции
      *
-     * @param mixed $key
+     * @param array|float|int|string $key
      * @param mixed $default
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function pull($key, $default = null)
+    public function pull(array|float|int|string $key, mixed $default = null): mixed
     {
         return Helper::arrayPull($key, $this->data, $default);
     }
 
     /**
-     * Поместите элемент в коллекцию по ключу.
+     * Поместите элемент в коллекцию по ключу
      *
-     * @param mixed $key
+     * @param float|int|string $key
      * @param mixed $value
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function put($key, $value)
+    public function put(float|int|string $key, mixed $value): static
     {
         $this->offsetSet($key, $value);
 
@@ -1090,28 +1056,28 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Вернет новый экземпляр коллекции с заполненными значениями до тех пор, пока массив не достигнет указанного размера.
+     * Вернет новый экземпляр коллекции с заполненными значениями до тех пор, пока массив не достигнет указанного размера
      *
-     * @note Этот метод ведет себя как функция PHP массива array_pad.
-     * @param int   $size
+     * @note Этот метод ведет себя как функция PHP массива array_pad
+     *
+     * @param int $size
      * @param mixed $value
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function pad($size, $value)
+    public function pad(int $size, mixed $value): static
     {
         return new static(array_pad($this->data, $size, $value));
     }
 
     /**
-     * Получить один или несколько элементов случайным образом из коллекции.
+     * Получить один или несколько элементов случайным образом из коллекции
      *
      * @link https://laravel.com/docs/5.6/collections#method-random
+     *
      * @param int $amount
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function random($amount = 1)
+    public function random(int $amount = 1): static
     {
         if ($amount > ($count = $this->count())) {
             $amount = $count;
@@ -1131,58 +1097,63 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Уменьшить коллекцию до одного значения.
+     * Уменьшает коллекцию до одного значения, передавая результат каждой итерации в последующую итерацию
      *
+     * @link https://laravel.ru/docs/v5/collections#reduce
      * @param callable $callback
-     * @param mixed    $initial
-     * @return mixed
+     * @param int|null $initial
+     * @return float|int
      */
-    #[\ReturnTypeWillChange]
-    public function reduce(callable $callback, $initial = null)
+    public function reduce(callable $callback, ?int $initial = null): float|int
     {
-        return array_reduce($this->data, $callback, $initial);
+        $result = $initial;
+
+        foreach ($this->data as $key => $value) {
+            $result = $callback($result, $value, $key);
+        }
+
+        return $result;
     }
 
     /**
-     * Создайте коллекцию всех элементов, которые не проходят данный тест истины.
+     * Фильтрует коллекцию, используя заданную функцию обратного вызова
      *
-     * @param callable|mixed $callback
+     * @see https://laravel.com/docs/11.x/collections#method-reject
+     * @note функция обратного вызова должна возвращать true для элементов, которые необходимо удалить из результирующей коллекции
+     *
+     * @param callable|float|int|string $callback
+     * @param bool $strict
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function reject($callback)
+    public function reject(callable|float|int|string $callback, bool $strict = false): static
     {
-        if ($this->useAsCallable($callback)) {
-            return $this->filter(function ($item) use ($callback) {
-                return ! $callback($item);
-            });
-        }
+        $useAsCallable = $this->useAsCallable($callback);
 
-        return $this->filter(function ($item) use ($callback) {
-            return $item != $callback;
+        return $this->filter(function ($value, $key) use ($callback, $useAsCallable, $strict) {
+            return $useAsCallable
+                ? ! $callback($value, $key)
+                : ($strict ? $value !== $callback : $value != $callback);
         });
     }
 
     /**
-     * Вернуть коллекцию в обратном порядке элементов от базового.
+     * Вернуть коллекцию в обратном порядке элементов от базового
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function reverse()
+    public function reverse(): static
     {
         return new static(array_reverse($this->data));
     }
 
     /**
-     * Найдите в коллекции заданное значение и в случае успеха вернёт соответствующий ключ.
+     * Найдите в коллекции заданное значение и в случае успеха вернёт соответствующий ключ
      *
      * @param mixed $value
-     * @param bool  $strict
-     * @return mixed
+     * @param bool $strict
+     * @return false|int|string
      */
-    #[\ReturnTypeWillChange]
-    public function search($value, $strict = false)
+    public function search(mixed $value, bool $strict = false): false|int|string
     {
         if (! $this->useAsCallable($value)) {
             return array_search($value, $this->data, $strict);
@@ -1198,23 +1169,21 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получение и удалите первого элемент из коллекции.
+     * Получение и удалите первого элемент из коллекции
      *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function shift()
+    public function shift(): mixed
     {
         return array_shift($this->data);
     }
 
     /**
-     * Вернуть коллекцию у которой все базовые элементы перемешаны.
+     * Вернуть коллекцию у которой все базовые элементы перемешаны
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function shuffle()
+    public function shuffle(): static
     {
         $items = $this->data;
 
@@ -1224,57 +1193,55 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Вернуть коллекцию по указаному базовому срезу элементов.
+     * Вернуть коллекцию по указанному базовому срезу элементов
      *
-     * @param int  $offset
-     * @param int  $length
+     * @param int $offset
+     * @param int|null $length
      * @param bool $preserveKeys
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function slice($offset, $length = null, $preserveKeys = false)
+    public function slice(int $offset, ?int $length = null, bool $preserveKeys = false): static
     {
         return new static(array_slice($this->data, $offset, $length, $preserveKeys));
     }
 
     /**
-     * Вернуть коллекцию в которой элементы отсортированы по возрастанию с помощью обратного вызова.
+     * Вернуть коллекцию в которой элементы отсортированы по возрастанию с помощью обратного вызова
      *
      * @link https://laravel.com/docs/5.6/collections#method-sort
+     *
      * @param callable|null $callback
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function sort(callable $callback = null)
+    public function sort(callable $callback = null): static
     {
         $items = $this->data;
 
         $callback
             ? uasort($items, $callback)
             : uasort($items, function ($a, $b) {
-            if ($a == $b) {
-                return 0;
-            }
+                if ($a == $b) {
+                    return 0;
+                }
 
-            return ($a < $b) ? -1 : 1;
-        });
+                return ($a < $b) ? -1 : 1;
+            });
 
         return new static($items);
     }
 
     /**
-     * Вернуть коллекцию которая отсортирована по заданному ключу.
+     * Вернуть коллекцию которая отсортирована по заданному ключу
      *
-     * @note В отсортированной коллекции хранятся ключи исходного массива
+     * @note В отсортированной коллекции хранятся ключи исходного массива.
      * Сортировка коллекции с помощью данного обратного вызова.
      *
      * @param callable|string $callback
-     * @param int             $options
-     * @param bool            $descending
+     * @param int $options
+     * @param bool $descending
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
+    public function sortBy(callable|string $callback, int $options = SORT_REGULAR, bool$descending = false): static
     {
         $results = [];
 
@@ -1288,7 +1255,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
 
         $descending ? arsort($results, $options) : asort($results, $options);
 
-        // После того, как мы отсортировали все ключи в массиве,
+        // После того как мы отсортировали все ключи в массиве,
         // мы пропустим их и возьмем соответствующую модель,
         // Затем мы просто вернем экземпляр коллекции.
 
@@ -1300,14 +1267,13 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Сортировка коллекции в порядке убывания с помощью данного обратного вызова.
+     * Сортировка коллекции в порядке убывания с помощью данного обратного вызова
      *
      * @param callable|string $callback
-     * @param int             $options
+     * @param int $options
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function sortByDesc($callback, $options = SORT_REGULAR)
+    public function sortByDesc(callable|string $callback, int $options = SORT_REGULAR): static
     {
         return $this->sortBy($callback, $options, true);
     }
@@ -1315,12 +1281,12 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     /**
      * Возвращает коллекцию после среза элементов у базовой коллекции, начинающийся с указанного индекса
      *
-     * @param int      $offset
+     * @param int $offset
      * @param int|null $length
-     * @param mixed    $replacement
+     * @param mixed $replacement
      * @return static
      */
-    public function splice($offset, $length = null, $replacement = [])
+    public function splice(int $offset, ?int $length = null, mixed $replacement = []): static
     {
         if (func_num_args() == 1) {
             return new static(array_splice($this->data, $offset));
@@ -1330,13 +1296,14 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Получить сумму всех элементов в коллекции.
+     * Получить сумму всех элементов в коллекции
+     *
+     * @link https://laravel.ru/docs/v5/collections#sum
      *
      * @param callable|string|null $callback
-     * @return mixed
+     * @return float|int
      */
-    #[\ReturnTypeWillChange]
-    public function sum($callback = null)
+    public function sum(callable|string|null $callback = null): float|int
     {
         if (is_null($callback)) {
             return array_sum($this->data);
@@ -1344,19 +1311,18 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
 
         $callback = $this->valueRetriever($callback);
 
-        return $this->reduce(function ($result, $item) use ($callback) {
-            return $result += $callback($item);
+        return $this->reduce(function (int $sum, $item) use ($callback) {
+            return $sum += (int)$callback($item);
         }, 0);
     }
 
     /**
      * Возвращает новую коллекцию с указанным количеством элементов
      *
-     * @param integer $limit
+     * @param int $limit
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function take($limit)
+    public function take(int $limit): static
     {
         if ($limit < 0) {
             return $this->slice($limit, abs($limit));
@@ -1369,11 +1335,11 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * Преобразуйте каждый элемент в коллекцию с помощью обратного вызова.
      *
      * @note В отличие от других методов, transform изменяет саму коллекцию! Если вы хотите создать новую коллекцию, используйте метод map()
+     *
      * @param callable $callback
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function transform(callable $callback)
+    public function transform(callable $callback): static
     {
         $this->data = $this->map($callback)->all();
 
@@ -1381,13 +1347,12 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возвращает все уникальные элементы из базового массива в новой коллекции.
+     * Возвращает все уникальные элементы из базового массива в новой коллекции
      *
-     * @param string|callable|null $key
+     * @param callable|string|null $key
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function unique($key = null)
+    public function unique(callable|string|null $key = null): static
     {
         if (is_null($key)) {
             return new static(array_unique($this->data, SORT_REGULAR));
@@ -1407,31 +1372,29 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
     }
 
     /**
-     * Возвращает новую коллекцию со сброшенными ключами к целым числам.
+     * Возвращает новую коллекцию со сброшенными ключами к целым числам
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function values()
+    public function values(): static
     {
         return new static(array_values($this->data));
     }
 
     /**
-     * Получить значение, извлекающее обратный вызов.
+     * Получить значение, извлекающее обратный вызов
      *
-     * @param string $value
+     * @param callable|string|null $value
      * @return callable
      */
-    #[\ReturnTypeWillChange]
-    protected function valueRetriever($value)
+    protected function valueRetriever(callable|string|null $value): callable
     {
         if ($this->useAsCallable($value)) {
             return $value;
         }
 
         return function ($item) use ($value) {
-            return Helper::arrayGet($item, $value);
+            return Helper::arrayGet($value, $item);
         };
     }
 
@@ -1443,7 +1406,7 @@ class Collection implements BaseCollection, \Iterator, \ArrayAccess, \Countable,
      * @param mixed $items
      * @return array
      */
-    protected function getArrayableItems($items): array
+    protected function getArrayableItems(mixed $items): array
     {
         if (is_array($items)) {
             return $items;

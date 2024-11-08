@@ -2,7 +2,6 @@
 
 namespace Warkhosh\Component\Url;
 
-use Warkhosh\Component\Traits\Singleton;
 use Warkhosh\Variable\VarStr;
 
 /**
@@ -35,8 +34,8 @@ class AppUrlPath
             $paths = VarStr::explode('/', $url['path'], ['', ' ']);
             $types = [];
 
-            if (is_array($paths) && count($paths) > 0) {
-                foreach ($paths as $key => $var) {
+            if (count($paths) > 0) {
+                foreach ($paths as $var) {
                     $types[] = is_numeric($var) ? (is_float($var) ? 'float' : ($var >= 0 ? 'num' : 'int')) : 'str';
                 }
 

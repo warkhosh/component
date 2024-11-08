@@ -8,100 +8,100 @@ use Warkhosh\Variable\VarStr;
 /**
  * Class AppUrl
  *
- * Класс для обработки урлов и построения типовых задач на их основе
+ * Класс для обработки орлов и построения типовых задач на их основе
  *
  * @package Ekv\Framework\Components\Url
  */
 class AppUrl
 {
     /**
-     * Значение урла который указали ( не обработанный, как передали )
+     * Значение урла который указали (не обработанный, как передали)
      *
-     * @var string
+     * @var string|null
      */
-    protected $primaryUrl = null;
+    protected ?string $primaryUrl = null;
 
     /**
-     * Значение урла который указали ( не обработанный, с приведением к типу: строка )
+     * Значение урла который указали (не обработанный, с приведением к типу: строка)
      *
      * @var string
      */
-    protected $originalUrl = '';
+    protected string $originalUrl = '';
 
     /**
      * Значение урла без названия файла
      *
      * @var string
      */
-    protected $url = '';
+    protected string $url = '';
 
     /**
      * Отдельно хранит только пути без фала и query параметров
      *
      * @var string
      */
-    protected $path = '';
+    protected string $path = '';
 
     /**
      * Отдельно хранит название файла если такой передали в урле
      *
      * @var string
      */
-    protected $file = '';
+    protected string $file = '';
 
     /**
      * Флаг для преобразования урла из абсолютного в относительный
      *
      * @var bool
      */
-    protected $relative = false;
+    protected bool $relative = false;
 
     /**
      * Флаг наличия query запросов в урле
      *
      * @var bool
      */
-    protected $withQuery = false;
+    protected bool $withQuery = false;
 
     /**
      * Флаг наличия слеша в конце пути (перед файлом)
      *
      * @var bool
      */
-    protected $slashAtEnd = false;
+    protected bool $slashAtEnd = false;
 
     /**
      * Строка для вырезания указанного пути из начала урла, для преобразования в относительный
      *
      * @var string
      */
-    protected $basePath = '';
+    protected string $basePath = '';
 
     /**
      * @var array
      */
-    protected $validExtensions = ['php', 'html', 'htm'];
+    protected array $validExtensions = ['php', 'html', 'htm'];
 
     /**
      * Флаг дописывания создания index файла если файл в урле не указан
      *
      * @var bool
      */
-    protected $filePresence = true;
+    protected bool $filePresence = true;
 
     /**
      * Название index файла для дописывания если указан флаг $filePresence
      *
      * @var string
      */
-    protected $indexFileName = 'index';
+    protected string $indexFileName = 'index';
 
     /**
      * Расширение index файла для дописывания если указан флаг $filePresence
      *
      * @var string
      */
-    protected $indexFileExtension = 'php';
+    protected string $indexFileExtension = 'php';
 
     /**
      * Флаг строгой проверки преобразований урла, расширений и прочих параметров
@@ -109,20 +109,20 @@ class AppUrl
      * @note речь идет о не корректных символах с точки зрения ЧПУ
      * @var bool
      */
-    protected $strict = false;
+    protected bool $strict = false;
 
     /**
-     * Системный флаг для определения что урл уже разбирался
+     * Системный флаг для определения, что урл уже разбирался
      *
      * @var bool
      */
-    private $prepareUrl = false;
+    private bool $prepareUrl = false;
 
     /**
      * AppUrl constructor.
      *
      * @param string|null $url
-     * @param false       $strict
+     * @param false $strict
      */
     public function __construct(?string $url = null, bool $strict = false)
     {
@@ -133,18 +133,17 @@ class AppUrl
      * Установка урла как передали для последующих проверок
      *
      * @param string|null $url
-     * @param bool        $strict - флаг вырезания лишних символов ( не корректных с точки зрения ЧПУ )
+     * @param bool $strict флаг вырезания лишних символов (не корректных с точки зрения ЧПУ)
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function set(?string $url = null, bool $strict = false)
+    public function set(?string $url = null, bool $strict = false): static
     {
-        $this->originalUrl = VarStr::trim(VarStr::getMakeString($url));
+        $this->originalUrl = VarStr::trim(VarStr::getMake($url));
         $this->primaryUrl = is_null($url) ? null : $this->originalUrl;
 
         if ($strict) {
             $this->setStrict($strict);
-            $this->originalUrl = preg_replace("/[^a-zA-Z0-9\/\.\-\_\?\=]/", "", VarStr::getMakeString($this->originalUrl));
+            $this->originalUrl = preg_replace("/[^a-zA-Z0-9\/\.\-\_\?\=]/", "", $this->originalUrl);
 
             if (($uri = ltrim($this->originalUrl, "/")) != $this->originalUrl) {
                 $this->originalUrl = "/{$uri}";
@@ -158,10 +157,9 @@ class AppUrl
      * Установка флага для определения наличия query запросов в урле
      *
      * @param bool $withQuery
-     * @return AppUrl
+     * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function withQuery($withQuery)
+    public function withQuery(bool $withQuery): static
     {
         $this->setWithQuery($withQuery);
 
@@ -174,7 +172,7 @@ class AppUrl
      * @param bool $withQuery
      * @return void
      */
-    public function setWithQuery($withQuery): void
+    public function setWithQuery(bool $withQuery): void
     {
         $this->withQuery = isTrue($withQuery);
     }
@@ -185,7 +183,7 @@ class AppUrl
      * @param bool $filePresence
      * @return void
      */
-    public function setFilePresence($filePresence): void
+    public function setFilePresence(bool $filePresence): void
     {
         $this->filePresence($filePresence);
     }
@@ -196,8 +194,7 @@ class AppUrl
      * @param bool $filePresence
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function filePresence($filePresence)
+    public function filePresence(bool $filePresence): static
     {
         $this->filePresence = isTrue($filePresence);
 
@@ -217,10 +214,10 @@ class AppUrl
     /**
      * Установить допустимые расширения файлов
      *
-     * @param array $extensions
+     * @param array|string $extensions
      * @return void
      */
-    public function setValidExtensions($extensions = []): void
+    public function setValidExtensions(array|string $extensions = []): void
     {
         if (is_array($extensions)) {
             $this->validExtensions = $extensions;
@@ -233,11 +230,10 @@ class AppUrl
     /**
      * Установить допустимые расширения файлов
      *
-     * @param array $extensions
+     * @param array|string $extensions
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function validExtensions($extensions = [])
+    public function validExtensions(array|string $extensions = []): static
     {
         $this->setValidExtensions($extensions);
 
@@ -258,9 +254,9 @@ class AppUrl
      * Устанавливает название index файла
      *
      * @param string $fileName
-     * @return string
+     * @return $this
      */
-    public function indexFileName(string $fileName): string
+    public function indexFileName(string $fileName): static
     {
         $this->setIndexFileName($fileName);
 
@@ -298,8 +294,7 @@ class AppUrl
      * @param string $fileExtension
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function indexFileExtension(string $fileExtension)
+    public function indexFileExtension(string $fileExtension): static
     {
         $this->setIndexFileExtension($fileExtension);
 
@@ -334,11 +329,10 @@ class AppUrl
     /**
      * Устанавливает признак наличия обязательного слеша в конце пути
      *
-     * @param boolean | integer $slashAtEnd
+     * @param bool|int $slashAtEnd
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function slashAtEnd($slashAtEnd)
+    public function slashAtEnd(bool|int $slashAtEnd): static
     {
         $this->setSlashAtEnd($slashAtEnd);
 
@@ -348,10 +342,10 @@ class AppUrl
     /**
      * Устанавливает признак наличия обязательного слеша в конце пути
      *
-     * @param boolean | integer $slashAtEnd
+     * @param bool|int $slashAtEnd
      * @return void
      */
-    public function setSlashAtEnd($slashAtEnd): void
+    public function setSlashAtEnd(bool|int $slashAtEnd): void
     {
         $this->slashAtEnd = isTrue($slashAtEnd);
     }
@@ -369,10 +363,10 @@ class AppUrl
     /**
      * Устанавливает значение флага строгой проверки урла
      *
-     * @param boolean|integer $strict
+     * @param bool|int $strict
      * @return void
      */
-    public function setStrict($strict): void
+    public function setStrict(bool|int $strict): void
     {
         $this->strict = isTrue($strict);
     }
@@ -380,11 +374,10 @@ class AppUrl
     /**
      * Устанавливает значение флага строгой проверки урла
      *
-     * @param boolean|integer $strict
+     * @param bool|int $strict
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function strict($strict)
+    public function strict(bool|int $strict): static
     {
         $this->setStrict($strict);
 
@@ -394,21 +387,20 @@ class AppUrl
     /**
      * Установка флага преобразования абсолютного пути в относительный
      *
-     * @param boolean $relative - флаг преобразования
-     * @param string  $basePath - базовый путь для прописывания его в начало урла
+     * @param boolean $relative флаг преобразования
+     * @param string $basePath базовый путь для прописывания его в начало урла
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function inRelative(bool $relative, string $basePath)
+    public function inRelative(bool $relative, string $basePath): static
     {
         $this->relative = isTrue($relative);
-        $this->basePath = (string)$basePath;
+        $this->basePath = $basePath;
 
         return $this;
     }
 
     /**
-     * Возвращает полученый урл, согласно текущих настроек
+     * Возвращает полученный урл, согласно текущих настроек
      *
      * @return string
      */
@@ -454,8 +446,7 @@ class AppUrl
      *
      * @return array|string
      */
-    #[\ReturnTypeWillChange]
-    public function get()
+    public function get(): array|string
     {
         if (! $this->prepareUrl) {
             $this->prepareUrl($this->originalUrl);
@@ -465,12 +456,11 @@ class AppUrl
         $data = ['path' => $this->path, 'file' => $this->file, 'url' => $this->url];
 
         // фикс если передали сюда пустой массив в массиве
-        if (is_array($arg) && count($arg) === 1 && is_array($arg[0]) && count($arg[0]) === 0) {
+        if (count($arg) === 1 && is_array($arg[0]) && count($arg[0]) === 0) {
             $arg = [];
         }
 
-        if (is_array($arg) && ($count = count($arg)) > 0) {
-
+        if (($count = count($arg)) > 0) {
             if ($count > 1) {
                 return VarArray::getOnly($arg, $data); // список полей
 
@@ -495,13 +485,13 @@ class AppUrl
      * @param string $url
      * @return string
      */
-    protected function getRelative($url = ''): string
+    protected function getRelative(string $url = ''): string
     {
         $relativeUrl = VarStr::getRemoveStart($this->basePath, $url);
 
-        // если удаление прошло удачно то отслеживаем наличие слеша в начале урла
+        // если удаление прошло удачно, то отслеживаем наличие слеша в начале урла
         if ($relativeUrl !== $url) {
-            $relativeUrl = "/" . ltrim($relativeUrl, "/");
+            $relativeUrl = "/".ltrim($relativeUrl, "/");
         }
 
         return $relativeUrl;
@@ -529,16 +519,15 @@ class AppUrl
         $info = pathinfo($param['path']);
         $this->file = '';
 
-        // Важно что-бы при всех варантах (включая кривые) всегда был dirname!
+        // Важно что-бы при всех вариантах (включая кривые) всегда был dirname!
         if (isset($info['dirname'])) {
             $info['dirname'] = $info['dirname'] === '.' ? DIRECTORY_SEPARATOR : $info['dirname'];
         } else {
             $info['dirname'] = DIRECTORY_SEPARATOR;
         }
 
-        // если есть расширение файла то пытаемся отдельно установить параметры файла
+        // если есть расширение файла, то пытаемся отдельно установить параметры файла
         if (isset($info['extension']) && isEmpty($info['extension']) === false) {
-
             // при включенной строгой проверке убираем недопустимые расширения и файл
             if ($this->isStrict() && ! in_array($info['extension'], $this->validExtensions)) {
                 unset($info['extension']);
@@ -551,15 +540,15 @@ class AppUrl
             unset($info['basename']); // удаляем сгруппированные значения о файле с разрешением
 
         } else {
-            $info['dirname'] = $info['dirname'] === '/' ? '' : "/" . ltrim($info['dirname'], '/');
+            $info['dirname'] = $info['dirname'] === '/' ? '' : "/".ltrim($info['dirname'], '/');
             $info['basename'] = $info['basename'] === '/' ? '' : VarStr::start('/', $info['basename']);
-            $info['dirname'] = $info['dirname'] . $info['basename']; // объединяем пути
+            $info['dirname'] = $info['dirname'].$info['basename']; // объединяем пути
             unset($info['basename']);
         }
 
-        // если стоит флаг обязательного наличия файла а его не удалось установить
+        // если стоит флаг обязательного наличия файла, а его не удалось установить
         if (! array_key_exists('extension', $info) && $this->filePresence) {
-            $this->file = $this->getIndexFileName() . ".{$this->indexFileExtension}";
+            $this->file = $this->getIndexFileName().".{$this->indexFileExtension}";
         }
 
         $path = isEmpty($info['dirname']) ? "/" : $info['dirname'];

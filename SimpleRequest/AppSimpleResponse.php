@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use stdClass;
 use Throwable;
 use Warkhosh\Variable\VarArray;
 
@@ -179,29 +180,24 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 
     /**
      * @param string $type
-     * @return array|\stdClass|string
+     * @return array|stdClass|string
      * @throws Throwable
      * @deprecated концепция получения контента документа изменилась и этот метод будет удален!
      */
-    public function getDocument(string $type = 'raw')
+    public function getDocument(string $type = 'raw'): array|string|stdClass
     {
-        try {
-            // Если тип ответа в формате JSON нужно превратить в массив
-            if ($type === 'toArray') {
-                return json_decode($this->response['document'], true);
+        // Если тип ответа в формате JSON нужно превратить в массив
+        if ($type === 'toArray') {
+            return json_decode($this->response['document'], true);
 
-            }
-
-            // Если тип ответа в формате JSON, нужно преобразовать его в объект stdClass
-            if ($type === 'toObject') {
-                return json_decode($this->response['document'], false);
-            }
-
-            return $this->getBody()->getContents();
-
-        } catch (Throwable $e) {
-            throw $e;
         }
+
+        // Если тип ответа в формате JSON, нужно преобразовать его в объект stdClass
+        if ($type === 'toObject') {
+            return json_decode($this->response['document'], false);
+        }
+
+        return $this->getBody()->getContents();
     }
 
     /**
@@ -217,26 +213,21 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     {
         static $cacheDocument, $data;
 
-        try {
-            if ($cacheDocument !== $this->response['document']) {
-                $cacheDocument = $this->response['document'];
-                $cached = false;
+        if ($cacheDocument !== $this->response['document']) {
+            $cacheDocument = $this->response['document'];
+            $cached = false;
 
-            } else {
-                $cached = true;
-            }
-
-            if ($this->getHeader('Content-Type') === 'json') {
-                $data = $cached ? $data : json_decode($this->response['document'], true);
-
-                return VarArray::get($key, $data, $default);
-            }
-
-            return $default;
-
-        } catch (Throwable $e) {
-            throw $e;
+        } else {
+            $cached = true;
         }
+
+        if ($this->getHeader('Content-Type') === 'json') {
+            $data = $cached ? $data : json_decode($this->response['document'], true);
+
+            return VarArray::get($key, $data, $default);
+        }
+
+        return $default;
     }
 
     /**
@@ -328,6 +319,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      *
      * @link http://tools.ietf.org/html/rfc7231#section-6
      * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+     *
      * @return string Reason phrase; must return an empty string if none present.
      * @todo нужно будет более глубже понять работу этого метода а пока сделал заглушку для работы интерфейса
      * @throws Exception

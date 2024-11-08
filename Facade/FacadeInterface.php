@@ -12,11 +12,11 @@ interface FacadeInterface
     /**
      * @return mixed
      */
-    static public function getAppName();
+    public static function getAppName(): mixed;
 
     /**
-     * @param $className
+     * @param string $className
      * @return mixed
      */
-    static function getRealObject(string $className);
+    public static function getRealObject(string $className): mixed;
 }

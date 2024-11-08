@@ -8,6 +8,8 @@ use RuntimeException;
 use Warkhosh\Variable\VarArray;
 use Throwable;
 
+use function stream_get_meta_data;
+
 class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 {
     /**
@@ -75,7 +77,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         } else {
             $stream = $resource;
 
-            if ((\stream_get_meta_data($resource)['uri'] ?? '') === 'php://input') {
+            if ((stream_get_meta_data($resource)['uri'] ?? '') === 'php://input') {
                 $stream = static::tryFopen('php://temp', 'w+');
                 stream_copy_to_stream($resource, $stream);
                 fseek($stream, 0);
@@ -160,7 +162,6 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return resource|null
      */
-    #[\ReturnTypeWillChange]
     public function detach()
     {
         if (! isset($this->stream)) {
@@ -178,7 +179,6 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * @return int|null
      */
-    #[\ReturnTypeWillChange]
     public function getSize(): ?int
     {
         if ($this->size !== null) {
@@ -262,10 +262,11 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
     /**
      * Устанавливает смещение к началу потока
      *
-     * @return void
-     * @throws RuntimeException on failure.
      * @link http://www.php.net/manual/en/function.fseek.php
-     * @see  seek()
+     * @see seek()
+     *
+     * @return void
+     * @throws RuntimeException on failure
      */
     public function rewind(): void
     {
@@ -276,6 +277,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * Устанавливает позицию в потоке
      *
      * @link http://www.php.net/manual/en/function.fseek.php
+     *
      * @param int $offset
      * @param int $whence
      * @return void
@@ -363,11 +365,11 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
     /**
      * @link http://php.net/manual/en/function.stream-get-meta-data.php
+     *
      * @param string|null $key
      * @return array|mixed|null
      */
-    #[\ReturnTypeWillChange]
-    public function getMetadata(?string $key = null)
+    public function getMetadata(?string $key = null): mixed
     {
         if (! isset($this->stream)) {
             return $key ? null : [];
@@ -389,7 +391,6 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return resource
      * @throws InvalidArgumentException
      */
-    #[\ReturnTypeWillChange]
     public static function stream(bool|float|int|string|null $resource = '')
     {
         if (is_scalar($resource)) {
@@ -405,7 +406,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
         } elseif (is_resource($resource)) {
             $stream = $resource;
 
-            if ((\stream_get_meta_data($resource)['uri'] ?? '') === 'php://input') {
+            if ((stream_get_meta_data($resource)['uri'] ?? '') === 'php://input') {
                 $stream = static::tryFopen('php://temp', 'w+');
                 stream_copy_to_stream($resource, $stream);
                 fseek($stream, 0);
@@ -426,7 +427,6 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
      * @return resource
      * @throws RuntimeException
      */
-    #[\ReturnTypeWillChange]
     public static function tryFopen(string $filename, string $mode)
     {
         $ex = null;

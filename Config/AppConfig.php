@@ -6,6 +6,8 @@ use Warkhosh\Component\Storage\AppStorage;
 use Warkhosh\Component\Traits\Singleton;
 use Warkhosh\Variable\VarArray;
 use Warkhosh\Variable\VarStr;
+use Throwable;
+use Exception;
 
 /**
  * Class AppConfig
@@ -24,29 +26,29 @@ class AppConfig
      *
      * @var array $data
      */
-    private $data = [];
+    private array $data = [];
 
     /**
      * Список загруженных конфигов
      *
      * @var array $data
      */
-    private $files = [];
+    private array $files = [];
 
     /**
      * The path
      *
      * @var string
      */
-    protected $basePath;
+    protected string $basePath;
 
     /**
      * Set the base path for the application.
      *
-     * @param  string $path
+     * @param string $path
      * @return void
      */
-    public function setBasePath($path = '')
+    public function setBasePath(string $path = ''): void
     {
         $this->basePath = rtrim($path, '\/');
     }
@@ -67,11 +69,10 @@ class AppConfig
      * Получить элемент из массива с использованием нотации "точка".
      *
      * @param string|null $key
-     * @param mixed       $default
+     * @param mixed $default
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function get($key = null, $default = null)
+    public function get(?string $key = null, mixed $default = null): mixed
     {
         try {
             if (is_null($key)) { // Без ключа отдаём все
@@ -81,7 +82,7 @@ class AppConfig
             $keys = VarArray::explode('.', $key);
 
             if (is_null($file = VarArray::getFirst($keys))) {
-                throw new \Exception("Bed config file: " . VarStr::getMakeString($key));
+                throw new Exception("Bed config file: ".VarStr::getMake($key));
             }
 
             if (! (isset($this->files[$file]) && array_key_exists($file, $this->files))) {
@@ -108,17 +109,17 @@ class AppConfig
 
             return $default;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $default;
         }
     }
 
 
     /**
-     * @param  string $file
+     * @param string|null $file
      * @return void
      */
-    protected function load($file = ''): void
+    protected function load(?string $file = null): void
     {
         if (! is_string($file) && ! mb_strlen($file) >= 1) {
             return;
@@ -130,7 +131,7 @@ class AppConfig
         }
 
         if (! array_key_exists($file, $this->data)) {
-            $fileName = '/' . ucfirst(ltrim(trim($file), '/')) . '.php';
+            $fileName = '/'.ucfirst(ltrim(trim($file), '/')).'.php';
             $path = $this->getBasePath();
 
             if ((new AppStorage())->exists("{$path}{$fileName}")) {

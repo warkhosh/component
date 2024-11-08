@@ -2,6 +2,7 @@
 
 namespace Warkhosh\Component\Url;
 
+use Exception;
 use Warkhosh\Variable\VarFloat;
 use Warkhosh\Variable\VarInt;
 use Warkhosh\Variable\VarStr;
@@ -13,28 +14,28 @@ trait UrlPathMethods
      *
      * @var array
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
      * Список типов переменных от $this->data для сложных проверок
      *
      * @var array
      */
-    protected $types = [];
+    protected array $types = [];
 
     /**
-     * Список путей из перебора $this->data но значения каждого пути подверглось проверки на реальность и корректность
+     * Список путей из перебора $this->data, но значения каждого пути подверглось проверки на реальность и корректность
      *
      * @var array
      */
-    protected $pathResults;
+    protected array $pathResults;
 
     /**
      * Название файла если оно присутствует в пути урла
      *
      * @var string
      */
-    protected $file;
+    protected string $file;
 
     /**
      * Проверяет пути на корректность и записывает результат в $this->correct с результатами от проверок
@@ -46,24 +47,24 @@ trait UrlPathMethods
     private function setPathResults(): void
     {
         foreach ($this->data as $key => $row) {
-            $this->pathResults[$key] = (trim($row) != '' &&
-                $row === UrlHelper::getRemoveNoSemanticChar($row, '.', false));
+            $this->pathResults[$key] = (trim($row) != ''
+                && $row === UrlHelper::getRemoveNoSemanticChar($row, '.', false));
         }
     }
 
     /**
      * Проверка значений путей на корректность для ЧПУ
      *
-     * @note: без указания $limit, не будет строгой проверки на количество выбранных записей а только по результатам выборки
+     * @note: без указания $limit, не будет строгой проверки на количество выбранных записей, а только по результатам выборки
      *
-     * @param int $key    - проверка по порядковому номеру в массиве а не ключу
-     * @param int $limit  - если указано без $key, включает проверку по диапазону ( отрицательное значение делает проверку с обратной стороны списка )
-     * @param int $offset - сдвиг
+     * @param int|null $key проверка по порядковому номеру в массиве, а не ключу
+     * @param int|null $limit если указано без $key, включает проверку по диапазону (отрицательное значение делает проверку с обратной стороны списка)
+     * @param int $offset сдвиг
      * @return bool
      */
-    public function isCorrectPart($key = null, $limit = null, $offset = 0): bool
+    public function isCorrectPart(?int $key = null, ?int $limit = null, int $offset = 0): bool
     {
-        if (is_null($this->pathResults)) {
+        if (empty($this->pathResults)) {
             $this->setPathResults();
         }
 
@@ -79,7 +80,7 @@ trait UrlPathMethods
         // проверка с обратной стороны списка
         if (! is_null($key) && $key < 0 && is_null($limit)) {
             // отрицательное число превращаем в положительное
-            $key = (getNum(trim(VarStr::getMakeString($key), '-')) - 1);
+            $key = (getNum(trim(VarStr::getMake($key), '-')) - 1);
 
             $reverse = array_reverse($this->pathResults);
             $select = array_slice($reverse, $offset);
@@ -91,8 +92,7 @@ trait UrlPathMethods
 
         // Не указали конкретный ключ, делаем проверку указанных частей по $limit
         // Отрицательное число означает проверку с обратной стороны списка
-        if (is_null($key) && ! is_null($limit) && ($limit > 0 || $limit < 0)) {
-
+        if (is_null($key) && ($limit > 0 || $limit < 0)) {
             if ($limit > 0) {
                 $select = array_slice($this->pathResults, $offset, $limit);
 
@@ -100,8 +100,8 @@ trait UrlPathMethods
             }
 
             if ($limit < 0) {
-                $limit = getNum(trim(VarStr::getMakeString($limit),
-                    '-')); // отрицательное число превращаем в положительное
+                // отрицательное число превращаем в положительное
+                $limit = getNum(trim(VarStr::getMake($limit), '-'));
                 $reverse = array_reverse($this->pathResults);
                 $select = array_slice($reverse, $offset, $limit);
 
@@ -118,20 +118,19 @@ trait UrlPathMethods
      * Если передано число ищет значение по ключу в списке (отрицательное значение ищет с конца).
      * Если в $limit указано число возвращает не более этого количества записей
      *
-     * @param null|int $key    - выборка по ключу
-     * @param null|int $limit  - ограничение
-     * @param int      $offset - сдвиг
+     * @param int|null $key выборка по ключу
+     * @param int|null $limit ограничение
+     * @param int $offset сдвиг
      * @return array|string
      */
-    #[\ReturnTypeWillChange]
-    public function getTypes($key = null, $limit = null, $offset = 0)
+    public function getTypes(?int $key = null, ?int $limit = null, int $offset = 0): array|string
     {
         if (! is_null($key) && $key > 0) {
             return array_key_exists((--$key), $this->types) ? $this->types[$key] : 'undefined';
         }
 
         if (! is_null($key) && $key < 0) {
-            $key = (getNum(trim(VarStr::getMakeString($key), '-')) - 1);
+            $key = (getNum(trim(VarStr::getMake($key), '-')) - 1);
             $reverse_params = array_reverse($this->types);
 
             if (array_key_exists($key, $reverse_params)) {
@@ -141,7 +140,7 @@ trait UrlPathMethods
             return 'undefined';
         }
 
-        // Если ключ не указали а запросили диапазон то возвращаем массив.
+        // Если ключ не указали, а запросили диапазон, то возвращаем массив.
         // Массив будет иметь указанное число записей или меньший диапазон значений если в списке нет нужных значений.
         if (! is_null($limit) && getNum($limit) > 0) {
             //$select = array_slice($this->types, $offset, $limit);
@@ -165,21 +164,20 @@ trait UrlPathMethods
      * Если передано число ищет значение по ключу в списке (отрицательное значение ищет с конца).
      * Если в $limit указано число возвращает не более этого количества записей
      *
-     * @param null|int $key    - выборка по ключу
-     * @param null|int $limit  - ограничение
-     * @param int      $offset - сдвиг
-     * @param string   $default
+     * @param int|null $key выборка по ключу
+     * @param int|null $limit ограничение
+     * @param int $offset сдвиг
+     * @param string $default
      * @return array|string
      */
-    #[\ReturnTypeWillChange]
-    public function get($key = null, $limit = null, $offset = 0, $default = '')
+    public function get(?int $key = null, ?int $limit = null, int $offset = 0, string $default = ''): array|string
     {
         if (! is_null($key) && $key > 0) {
             return array_key_exists((--$key), $this->data) ? $this->data[$key] : $default;
         }
 
         if (! is_null($key) && $key < 0) {
-            $key = (getNum(trim(VarStr::getMakeString($key), '-')) - 1);
+            $key = (getNum(trim(VarStr::getMake($key), '-')) - 1);
             $reverse_params = array_reverse($this->data);
 
             if (array_key_exists($key, $reverse_params)) {
@@ -189,14 +187,10 @@ trait UrlPathMethods
             return $default;
         }
 
-        // Если ключ не указали а запросили диапазон то возвращаем массив.
+        // Если ключ не указали, а запросили диапазон, то возвращаем массив.
         // Массив будет иметь указанное число записей или меньший диапазон значений если в списке нет нужных значений.
         if (! is_null($limit) && getNum($limit) > 0) {
             return array_slice($this->data, $offset, $limit);
-        }
-
-        if (is_null($key)) {
-            return $this->data;
         }
 
         return $this->data;
@@ -205,16 +199,15 @@ trait UrlPathMethods
     /**
      * Возвращает текущий путь
      *
-     * @param null|string $glue - символ объединения строк
+     * @param string|null $glue символ объединения строк
      * @return array|string
      */
-    #[\ReturnTypeWillChange]
-    public function getPaths($glue = null)
+    public function getPaths(?string $glue = null): array|string
     {
         $return = $this->get();
 
         if (is_string($glue)) {
-            $return = '/' . join($glue, $return);
+            $return = '/'.join($glue, $return);
         }
 
         return $return;
@@ -224,16 +217,16 @@ trait UrlPathMethods
      * Последовательная проверка указанных путей на наличие
      *
      * @param array $paths
-     * @param int   $offset      - сдвиг
-     * @param bool  $strictLimit - флаг отвечающий за строгую проверку количества путей
+     * @param int $offset сдвиг
+     * @param bool $strictLimit флаг отвечающий за строгую проверку количества путей
      * @return bool
      */
     public function checkingPaths(array $paths = [], int $offset = 0, bool $strictLimit = true): bool
     {
-        $offset = $offset >= 0 ? $offset : 0;
+        $offset = max($offset, 0);
 
         if (($count = count($paths)) > 0) {
-            // Максимально возможные пути или только количество что указали
+            // Максимально возможные пути или только количество, что указали
             $limit = $strictLimit ? 9999 : count($paths);
 
             // Получаем реальное количество путей
@@ -307,43 +300,32 @@ trait UrlPathMethods
     /**
      * Возвращает первый путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function first(?string $type = null): string
     {
         $url = $this->get(1);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет первый путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function firstIs($name = null): bool
+    public function firstIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[0]) && $this->data[0] === $name) {
             return true;
@@ -355,43 +337,32 @@ trait UrlPathMethods
     /**
      * Возвращает второй путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function second(?string $type = null): string
     {
         $url = $this->get(2);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет второй путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function secondIs($name = null): bool
+    public function secondIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[1]) && $this->data[1] === $name) {
             return true;
@@ -403,43 +374,32 @@ trait UrlPathMethods
     /**
      * Возвращает третий путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function third(?string $type = null): string
     {
         $url = $this->get(3);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет третий путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function thirdIs($name = null): bool
+    public function thirdIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[2]) && $this->data[2] === $name) {
             return true;
@@ -451,43 +411,32 @@ trait UrlPathMethods
     /**
      * Возвращает четвертый путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function fourth(?string $type = null): string
     {
         $url = $this->get(4);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет четвертый путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function fourthIs($name = null): bool
+    public function fourthIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[3]) && $this->data[3] === $name) {
             return true;
@@ -499,43 +448,32 @@ trait UrlPathMethods
     /**
      * Возвращает пятый путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function fifth(?string $type = null): string
     {
         $url = $this->get(5);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет пятый путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param bool|null $name
      * @return bool
      */
-    public function fifthIs($name = null): bool
+    public function fifthIs(?bool $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[4]) && $this->data[4] === $name) {
             return true;
@@ -547,43 +485,32 @@ trait UrlPathMethods
     /**
      * Возвращает шестой путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function sixth(?string $type = null): string
     {
         $url = $this->get(6);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет шестой путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function sixthIs($name = null): bool
+    public function sixthIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[5]) && $this->data[5] === $name) {
             return true;
@@ -595,43 +522,32 @@ trait UrlPathMethods
     /**
      * Возвращает седьмой путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function seventh(?string $type = null): string
     {
         $url = $this->get(7);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет седьмой путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function seventhIs($name = null): bool
+    public function seventhIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[6]) && $this->data[6] === $name) {
             return true;
@@ -643,43 +559,32 @@ trait UrlPathMethods
     /**
      * Возвращает последний путь
      *
-     * @param string|null $type - признак типа возвращаемого значения
+     * @param string|null $type признак типа возвращаемого значения
      * @return string
+     * @throws Exception
      */
     public function last(?string $type = null): string
     {
         $url = $this->get(-1);
         $url = ! is_array($url) ? $url : '';
 
-        switch ($type) {
-            case "num":
-                return VarInt::getMakePositiveInteger($url);
-                break;
+        return match ($type) {
+            "num" => VarInt::getMakePositiveInteger($url),
+            "int", "integer" => VarInt::getMake($url),
+            "float" => VarFloat::getMake($url),
+            "string" => VarStr::getMake($url),
+            default => $url,
+        };
 
-            case "int":
-            case "integer":
-                return VarInt::getMakeInteger($url);
-                break;
-
-            case "float":
-                return VarFloat::getMake($url);
-                break;
-
-            case "string":
-                return VarStr::getMakeString($url);
-                break;
-        }
-
-        return $url;
     }
 
     /**
      * Проверяет последний путь на равенство с указанным значением
      *
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function lastIs($name = null): bool
+    public function lastIs(?string $name = null): bool
     {
         if (gettype($name) === 'string' && isset($this->data[(count($this->data) - 1)])) {
             return ($this->data[(count($this->data) - 1)] === $name);
@@ -691,10 +596,10 @@ trait UrlPathMethods
     /**
      * Проверка длинны
      *
-     * @param integer $equal
+     * @param int|null $equal
      * @return int
      */
-    public function amountIs($equal = null): int
+    public function amountIs(?int $equal = null): int
     {
         if ($equal === count($this->data)) {
             return true;
@@ -718,17 +623,16 @@ trait UrlPathMethods
      *
      * @return string|null
      */
-    #[\ReturnTypeWillChange]
-    public function getFileName()
+    public function getFileName(): string|null
     {
         return empty($this->file) ? null : $this->file;
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function fileIs($name = null): bool
+    public function fileIs(?string $name = null): bool
     {
         if ($this->file === $name) {
             return true;
@@ -740,8 +644,7 @@ trait UrlPathMethods
     /**
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    private function reset()
+    private function reset(): static
     {
         $this->data = [];
 
@@ -751,8 +654,7 @@ trait UrlPathMethods
     /**
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }

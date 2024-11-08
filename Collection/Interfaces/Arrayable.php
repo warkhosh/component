@@ -5,9 +5,9 @@ namespace Warkhosh\Component\Collection\Interfaces;
 interface Arrayable
 {
     /**
-     * Получить массив.
+     * Получить массив
      *
      * @return array
      */
-    public function toArray();
+    public function toArray(): array;
 }

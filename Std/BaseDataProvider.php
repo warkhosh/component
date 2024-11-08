@@ -4,39 +4,42 @@ namespace Warkhosh\Component\Std;
 
 use Warkhosh\Component\Collection\Interfaces\Arrayable;
 use Warkhosh\Component\Collection\Interfaces\Jsonable;
+use ArrayObject;
 use JsonSerializable;
+use Traversable;
+use Throwable;
 
 /**
  * BaseDataProvider (поставщик данных)
  *
  * Класс для хранения в нем данных и использования универсальных методов при работе с ними
  *
- * @note    Не реализует Iterator ( foreach и while с объектом не выдадут ошибку, но и не отработают )
- * @note    ArrayObject используется для декоративного применения, чтобы phpstorm не подсвечивал magic переменные
+ * @note Не реализует Iterator (foreach и while с объектом не выдадут ошибку, но и не отработают)
+ * @note ArrayObject используется для декоративного применения, чтобы phpstorm не подсвечивал magic переменные
  *
  * @package Warkhosh\Component\Std
  */
-class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderInterface
+class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInterface
 {
     /**
      * @var array
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
      * Флаг для использования значения по умолчанию вместо бросания исключений при обращении к недопустимым значениям
      *
      * @var bool
      */
-    protected $useDefault = true;
+    protected bool $useDefault = true;
 
     /**
-     * @var null
+     * @var mixed
      */
-    protected $default = null;
+    protected mixed $default = null;
 
     /**
-     * @param array|Arrayable|Jsonable|string|int|float|null $input
+     * @param array|Arrayable|float|int|Jsonable|string|null $input
      */
     public function __construct($input = [])
     {
@@ -49,7 +52,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param mixed $input
      * @return array
      */
-    protected function getArrayItems($input): array
+    protected function getArrayItems(mixed $input): array
     {
         if (is_array($input)) {
             return $input;
@@ -69,7 +72,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
         } elseif ($input instanceof JsonSerializable) {
             return $input->jsonSerialize();
 
-        } elseif ($input instanceof \Traversable) {
+        } elseif ($input instanceof Traversable) {
             return iterator_to_array($input);
         }
 
@@ -88,11 +91,12 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Сортировать записи по значению
      *
      * @link https://php.net/manual/en/arrayobject.asort.php
+     *
      * @param int $flags
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function asort($flags = SORT_REGULAR)
+    public function asort(int $flags = SORT_REGULAR): static
     {
         asort($this->data, $flags);
 
@@ -103,6 +107,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Получить количество общедоступных свойств ArrayObject
      *
      * @link  https://php.net/manual/en/arrayobject.count.php
+     *
      * @return int
      */
     public function count(): int
@@ -114,11 +119,12 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Сортировать записи по ключам
      *
      * @link https://php.net/manual/en/arrayobject.ksort.php
+     *
      * @param int $flags
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function ksort($flags = SORT_REGULAR)
+    public function ksort(int $flags = SORT_REGULAR): static
     {
         krsort($this->data, $flags);
 
@@ -129,10 +135,11 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Сортировать массив, используя алгоритм "natural order"
      *
      * @link  https://php.net/manual/en/arrayobject.natsort.php
+     *
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function natsort()
+    public function natsort(): static
     {
         natsort($this->data);
 
@@ -143,10 +150,11 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Сортировать массив, используя регистронезависимый алгоритм "natural order"
      *
      * @link  https://php.net/manual/en/arrayobject.natcasesort.php
+     *
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function natcasesort()
+    public function natcasesort(): static
     {
         natcasesort($this->data);
 
@@ -157,39 +165,41 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Возвращает, существует ли указанный индекс
      *
      * @link https://php.net/manual/en/arrayobject.offsetexists.php
-     * @param mixed $index
+     *
+     * @param mixed $key
      * @return bool true if the requested index exists, otherwise false
      */
-    public function offsetExists($index): bool
+    public function offsetExists(mixed $key): bool
     {
-        return key_exists($index, $this->data);
+        return key_exists($key, $this->data);
     }
 
     /**
      * Возвращает значение по указанному индексу
      *
      * @link https://php.net/manual/en/arrayobject.offsetget.php
-     * @param mixed $index
-     * @return mixed The value at the specified index or false.
+     *
+     * @param mixed $key
+     * @return mixed The value at the specified index or false
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($index)
+    public function offsetGet(mixed $key): mixed
     {
-        return key_exists($index, $this->data) ? $this->data[$index] : $this->default;
+        return key_exists($key, $this->data) ? $this->data[$key] : $this->default;
     }
 
     /**
      * Устанавливает новое значение по указанному индексу
      *
      * @link https://php.net/manual/en/arrayobject.offsetset.php
-     * @param mixed $index
+     *
+     * @param mixed $key
      * @param mixed $value
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function offsetSet($index, $value)
+    public function offsetSet(mixed $key, mixed $value): static
     {
-        $this->data[$index] = $value;
+        $this->data[$key] = $value;
 
         return $this;
     }
@@ -198,14 +208,15 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Удаляет значение по указанному индексу
      *
      * @link https://php.net/manual/en/arrayobject.offsetunset.php
-     * @param integer | string $index
+     *
+     * @param mixed $key
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function offsetUnset($index)
+    public function offsetUnset(mixed $key): static
     {
-        if (! is_null($index) && key_exists($index, $this->data)) {
-            unset($this->data[$index]);
+        if (! is_null($key) && key_exists($key, $this->data)) {
+            unset($this->data[$key]);
         }
 
         return $this;
@@ -215,6 +226,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Генерирует пригодное для хранения представление
      *
      * @link https://php.net/manual/en/arrayobject.serialize.php
+     *
      * @return string
      */
     public function serialize(): string
@@ -226,13 +238,14 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Сортировать записи, используя пользовательскую функцию для сравнения элементов и сохраняя при этом связь ключ/значение
      *
      * @link https://php.net/manual/en/arrayobject.uasort.php
-     * @param callable $function
+     *
+     * @param callable $callback
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function uasort($function)
+    public function uasort(callable $callback): static
     {
-        uasort($this->data, $function);
+        uasort($this->data, $callback);
 
         return $this;
     }
@@ -241,13 +254,14 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Сортировать массив по ключам, используя пользовательскую функцию для сравнения
      *
      * @link https://php.net/manual/en/arrayobject.uksort.php
-     * @param callable $function
+     *
+     * @param callable $callback
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function uksort($function)
+    public function uksort(callable $callback): static
     {
-        uksort($this->data, $function);
+        uksort($this->data, $callback);
 
         return $this;
     }
@@ -256,13 +270,14 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Добавляет значение в конец массива
      *
      * @link  https://php.net/manual/en/arrayobject.append.php
+     *
      * @param mixed $value
      * @return $this
      */
     #[\ReturnTypeWillChange]
-    public function append($value)
+    public function append(mixed $value): static
     {
-        array_push($this->data, $value);
+        $this->data[] = $value;
 
         return $this;
     }
@@ -274,8 +289,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param mixed $value
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function put($key, $value)
+    public function put(mixed $key, mixed $value): static
     {
         $this->offsetSet($key, $value);
 
@@ -286,6 +300,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * Создаёт копию ArrayObject как массив
      *
      * @link  https://php.net/manual/en/arrayobject.getarraycopy.php
+     *
      * @return array
      */
     public function getArrayCopy(): array
@@ -295,10 +310,10 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
 
     /**
      * @param string $index
-     * @param mixed  $value
+     * @param mixed $value
      * @return void
      */
-    public function __set($index, $value)
+    public function __set(string $index, mixed $value)
     {
         $this->data[$index] = $value;
     }
@@ -307,8 +322,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param string $index
      * @return mixed
      */
-
-    public function __get($index)
+    public function __get(string $index)
     {
         if ($this->useDefault) {
             return key_exists($index, $this->data) ? $this->data[$index] : $this->default;
@@ -318,7 +332,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * @param string | integer $index
+     * @param integer|string $index
      * @return mixed
      *
      * public function get($index)
@@ -343,7 +357,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param string $index
      * @return void
      */
-    public function __unset($index)
+    public function __unset(string $index)
     {
         unset($this->data[$index]);
     }
@@ -363,7 +377,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      */
     public function toArray(): array
     {
-        return array_map(function($value) {
+        return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
         }, $this->data);
     }
@@ -372,8 +386,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param mixed $default
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function setDefault($default)
+    public function setDefault(mixed $default): static
     {
         $this->default = $default;
 
@@ -381,19 +394,18 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * @param boolean $use
+     * @param bool $use
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function setUseDefault($use)
+    public function setUseDefault(bool $use): static
     {
-        $this->useDefault = (bool)$use;
+        $this->useDefault = $use;
 
         return $this;
     }
 
     /**
-     * Возвращает результат проверки: не является ли пустой выборкой.
+     * Возвращает результат проверки: не является ли пустой выборкой
      *
      * @return bool
      */
@@ -403,7 +415,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * Возвращает результат проверки: является ли выборка пустой или нет.
+     * Возвращает результат проверки: является ли выборка пустой или нет
      *
      * @return bool
      */
@@ -413,13 +425,12 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * Добавить указанные данные к существующим ( перезапишет присутствующие значения )
+     * Добавить указанные данные к существующим (перезапишет присутствующие значения)
      *
      * @param array $input
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function merge($input = [])
+    public function merge(array $input = []): static
     {
         $this->data = array_merge($this->data, $this->getArrayItems($input));
 
@@ -427,7 +438,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * Определяет, существует ли элемент в коллекции по ключу.
+     * Определяет, существует ли элемент в коллекции по ключу
      *
      * @param mixed $key
      * @return bool
@@ -438,24 +449,22 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * Получите колекцию с ключами от предметов коллекции.
+     * Получите коллекцию с ключами от предметов коллекции
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function keys()
+    public function keys(): static
     {
         return new static(array_keys($this->data));
     }
 
     /**
-     * Удаление элемента по ключу.
+     * Удаление элемента по ключу
      *
-     * @param string|array $keys
+     * @param array|string $keys
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function forget($keys)
+    public function forget(array|string $keys): static
     {
         foreach ((array)$keys as $key) {
             $this->offsetUnset($key);
@@ -469,8 +478,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      *
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function clone()
+    public function clone(): static
     {
         return clone $this;
     }
@@ -481,26 +489,24 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param int $depth
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function flatten($depth = INF)
+    public function flatten(int $depth = INF): static
     {
         return new static($this->getFlatten($this->toArray(), $depth));
     }
 
     /**
      * @param array $array
-     * @param       $depth
+     * @param int $depth
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    private function getFlatten($array = [], $depth = INF)
+    private function getFlatten(array $array = [], int $depth = INF): mixed
     {
         if (! is_array($array)) {
             return [];
         }
 
-        return array_reduce($array, function($result, $item) use ($depth) {
-            $item = $item instanceof \Warkhosh\Component\Std\DataProviderInterface ? $item->toArray() : $item;
+        return array_reduce($array, function ($result, $item) use ($depth) {
+            $item = $item instanceof DataProviderInterface ? $item->toArray() : $item;
 
             if (! is_array($item)) {
                 return array_merge($result, [$item]);
@@ -519,14 +525,13 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      *
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    public function collapse()
+    public function collapse(): static
     {
         return new static($this->getCollapse($this->toArray()));
     }
 
     /**
-     * Collapse an array of arrays into a single array.
+     * Collapse an array of arrays into a single array
      *
      * @param array $array
      * @return array
@@ -536,7 +541,7 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
         $results = [];
 
         foreach ($array as $key => $values) {
-            if ($values instanceof \Warkhosh\Component\Std\DataProviderInterface) {
+            if ($values instanceof DataProviderInterface) {
                 $values = $values->toArray();
 
             } elseif (! is_array($values)) {
@@ -558,10 +563,11 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * Выбрасывает показ всех значений и завершение сценария.
+     * Выбрасывает показ всех значений и завершение сценария
      *
      * @return void
      */
+    #[\JetBrains\PhpStorm\NoReturn]
     public function dd(): void
     {
         var_dump($this->all());
@@ -569,12 +575,12 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
     }
 
     /**
-     * Преобразуйте значений в ее строковое JSON представление.
+     * Преобразуйте значений в ее строковое JSON представление
      *
      * @param int $options
      * @return string
      */
-    public function toJson($options = 0): string
+    public function toJson(int $options = JSON_UNESCAPED_UNICODE): string
     {
         return json_encode($this->toArray(), $options);
     }
@@ -585,19 +591,18 @@ class BaseDataProvider extends \ArrayObject implements Arrayable, DataProviderIn
      * @param $exception
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function addException($exception)
+    public function addException($exception): static
     {
-        if ($exception instanceof \Throwable) {
+        if ($exception instanceof Throwable) {
             $this->data['exception_message'] = $exception->getMessage();
             $this->data['exception_code'] = $exception->getCode();
-            $this->data['exception_file'] = $exception->getFile() . "(" . $exception->getLine() . ")";
+            $this->data['exception_file'] = $exception->getFile()."(".$exception->getLine().")";
             $this->data['exception_line'] = $exception->getLine();
             $this->data['exception_trace'] = $exception->getTraceAsString();
 
             if ($exception instanceof ExceptionDataProvider) {
                 $field = $exception->getField();
-                $this->data['field'] = is_null($field) || empty($field) ? null : $field;
+                $this->data['field'] = empty($field) ? null : $field;
 
                 if ($exception->getSignal() !== 1) {
                     if (isset($this->data['exception_code'])) {

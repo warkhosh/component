@@ -2,7 +2,6 @@
 
 namespace Warkhosh\Component\Debug;
 
-
 /**
  * Class Dump
  *
@@ -15,21 +14,21 @@ class Dump
      *
      * @var array
      */
-    public static $wrapper = [
+    public static array $wrapper = [
         "layout" => '<pre style="border:1px solid #900; margin:5px; padding:3px; font-size:10pt; white-space: pre;">%s</pre>',
-        "title"  => '<div style="background-color:#990000; color:#FFF; padding:2px;"><strong>%s</strong></div>',
-        "type"   => '<div style="padding:5px;" align="left">[<strong>%s</strong>]</div>',
-        "value"  => '<div style="padding:5px;" align="left">%s</div>',
+        "title" => '<div style="background-color:#990000; color:#FFF; padding:2px;"><strong>%s</strong></div>',
+        "type" => '<div style="padding:5px;" align="left">[<strong>%s</strong>]</div>',
+        "value" => '<div style="padding:5px;" align="left">%s</div>',
     ];
 
     /**
-     * Вывод полученого параметра с оформлением.
+     * Вывод полученного параметра с оформлением.
      *
-     * @param string $value = 'test'
+     * @param mixed $value = 'test'
      * @param string $title = 'PRINT PARAM'
      * @return string
      */
-    static public function get($value = 'test', $title = 'PRINT PARAM'): string
+    public static function get(mixed $value = 'test', string $title = 'PRINT PARAM'): string
     {
         if (is_bool($value)) {
             $value = ($value === true ? "TRUE" : "FALSE");
@@ -46,6 +45,6 @@ class Dump
         $type = sprintf(static::$wrapper['type'], $valueType);
         $value = sprintf(static::$wrapper['value'], $value);
 
-        return sprintf(PHP_EOL . static::$wrapper['layout'] . PHP_EOL, $title . $type . $value);
+        return sprintf(PHP_EOL.static::$wrapper['layout'].PHP_EOL, $title.$type.$value);
     }
 }

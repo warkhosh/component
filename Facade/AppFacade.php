@@ -2,6 +2,8 @@
 
 namespace Warkhosh\Component\Facade;
 
+use Exception;
+
 /**
  * Class AppFacade
  *
@@ -9,16 +11,13 @@ namespace Warkhosh\Component\Facade;
  */
 class AppFacade implements FacadeInterface
 {
-    protected $app;
-
     /**
      * Возвращает название класса у фасада. Если его нет, инициализирует на основе константы класса обёртки.
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    #[\ReturnTypeWillChange]
-    static public function getAppName()
+    public static function getAppName(): mixed
     {
         $className = get_called_class(); // с php 5.5 можно через static::class!
 
@@ -30,7 +29,7 @@ class AppFacade implements FacadeInterface
             return $className::APP_NAME;
         }
 
-        throw new \Exception("Unknown class {$className}", E_USER_ERROR);
+        throw new Exception("Unknown class {$className}", E_USER_ERROR);
     }
 
 
@@ -40,8 +39,7 @@ class AppFacade implements FacadeInterface
      * @param string $className
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    static function getRealObject(string $className)
+    public static function getRealObject(string $className): mixed
     {
         if (method_exists($className, 'getInstance')) {
             return $className::getInstance();
@@ -53,14 +51,13 @@ class AppFacade implements FacadeInterface
 
     /**
      * @param string $method
-     * @param array  $args
+     * @param array $args
      *
      * @note https://www.php.net/manual/ru/language.oop5.overloading.php#object.callstatic
      *
-     * @return static|mixed
-     * @throws \Exception
+     * @return mixed|static
+     * @throws Exception
      */
-    #[\ReturnTypeWillChange]
     public static function __callStatic(string $method, array $args)
     {
         $className = static::getAppName();

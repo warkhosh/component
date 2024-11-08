@@ -19,13 +19,13 @@ interface CacheSerializerInterface
      * @param mixed $value
      * @return string Cache value
      */
-    public function getEncodeValue($value);
+    public function getEncodeValue(mixed $value): string;
 
     /**
      * @param mixed $value
      * @return string Cache value
      */
-    public function getDecodeValue($value);
+    public function getDecodeValue(mixed $value): string;
 
     public function __toString();
 }

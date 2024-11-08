@@ -2,7 +2,10 @@
 
 namespace Warkhosh\Component\Std;
 
-class ExceptionDataProvider extends \Exception
+use Exception;
+use Throwable;
+
+class ExceptionDataProvider extends Exception
 {
     /**
      * The error message
@@ -23,35 +26,35 @@ class ExceptionDataProvider extends \Exception
      *
      * @var string
      */
-    protected $file;
+    protected string $file;
 
     /**
      * The line where the error happened
      *
-     * @var string
+     * @var int
      */
-    protected $line;
+    protected int $line;
 
     /**
      * Название поля
      *
      * @var string
      */
-    protected $field;
+    protected string $field;
 
     /**
      * signal
      *
      * @var int|string|null
      */
-    protected $signal = null;
+    protected int|string|null $signal = null;
 
     /**
      * @var int
      */
-    protected $system = 1;
+    protected int $system = 1;
 
-    public function __construct(string $message = "", int $code = 0, \Throwable $previous = null)
+    public function __construct(string $message = "", int $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
@@ -59,13 +62,13 @@ class ExceptionDataProvider extends \Exception
     /**
      * Static constructor
      *
-     * @param string          $message
-     * @param int             $code
-     * @param \Throwable|null $previous
-     * @return \Warkhosh\Component\Std\ExceptionDataProvider
+     * @param string $message
+     * @param int $code
+     * @param Throwable|null $previous
+     * @return ExceptionDataProvider
      */
-    #[\ReturnTypeWillChange]
-    public static function init($message = "", $code = 0, \Throwable $previous = null) {
+    public static function init(string $message = "", int $code = 0, Throwable $previous = null): ExceptionDataProvider
+    {
         return new static($message, $code, $previous);
     }
 
@@ -73,10 +76,8 @@ class ExceptionDataProvider extends \Exception
      * @param string $file
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function file(
-        string $file
-    ) {
+    public function file(string $file): static
+    {
         $this->setFile($file);
 
         return $this;
@@ -95,10 +96,8 @@ class ExceptionDataProvider extends \Exception
      * @param string $line
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function line(
-        string $line
-    ) {
+    public function line(string $line): static
+    {
         $this->setLine($line);
 
         return $this;
@@ -114,20 +113,18 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
-     * @param null|string $field
+     * @param string|null $field
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function field(
-        ?string $field = null
-    ) {
+    public function field(?string $field = null): static
+    {
         $this->setField($field);
 
         return $this;
     }
 
     /**
-     * @param null|string $field
+     * @param string|null $field
      * @return void
      */
     private function setField(?string $field = null): void
@@ -136,10 +133,9 @@ class ExceptionDataProvider extends \Exception
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
-    #[\ReturnTypeWillChange]
-    public function getField()
+    public function getField(): string|null
     {
         return $this->field;
     }
@@ -148,10 +144,8 @@ class ExceptionDataProvider extends \Exception
      * @param int|string|null $signal
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function signal(
-        $signal
-    ) {
+    public function signal($signal): static
+    {
         $this->setSignal($signal);
 
         return $this;
@@ -161,20 +155,15 @@ class ExceptionDataProvider extends \Exception
      * @param int|string|null $signal
      * @return void
      */
-    private function setSignal($signal): void
+    private function setSignal(int|string|null $signal): void
     {
-        if (! (is_null($signal) || is_string($signal) || is_int($signal))) {
-            $signal = null;
-        }
-
         $this->signal = $signal;
     }
 
     /**
      * @return int|string|null
      */
-    #[\ReturnTypeWillChange]
-    public function getSignal()
+    public function getSignal(): int|string|null
     {
         return $this->signal;
     }
@@ -183,10 +172,8 @@ class ExceptionDataProvider extends \Exception
      * @param int $system
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function system(
-        int $system
-    ) {
+    public function system(int $system): static
+    {
         $this->setSystem($system);
 
         return $this;

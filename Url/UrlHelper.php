@@ -28,7 +28,7 @@ class UrlHelper
      */
     public static function getRemoveNoSemanticChar(string $str = '', string $ignore = '', bool $toLower = true): string
     {
-        $str = rawurldecode(VarStr::trim($str)); // Преобразовывает символьные коды в символы. %20 - станет пробелом
+        $str = rawurldecode(VarStr::trim($str)); // Преобразовывает символьные коды в символ. %20 - станет пробелом
         $str = $toLower ? strtolower($str) : $str;
 
         return preg_replace("|[^a-zA-Z0-9\_\-".preg_quote($ignore)."]|ium", "", $str);
@@ -73,7 +73,7 @@ class UrlHelper
             $str = @iconv('windows-1251', 'utf-8//ignore', $str);
         }
 
-        $str = rawurldecode($str); // Преобразовывает символьные коды в их символы. %20 - станет пробелом
+        $str = rawurldecode($str); // Преобразовывает символьные коды в их символы, %20 - станет пробелом
 
         // Что-бы правильно обрабатывать кривые урлы, левый слеш убираем, а правый оставляем
         $part = VarArray::explode('/', ltrim($str, '/'), '');
@@ -401,7 +401,7 @@ class UrlHelper
             return [];
         }
 
-        $str = VarStr::getMakeString(VarStr::trim($str));
+        $str = VarStr::getMake(VarStr::trim($str));
         $str = VarStr::getUrlDecode($str);
 
         // если указали ссылку с путями, то выбираем из неё только query параметры

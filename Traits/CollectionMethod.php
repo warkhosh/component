@@ -19,7 +19,6 @@ trait CollectionMethod
      * Интерфейс Arrayable
      *
      * @note Обеспечивает преобразования значений простой массив
-     *
      */
 
     /**
@@ -35,37 +34,34 @@ trait CollectionMethod
     }
 
     /**
-     *
      * Интерфейс Jsonable
      *
      * @note Обеспечивает преобразования значений в JSON
-     *
      */
 
     /**
-     * Get the collection of items as JSON.
+     * Get the collection of items as JSON
      *
      * @param int $options
      * @return string
      */
-    public function toJson($options = 0): string
+    public function toJson(int $options = JSON_UNESCAPED_UNICODE): string
     {
         return json_encode($this->toArray(), $options);
     }
 
     /**
-     *
      * Интерфейс Iterator
      *
      * @note Для внешних итераторов или объектов, которые могут повторять себя изнутри
-     *
      */
 
     /**
-     * Перемотка Итератора к первому элементу.
+     * Перемотка Итератора к первому элементу
      *
      * @link  http://php.net/manual/en/iterator.rewind.php
      * @note  Любое возвращаемое значение игнорируется
+     *
      * @return void
      */
     public function rewind(): void
@@ -74,41 +70,37 @@ trait CollectionMethod
     }
 
     /**
-     * Возвращает текущий элемент.
+     * Возвращает текущий элемент
      *
      * @link  http://php.net/manual/en/iterator.current.php
      * @note  Может возвращать любой тип!
+     *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
-        $var = current($this->data);
-
-        return $var;
+        return current($this->data);
     }
 
-
     /**
-     * Возврат ключа текущего элемента.
+     * Возврат ключа текущего элемента
      *
      * @link  http://php.net/manual/en/iterator.key.php
      * @note  Скаляр при успешном выполнении или null при сбое
+     *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): mixed
     {
-        $var = key($this->data);
-
-        return $var;
+        return key($this->data);
     }
 
     /**
-     * Перейти к следующему элементу.
+     * Перейти к следующему элементу
      *
      * @link  http://php.net/manual/en/iterator.next.php
      * @note  Любое возвращаемое значение игнорируется
+     *
      * @return void
      */
     public function next(): void
@@ -117,10 +109,11 @@ trait CollectionMethod
     }
 
     /**
-     * Проверяет, действительна ли текущая позиция.
+     * Проверяет, действительна ли текущая позиция
      *
-     * @link  http://php.net/manual/en/iterator.valid.php
-     * @note  Возвращает true при успешном выполнении или false при сбое.
+     * @link http://php.net/manual/en/iterator.valid.php
+     * @note Возвращает true при успешном выполнении или false при сбое
+     *
      * @return bool
      */
     public function valid(): bool
@@ -129,58 +122,50 @@ trait CollectionMethod
     }
 
     /**
-     * Добавление элемента.
+     * Alias for the "offsetSet" method
      *
-     * @param string | integer $key
-     * @param mixed            $item
+     * @param float|int|string $key
+     * @param mixed $value
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function add($key = null, $item = null)
+    public function add(float|int|string $key, mixed $value = null): static
     {
-        if (is_numeric($key) || (is_string($key) && ! empty($key))) {
-            $this->data[$key] = $item;
-
-        } else {
-            trigger_error("Для добавления значения в коллекцию необходимо указать ключ");
-        }
+        $this->offsetSet($key, $value);
 
         return $this;
     }
 
     /**
-     *
      * Интерфейс ArrayAccess
      *
      * @note Обеспечивает доступ к объектам как к массиву
-     *
      */
 
     /**
      * Проверка существования значения в массиве по указанному ключу
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetexists.php
-     * @note  Данный метод исполняется, когда используется функция isset() или функция empty() для объекта
-     * @param mixed $offset - смещение для проверки.
-     * @return bool - возвращает true в случае успешного завершения или false в случае возникновения ошибки
+     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+     * @note Данный метод исполняется, когда используется функция isset() или функция empty() для объекта
+     *
+     * @param mixed $offset смещение для проверки
+     * @return bool возвращает true в случае успешного завершения или false в случае возникновения ошибки
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->data);
     }
 
     /**
-     * Получения значения из массива по ключу.
+     * Получения значения из массива по ключу
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetget.php
-     * @note  Работа с многомерным набором будет вызывать исключение и точка :(
-     * @param mixed $offset - смещение для извлечения
+     * @link http://php.net/manual/en/arrayaccess.offsetget.php
+     * @note Работа с многомерным набором будет вызывать исключение и точка
+     *
+     * @param mixed $offset смещение для извлечения
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
-        // if ($this->offsetExists($offset)) {
         if (array_key_exists($offset, $this->data)) {
             return $this->data[$offset];
 
@@ -196,15 +181,16 @@ trait CollectionMethod
     }
 
     /**
-     * Установки значения в массиве по ключу.
+     * Установки значения в массиве по ключу
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetset.php
-     * @note  Работа с многомерным набором будет вызывать исключение и точка :(
-     * @param mixed $offset - смещение для присвоения значения
-     * @param mixed $value  - значение для установки
+     * @link http://php.net/manual/en/arrayaccess.offsetset.php
+     * @note Работа с многомерным набором будет вызывать исключение и точка
+     *
+     * @param mixed $offset смещение для присвоения значения
+     * @param mixed $value значение для установки
      * @return void
      */
-    public function offsetSet($offset = null, $value = null): void
+    public function offsetSet(mixed $offset = null, mixed $value = null): void
     {
         if (is_null($offset)) {
             $this->data[] = $value;
@@ -214,26 +200,24 @@ trait CollectionMethod
     }
 
     /**
-     * удаление значения из массива по ключу
+     * Удаление значения из массива по ключу
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset - смещение для удаления
+     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
+     *
+     * @param mixed $offset
      * @return void
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
-        // if ($this->offsetExists($offset)) {
         if (array_key_exists($offset, $this->data)) {
             unset($this->data[$offset]);
         }
     }
 
     /**
-     *
      * Интерфейс Countable
      *
      * @note Обеспечивает подсчет количество элементов объекта
-     *
      */
 
     /**
@@ -248,15 +232,13 @@ trait CollectionMethod
     }
 
     /**
-     *
      * Интерфейс JsonSerializable
      *
      * @note Задает данные, которые должны быть сериализованы в JSON
-     *
      */
 
     /**
-     * Convert the object into something JSON serializable.
+     * Convert the object into something JSON serializable
      *
      * @return array
      */

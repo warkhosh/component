@@ -17,32 +17,32 @@ class JsonDecode
      *
      * @var mixed
      */
-    private $json = null;
+    private mixed $json = null;
 
     /**
      * Декодированные данные из JSON строки
      *
      * @var mixed
      */
-    private $value;
+    private mixed $value;
 
     /**
      * Признак допущения простых типов (null, numeric, bool) для кодирования
      *
-     * @var int
+     * @var bool
      */
-    private $simpleType = false;
+    private bool $simpleType = false;
 
     /**
      * @var bool
      */
-    private $hasError = false;
+    private bool $hasError = false;
 
     /**
      * @param string $json
-     * @param bool   $associative
-     * @param int    $depth
-     * @param int    $flags
+     * @param bool $associative
+     * @param int $depth
+     * @param int $flags
      */
     public function __construct(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0)
     {
@@ -70,13 +70,12 @@ class JsonDecode
      * Статичный вариант для начала работы с объектом
      *
      * @param string $json
-     * @param bool   $associative
-     * @param int    $depth
-     * @param int    $flags
+     * @param bool $associative
+     * @param int $depth
+     * @param int $flags
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    static public function init(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0)
+    public static function init(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0): static
     {
         return new static($json, $associative, $depth, $flags);
     }
@@ -87,8 +86,7 @@ class JsonDecode
      * @param bool $flag
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function simpleType(bool $flag)
+    public function simpleType(bool $flag): static
     {
         $this->simpleType = boolval($flag);
 
@@ -141,8 +139,7 @@ class JsonDecode
      * @return $this
      * @throws Exception
      */
-    #[\ReturnTypeWillChange]
-    public function exceptionInError(?string $customMessage = null)
+    public function exceptionInError(?string $customMessage = null): static
     {
         if ($this->isFail() === true) {
             $message = $this->simpleType === false ? "Simple data type is formed from JSON" : "JSON decoding error";
@@ -157,8 +154,7 @@ class JsonDecode
      *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
@@ -179,8 +175,7 @@ class JsonDecode
      *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function getJson()
+    public function getJson(): mixed
     {
         return $this->json;
     }

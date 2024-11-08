@@ -12,10 +12,10 @@ trait Email
     /**
      * Проверяет Email на корректные символы
      *
-     * @param null|string $email
+     * @param string|null $email
      * @return bool
      */
-    static public function isCorrectEmail(?string $email = null): bool
+    public static function isCorrectEmail(?string $email = null): bool
     {
         $email = (string)$email;
 
@@ -35,10 +35,10 @@ trait Email
     /**
      * Проверяет никнейм на корректные символы
      *
-     * @param null|string $name
+     * @param string|null $name
      * @return bool
      */
-    static public function isCorrectNickname(?string $name = null): bool
+    public static function isCorrectNickname(?string $name = null): bool
     {
         return (preg_replace('/[a-z0-9а-я\-\_\ ]/ium', '', (string)$name) === '');
     }

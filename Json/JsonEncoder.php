@@ -17,33 +17,33 @@ class JsonEncoder
      *
      * @var string
      */
-    private $value = "";
+    private string $value = "";
 
     /**
      * Значения для преобразования
      *
      * @var mixed
      */
-    private $source;
+    private mixed $source;
 
     /**
      * Признак допущения простых типов (null, numeric, bool) для кодирования
      *
-     * @var int
+     * @var bool
      */
-    private $simpleType = false;
+    private bool $simpleType = false;
 
     /**
      * @var bool
      */
-    private $hasError = false;
+    private bool $hasError = false;
 
     /**
      * @param mixed $value
-     * @param int   $flags
-     * @param int   $depth
+     * @param int $flags
+     * @param int $depth
      */
-    public function __construct($value = null, int $flags = 0, int $depth = 512)
+    public function __construct(mixed $value = null, int $flags = JSON_UNESCAPED_UNICODE, int $depth = 512)
     {
         $this->source = $value;
 
@@ -60,20 +60,20 @@ class JsonEncoder
             }
 
         } catch (Throwable $e) {
-            $this->value = $this->hasError = false;
+            $this->hasError = false;
+            $this->value = "{}";
         }
     }
 
     /**
      * Статичный вариант для начала работы с объектом
      *
-     * @param null $value
-     * @param int  $flags
-     * @param int  $depth
+     * @param mixed $value
+     * @param int $flags
+     * @param int $depth
      * @return static
      */
-    #[\ReturnTypeWillChange]
-    static public function init($value = null, int $flags = 0, int $depth = 512)
+    public static function init(mixed $value = null, int $flags = 0, int $depth = 512): static
     {
         return new static($value, $flags, $depth);
     }
@@ -84,8 +84,7 @@ class JsonEncoder
      * @param bool $flag
      * @return $this
      */
-    #[\ReturnTypeWillChange]
-    public function simpleType(bool $flag)
+    public function simpleType(bool $flag): static
     {
         $this->simpleType = boolval($flag);
 
@@ -138,8 +137,7 @@ class JsonEncoder
      * @return $this
      * @throws Exception
      */
-    #[\ReturnTypeWillChange]
-    public function exceptionInError(?string $customMessage = null)
+    public function exceptionInError(?string $customMessage = null): static
     {
         if ($this->isFail() === true) {
             $message = $this->simpleType === false ? "Specified a simple data type for JSON" : "JSON encoding error";
@@ -157,7 +155,7 @@ class JsonEncoder
      */
     public function getJson(): string
     {
-        return is_string($this->value) ? $this->value : "";
+        return $this->value;
     }
 
     /**
@@ -176,8 +174,7 @@ class JsonEncoder
      *
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function getSource()
+    public function getSource(): mixed
     {
         return $this->source;
     }

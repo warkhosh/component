@@ -12,34 +12,34 @@ namespace Warkhosh\Component\Collection\Interfaces;
 interface BaseCollection
 {
     /**
-     * Вернет новый экземпляр коллекции с указаными значениями.
+     * Вернет новый экземпляр коллекции с указанными значениями
      *
      * @param mixed $items
      * @return static
      */
-    public static function make($items = []);
+    public static function make(mixed $items = []): static;
 
     /**
-     * Вернет коллекцию с указаным значением, если это применимо.
+     * Вернет коллекцию с указанным значением, если это применимо
      *
      * @param mixed $value
      * @return static
      */
-    public static function wrap($value);
+    public static function wrap(mixed $value): static;
 
     /**
-     * Получить базовые элементы из данной коллекции, если это применимо.
+     * Получить базовые элементы из данной коллекции, если это применимо
      *
-     * @param array|static $value
+     * @param array|BaseCollection $value
      * @return array
      */
-    public static function unwrap($value);
+    public static function unwrap(array|BaseCollection $value): array;
 
     /**
      * @param mixed $default
      * @return $this
      */
-    public function setDefault($default);
+    public function setDefault(mixed $default): static;
 
     /**
      * @return mixed
@@ -47,114 +47,121 @@ interface BaseCollection
      * public function getDefault(); */
 
     /**
-     * Получить все элементы в коллекции.
+     * Получить все элементы в коллекции
      *
      * @return array
      */
-    public function all();
+    public function all(): array;
 
     /**
-     * Получить среднее значение элементов.
+     * Получить среднее значение элементов
      *
-     * @param string $key - ключ в значениях которых вычесляем среднее значение
-     * @return mixed
+     * @param callable|string|null $key ключ в значениях которых вычисляем среднее значение
+     * @return float|int
      */
-    public function avg($key = null);
+    public function avg(callable|string|null $key = null): float|int;
 
     /**
-     * Alias for the "avg" method.
+     * Alias for the "avg" method
      *
-     * @param callable|string $callback
-     * @return mixed
+     * @param callable|string|null $callback
+     * @return float|int
      */
-    public function average($callback = null);
+    public function average(callable|string|null $callback = null): float|int;
 
     /**
      * Получить медиану.
      *
      * @link https://en.wikipedia.org/wiki/Median
-     * @param string $key - ключ в значениях которых вычесляем медиану
-     * @return mixed
+     *
+     * @param array|string|null $key ключ в значениях которых вычисляем медиану
+     * @return float|int|null
      */
-    public function median($key = null);
+    public function median(array|string|null $key = null): float|int|null;
 
     /**
-     * Получить режим заданного ключа.
+     * Получить режим заданного ключа
      *
      * @link https://laravel.com/docs/5.6/collections#method-mode
      * @link https://en.wikipedia.org/wiki/Mode_(statistics)
-     * @param mixed $key
+     *
+     * @param array|string|null $key
      * @return array|null
      */
-    public function mode($key = null);
+    public function mode(array|string|null $key = null): array|null;
 
     /**
-     * Дамп коллекции и завершение сценария.
+     * Дамп коллекции и завершение сценария
      *
      * @return void
      */
-    public function dd();
+    public function dd(): void;
 
     /**
-     * Выполнит обратный вызов по каждому элементу.
+     * Выполнит обратный вызов по каждому элементу
      *
      * @link https://laravel.com/docs/5.6/collections#method-each
      * @note Если вы хотите остановить итерацию через элементы, вы можете вернуть false из $callback
+     *
      * @param callable $callback
      * @return $this
      */
-    public function each(callable $callback);
+    public function each(callable $callback): static;
 
     /**
      * Метод для проверки того, что все элементы коллекции проходят заданный тест истинности
      *
-     * @param string|callable $key
-     * @param mixed           $operator
-     * @param mixed           $value
+     * @param callable|string $key
+     * @param mixed $operator
+     * @param mixed $value
      * @return bool
      */
-    public function every($key, $operator = null, $value = null);
+    public function every(callable|string $key, mixed $operator = null, mixed $value = null): bool;
 
     /**
-     * Вернет коллекцию с элементами кроме тех, у которых указаны указанные ключи.
+     * Вернет коллекцию с элементами кроме тех, у которых указаны указанные ключи
      *
      * @param array|string $keys
      * @return static
      */
-    public function except($keys);
+    public function except(array|string $keys): static;
 
     /**
-     * Вернет коллекцию с элементами к которым был применен фильтр.
+     * Вернет коллекцию с элементами к которым был применен фильтр
      *
-     * @param callable $callback
+     * @param callable|null $callback
      * @return static
      */
-    public function filter(callable $callback = null);
+    public function filter(?callable $callback = null): static;
 
     /**
-     * Выполнит $callback функцию если указаное значение будет правда
+     * Выполнит $callback функцию если указанное значение будет правда
      *
      * @link https://laravel.com/docs/5.6/collections#method-when
-     * @param bool     $value
+     * @note функция $callback должна вернуть эту-же коллекцию
+     *
+     * @param bool $value
      * @param callable $callback
-     * @param callable $default
-     * @return mixed
+     * @param callable|null $default
+     * @return static
      */
-    public function when($value, callable $callback, callable $default = null);
+    public function when(bool $value, callable $callback, callable $default = null): static;
 
     /**
-     * Выполнит $callback функцию если указаное значение будет ложь.
+     * Выполнит $callback функцию если указанное значение будет ложь
      *
      * @link https://laravel.com/docs/5.6/collections#method-unless
-     * @param bool     $value
+     * @note функция $callback должна вернуть эту-же коллекцию
+     *
+     * @param bool $value
      * @param callable $callback
-     * @param callable $default
+     * @param callable|null $default
      * @return mixed
      */
-    public function unless($value, callable $callback, callable $default = null);
+    public function unless(bool $value, callable $callback, callable $default = null): static;
 
     /**
-     * Возвращает новую коллекцию после фильтрации элементов по заданной паре значений.
+     * Возвращает новую коллекцию после фильтрации элементов по заданной паре значений
      *
      * @link https://laravel.com/docs/5.6/collections#method-where
      * @note Метод использует «свободные» сравнения при проверке значений элементов.
@@ -162,379 +169,396 @@ interface BaseCollection
      *       Используйте метод whereStrict для фильтрации с использованием «строгих» сравнений.
      *
      * @param string $key
-     * @param mixed  $operator
-     * @param mixed  $value
+     * @param mixed $operator
+     * @param mixed $value
      * @return static
      */
-    public function where($key, $operator, $value = null);
+    public function where(string $key, mixed $operator, mixed $value = null): static;
 
     /**
-     * Возвращает первый элемент в коллекции.
+     * Возвращает первый элемент в коллекции
      *
-     * @param callable $callback
-     * @param mixed    $default
+     * @param callable|null $callback
+     * @param mixed $default
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null);
+    public function first(callable $callback = null, mixed $default = null): mixed;
 
     /**
-     * Возвращает коллекцию в которой многомерная коллекцию сплющенный в одно измерение.
+     * Возвращает коллекцию в которой многомерная коллекция сплющено в одно измерение
      *
      * @link https://laravel.com/docs/5.6/collections#method-flatten
+     *
      * @param int $depth
      * @return static
      */
-    public function flatten($depth = INF);
+    public function flatten(int $depth = INF): static;
 
     /**
      * Возвращает коллекцию в которой исходные значения перевернуты наоборот
      *
      * @return static
      */
-    public function flip();
+    public function flip(): static;
 
     /**
      * Удаление элемента из коллекции по ключу.
      *
-     * @param string|array $keys
+     * @param mixed $keys
      * @return $this
      */
-    public function forget($keys);
+    public function forget(mixed $keys): static;
 
     /**
-     * Возвращает коллекцию сгруппированную по указанному ключу с использованием обратного вызова.
+     * Возвращает коллекцию, сгруппированную по указанному ключу с использованием обратного вызова
      *
      * @link https://laravel.com/docs/5.6/collections#method-groupby
+     *
      * @param callable|string $groupBy
-     * @param bool            $preserveKeys - признак созранения ключей
+     * @param bool $preserveKeys - признак сохранения ключей
      * @return static
      */
-    public function groupBy($groupBy, $preserveKeys = false);
+    public function groupBy(callable|string $groupBy, bool $preserveKeys = false): static;
 
     /**
-     * Возвращает коллекцию сгруппированную по указанному ключу
+     * Возвращает коллекцию, сгруппированную по указанному ключу
      *
      * @link https://laravel.com/docs/5.6/collections#method-keyby
-     * @note Если несколько элементов имеют один и тот же ключ, в новой коллекции будет отображаться только последний.
+     * @note Если несколько элементов имеют один и тот же ключ, в новой коллекции будет отображаться только последний
+     *
      * @param callable|string $keyBy
      * @return static
      */
-    public function keyBy($keyBy);
+    public function keyBy(callable|string $keyBy): static;
 
     /**
-     * Определяет, существует ли элемент в коллекции по ключу.
+     * Определяет, существует ли элемент(ы) в коллекции по ключу
      *
-     * @param mixed $key
+     * @note если передан список ключей, то система при первой неудачной проверке вернет false
+     *
+     * @param array|float|int|string $key
      * @return bool
      */
-    public function has($key);
+    public function has(array|float|int|string $key): bool;
 
     /**
-     * Concatenate values of a given key as a string.
+     * Соединяет элементы в коллекции
      *
      * @param string $value
-     * @param string $glue
+     * @param string|null $glue
      * @return string
      */
-    public function implode($value, $glue = null);
+    public function implode(string $value, string $glue = null): string;
 
     /**
-     * Удаляет все значения из исходной коллекции, отсутствующие в данном массиве или коллекции.
+     * Удаляет все значения из исходной коллекции, отсутствующие в данном массиве или коллекции
      *
      * @note Полученная коллекция сохранит ключи исходной коллекции
+     *
      * @param mixed $items
      * @return static
      */
-    public function intersect($items);
+    public function intersect(mixed $items): static;
 
     /**
-     * Возвращает результат проверки: не является ли коллекция пустой.
+     * Возвращает результат проверки: не является ли коллекция пустой
      *
      * @return bool
      */
-    public function isNotEmpty();
+    public function isNotEmpty(): bool;
 
     /**
-     * Возвращает результат проверки: является ли коллекция пустой или нет.
+     * Возвращает результат проверки: является ли коллекция пустой или нет
      *
      * @return bool
      */
-    public function isEmpty();
+    public function isEmpty(): bool;
 
     /**
-     * Получите колекцию с ключами от предметов коллекции.
+     * Получите коллекцию с ключами от предметов коллекции
      *
      * @return static
      */
-    public function keys();
+    public function keys(): static;
 
     /**
-     * Возвращает последний элемент в массиве.
+     * Возвращает последний элемент в массиве
      *
      * @link https://laravel.com/docs/5.6/collections#method-last
      * @note Если указан $callback вернет последний элемент в коллекции, который проходит данный тест истины
-     * @param callable $callback
-     * @param mixed    $default
+     *
+     * @param callable|null $callback
+     * @param mixed $default
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null);
+    public function last(callable $callback = null, mixed $default = null): mixed;
 
     /**
-     * Получить колекцию со значениями из массива текущей коллекции.
+     * Получить коллекцию со значениями из массива текущей коллекции
      *
-     * @note можно указать конкретный ключь в массиве для использования в новом массиве
+     * @note можно указать конкретный ключ в массиве для использования в новом массиве
      * @link https://laravel.com/docs/5.6/collections#method-pluck
-     * @param string      $value
+     *
+     * @param string $value
      * @param string|null $key
      * @return static
      */
-    public function pluck($value, $key = null);
-
+    public function pluck(string $value, ?string $key = null): static;
 
     /**
-     * Вернуть коллекцию после итерацию над каждым элементом в ней.
+     * Вернуть коллекцию после итерацию над каждым элементом в ней
      *
      * @note Метод map выполняет итерацию по коллекции и передает каждое значение заданному обратному вызову.
-     * Обратный вызов может изменять элемент и возвращать его, тем самым формируя новую коллекцию измененных элементов
+     *       Обратный вызов может изменять элемент и возвращать его, тем самым формируя новую коллекцию измененных элементов.
      *
      * @param callable $callback
      * @return static
      */
-    public function map(callable $callback);
+    public function map(callable $callback): static;
 
     /**
-     * Получить максимальное значение данного ключа.
+     * Получить максимальное значение данного ключа
      *
-     * @note без ключа делает поиск по всему массиву
      * @link https://laravel.com/docs/5.6/collections#method-max
+     * @note без ключа делает поиск по всему массиву
+     *
      * @param string|null $key
-     * @return mixed
+     * @return float|int
      */
-    public function max($key = null);
+    public function max(?string $key = null): float|int;
 
     /**
-     * Вернуть коллекцию после обхединения с заданными элементами.
+     * Вернуть коллекцию после объединения с заданными элементами
      *
      * @param mixed $items
      * @return static
      */
-    public function merge($items);
+    public function merge(mixed $items): static;
 
     /**
-     * Получить минимальное значение по указаному ключу.
+     * Получить минимальное значение по указанному ключу
      *
      * @note без ключа делает поиск по всему массиву
      * @link https://laravel.com/docs/5.6/collections#method-min
+     *
      * @param string|null $key
-     * @return mixed
+     * @return float|int
      */
-    public function min($key = null);
+    public function min(?string $key = null): float|int;
 
     /**
-     * Получить коллекцию толкьо с указаными ключами из текущих значений.
+     * Получить коллекцию толкло с указанными ключами из текущих значений
      *
-     * @param mixed $keys
+     * @param array $keys
      * @return static
      */
-    public function only($keys);
+    public function only(array $keys): static;
 
     /**
-     * Получить и удалить последний элемент из текущей коллекции.
+     * Получить и удалить последний элемент из текущей коллекции
      *
      * @return mixed
      */
-    public function pop();
+    public function pop(): mixed;
 
     /**
-     * Добавить элемент в начало коллекции.
+     * Добавить элемент в начало коллекции
      *
      * @param mixed $value
      * @param mixed $key
      * @return $this
      */
-    public function prepend($value, $key = null);
+    public function prepend(mixed $value, mixed $key = null): static;
 
     /**
-     * Добавить элемент в конец коллекции.
+     * Добавить элемент в конец коллекции
      *
      * @param mixed $value
      * @return $this
      */
-    public function push($value);
+    public function push(mixed $value): static;
 
     /**
-     * Получение и удаление элемента из коллекции.
+     * Получение и удаление элемента из коллекции
      *
-     * @param mixed $key
+     * @param array|float|int|string $key
      * @param mixed $default
      * @return mixed
      */
-    public function pull($key, $default = null);
+    public function pull(array|float|int|string $key, mixed $default = null): mixed;
 
     /**
-     * Поместите элемент в коллекцию по ключу.
+     * Поместите элемент в коллекцию по ключу
      *
-     * @param mixed $key
+     * @param float|int|string $key
      * @param mixed $value
      * @return $this
      */
-    public function put($key, $value);
+    public function put(float|int|string $key, mixed $value): static;
 
     /**
-     * Вернет новый экземпляр коллекции с заполнеными значениями до тех пор, пока массив не достигнет указанного размера.
+     * Вернет новый экземпляр коллекции с заполненными значениями до тех пор, пока массив не достигнет указанного размера
      *
-     * @note Этот метод ведет себя как функция PHP массива array_pad.
-     * @param int   $size
+     * @note Этот метод ведет себя как функция PHP массива array_pad
+     *
+     * @param int $size
      * @param mixed $value
      * @return static
      */
-    public function pad($size, $value);
+    public function pad(int $size, mixed $value): static;
 
     /**
-     * Получить один или несколько элементов случайным образом из коллекции.
+     * Получить один или несколько элементов случайным образом из коллекции
+     *
+     * @link https://laravel.com/docs/5.6/collections#method-random
      *
      * @param int $amount
      * @return static
-     *
-     * @link https://laravel.com/docs/5.6/collections#method-random
      */
-    public function random($amount = 1);
+    public function random(int $amount = 1): static;
 
     /**
      * Уменьшить коллекцию до одного значения.
      *
      * @param callable $callback
-     * @param mixed    $initial
-     * @return mixed
+     * @param mixed $initial
+     * @return float|int
      */
-    public function reduce(callable $callback, $initial = null);
+    public function reduce(callable $callback, ?int $initial = null): float|int;
 
     /**
-     * Создайте коллекцию всех элементов, которые не проходят данный тест истины.
+     * Фильтрует коллекцию, используя заданную функцию обратного вызова
      *
-     * @param callable|mixed $callback
+     * @note функция обратного вызова должна возвращать true для элементов, которые необходимо удалить из результирующей коллекции
+     *
+     * @param callable|float|int|string $callback
+     * @param bool $strict
      * @return static
      */
-    public function reject($callback);
+    public function reject(callable|float|int|string $callback, bool $strict = false): static;
 
     /**
-     * Вернуть коллекцию в обратном порядоке элементов от базового.
+     * Вернуть коллекцию в обратном порядке элементов от базового
      *
      * @return static
      */
-    public function reverse();
+    public function reverse(): static;
 
     /**
-     * Найдите в коллекции заданное значение и в случае успеха вернёт соответствующий ключ.
+     * Найдите в коллекции заданное значение и в случае успеха вернёт соответствующий ключ
      *
      * @param mixed $value
-     * @param bool  $strict
-     * @return mixed
+     * @param bool $strict
+     * @return false|int|string
      */
-    public function search($value, $strict = false);
+    public function search(mixed $value, bool $strict = false): false|int|string;
 
     /**
-     * Получение и удалите первого элемент из коллекции.
+     * Получение и удалите первого элемент из коллекции
      *
      * @return mixed
      */
-    public function shift();
+    public function shift(): mixed;
 
     /**
-     * Вернуть коллекцию у которой все базовые элементы перемешаны.
+     * Вернуть коллекцию у которой все базовые элементы перемешаны
      *
      * @return static
      */
-    public function shuffle();
+    public function shuffle(): static;
 
     /**
-     * Вернуть коллекцию по указаному базовому срезу элементов.
+     * Вернуть коллекцию по указанному базовому срезу элементов
      *
-     * @param int  $offset
-     * @param int  $length
+     * @param int $offset
+     * @param int|null $length
      * @param bool $preserveKeys
      * @return static
      */
-    public function slice($offset, $length = null, $preserveKeys = false);
+    public function slice(int $offset, ?int $length = null, bool $preserveKeys = false): static;
 
     /**
-     * Вернуть коллекцию в которой элементы отсортированы по возрастанию с помощью обратного вызова.
+     * Вернуть коллекцию в которой элементы отсортированы по возрастанию с помощью обратного вызова
      *
      * @link https://laravel.com/docs/5.6/collections#method-sort
+     *
      * @param callable|null $callback
      * @return static
      */
-    public function sort(callable $callback = null);
+    public function sort(callable $callback = null): static;
 
     /**
-     * Вернуть коллекцию которая отсортирована по заданному ключу.
+     * Вернуть коллекцию которая отсортирована по заданному ключу
      *
-     * @note В отсортированной коллекции хранятся ключи исходного массива
-     * Сортировка коллекции с помощью данного обратного вызова.
+     * @note В отсортированной коллекции хранятся ключи исходного массива.
+     *       Сортировка коллекции с помощью данного обратного вызова.
      *
      * @param callable|string $callback
-     * @param int             $options
-     * @param bool            $descending
+     * @param int $options
+     * @param bool $descending
      * @return static
      */
-    public function sortBy($callback, $options = SORT_REGULAR, $descending = false);
+    public function sortBy(callable|string $callback, int $options = SORT_REGULAR, bool $descending = false): static;
 
     /**
-     * Сортировка коллекции в порядке убывания с помощью данного обратного вызова.
+     * Сортировка коллекции в порядке убывания с помощью данного обратного вызова
      *
      * @param callable|string $callback
-     * @param int             $options
+     * @param int $options
      * @return static
      */
-    public function sortByDesc($callback, $options = SORT_REGULAR);
+    public function sortByDesc(callable|string $callback, int $options = SORT_REGULAR): static;
 
     /**
      * Возвращает коллекцию после среза элементов у базовой коллекции, начинающийся с указанного индекса
      *
-     * @param int      $offset
+     * @param int $offset
      * @param int|null $length
-     * @param mixed    $replacement
+     * @param mixed $replacement
      * @return static
      */
-    public function splice($offset, $length = null, $replacement = []);
+    public function splice(int $offset, ?int $length = null, mixed $replacement = []): static;
 
     /**
      * Получить сумму всех элементов в коллекции.
      *
+     * @link https://laravel.ru/docs/v5/collections#sum
+     *
      * @param callable|string|null $callback
-     * @return mixed
+     * @return float|int
      */
-    public function sum($callback = null);
+    public function sum(callable|string|null $callback = null): float|int;
 
     /**
      * Возвращает новую коллекцию с указанным количеством элементов
      *
-     * @param integer $limit
+     * @param int $limit
      * @return static
      */
-    public function take($limit);
+    public function take(int $limit): static;
 
     /**
-     * Преобразуйте каждый элемент в коллекцию с помощью обратного вызова.
+     * Преобразуйте каждый элемент в коллекцию с помощью обратного вызова
      *
      * @note В отличие от других методов, transform изменяет саму коллекцию! Если вы хотите создать новую коллекцию, используйте метод map()
+     *
      * @param callable $callback
      * @return $this
      */
-    public function transform(callable $callback);
+    public function transform(callable $callback): static;
 
     /**
-     * Возвращает все уникальные элементы из базового массива в новой коллекции.
+     * Возвращает все уникальные элементы из базового массива в новой коллекции
      *
-     * @param string|callable|null $key
+     * @param callable|string|null $key
      * @return static
      */
-    public function unique($key = null);
+    public function unique(callable|string|null $key = null): static;
 
     /**
-     * Возвращает новую коллекцию со сброшеными ключами к целым числам.
+     * Возвращает новую коллекцию со сброшенными ключами к целым числам
      *
      * @return static
      */
-    public function values();
+    public function values(): static;
 }

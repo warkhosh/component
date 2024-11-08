@@ -155,18 +155,13 @@ class AppSimpleRequest
      */
     public function get(string $uri = null): AppSimpleResponse
     {
-        try {
-            if (! is_null($uri)) {
-                $this->setUrl($uri);
-            }
-
-            $this->setMethod("GET");
-
-            return $this->request();
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (! is_null($uri)) {
+            $this->setUrl($uri);
         }
+
+        $this->setMethod("GET");
+
+        return $this->request();
     }
 
     /**
@@ -178,23 +173,18 @@ class AppSimpleRequest
      */
     public function post(array $fields = [], ?string $uri = null, ?string $referer = null): AppSimpleResponse
     {
-        try {
-            if (! is_null($uri)) {
-                $this->setUrl($uri);
-            }
-
-            if (! is_null($referer)) {
-                $this->setHeader("Referer: {$referer}");
-            }
-
-            $this->setMethod("POST");
-            $this->fields($fields);
-
-            return $this->request();
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (! is_null($uri)) {
+            $this->setUrl($uri);
         }
+
+        if (! is_null($referer)) {
+            $this->setHeader("Referer: {$referer}");
+        }
+
+        $this->setMethod("POST");
+        $this->fields($fields);
+
+        return $this->request();
     }
 
     /**
@@ -205,20 +195,15 @@ class AppSimpleRequest
      */
     public function put(array $fields = [], ?string $uri = null): AppSimpleResponse
     {
-        try {
-            if (! is_null($uri)) {
-                $this->setUrl($uri);
-            }
-
-            $this->setMethod("PUT");
-            $this->setCustomRequest("PUT");
-            $this->fields($fields);
-
-            return $this->request();
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (! is_null($uri)) {
+            $this->setUrl($uri);
         }
+
+        $this->setMethod("PUT");
+        $this->setCustomRequest("PUT");
+        $this->fields($fields);
+
+        return $this->request();
     }
 
     /**
@@ -229,20 +214,15 @@ class AppSimpleRequest
      */
     public function patch(array $fields = [], ?string $uri = null): AppSimpleResponse
     {
-        try {
-            if (! is_null($uri)) {
-                $this->setUrl($uri);
-            }
-
-            $this->setMethod("PATCH");
-            $this->setCustomRequest("PATCH");
-            $this->fields($fields);
-
-            return $this->request();
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (! is_null($uri)) {
+            $this->setUrl($uri);
         }
+
+        $this->setMethod("PATCH");
+        $this->setCustomRequest("PATCH");
+        $this->fields($fields);
+
+        return $this->request();
     }
 
     /**
@@ -253,20 +233,15 @@ class AppSimpleRequest
      */
     public function delete(array $fields = [], ?string $uri = null): AppSimpleResponse
     {
-        try {
-            if (! is_null($uri)) {
-                $this->setUrl($uri);
-            }
-
-            $this->setMethod("DELETE");
-            $this->setCustomRequest("DELETE");
-            $this->fields($fields);
-
-            return $this->request();
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (! is_null($uri)) {
+            $this->setUrl($uri);
         }
+
+        $this->setMethod("DELETE");
+        $this->setCustomRequest("DELETE");
+        $this->fields($fields);
+
+        return $this->request();
     }
 
     /**
@@ -276,19 +251,14 @@ class AppSimpleRequest
      */
     public function head(?string $uri = null): AppSimpleResponse
     {
-        try {
-            if (! is_null($uri)) {
-                $this->setUrl($uri);
-            }
-
-            $this->setMethod("GET");
-            $this->setHeadersInOutput(true); // принудительно включаем получение заголовков в результате запроса
-
-            return $this->request();
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (! is_null($uri)) {
+            $this->setUrl($uri);
         }
+
+        $this->setMethod("GET");
+        $this->setHeadersInOutput(true); // принудительно включаем получение заголовков в результате запроса
+
+        return $this->request();
     }
 
     /**
@@ -416,7 +386,7 @@ class AppSimpleRequest
 
                         if ($first === 'Content-Type') {
                             $row = explode(";", $result['headers'][$first]);
-                            $first = is_string($first = array_shift($row)) ? trim($first) : '';
+                            //$first = is_string($first = array_shift($row)) ? trim($first) : '';
 
                             //switch ($first) {
                             //    case 'application/xml':
@@ -590,7 +560,7 @@ class AppSimpleRequest
         }
 
         if (is_array($data)) {
-            $data = json_encode($data);
+            $data = json_encode($data, JSON_UNESCAPED_UNICODE);
         }
 
         $this->files = $this->fields = [];
@@ -638,7 +608,7 @@ class AppSimpleRequest
         if (is_array($data)) {
             $dom = new DOMDocument();
             $dom->preserveWhiteSpace = false;
-            $dom->loadXML($xml = array_to_xml($data, new SimpleXMLElement("<{$rootNode}/>"))->asXML());
+            $dom->loadXML(array_to_xml($data, new SimpleXMLElement("<{$rootNode}/>"))->asXML());
             $dom->formatOutput = true;
             $data = $dom->saveXml();
         }

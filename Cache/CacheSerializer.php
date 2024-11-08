@@ -6,17 +6,17 @@ use Warkhosh\Component\Cache\Exception\CacheException;
 
 class CacheSerializer implements CacheSerializerInterface
 {
-    const SERIALIZE = 'serialize';
-    const JSON = 'json';
-    const NONE = 'none';
+    public const SERIALIZE = 'serialize';
+    public const JSON = 'json';
+    public const NONE = 'none';
 
-    public static $serializerMethods = [
-        self::NONE      => 'none',
-        self::JSON      => 'json',
+    public static array $serializerMethods = [
+        self::NONE => 'none',
+        self::JSON => 'json',
         self::SERIALIZE => 'serialize',
     ];
 
-    protected $type = self::SERIALIZE;
+    protected string $type = self::SERIALIZE;
 
     /**
      * @param string $type
@@ -36,17 +36,17 @@ class CacheSerializer implements CacheSerializerInterface
     }
 
     /**
-     * @param string $type
+     * @param string $serializer
      * @return void
      * @throws \Psr\SimpleCache\CacheException
      */
-    public function setType(string $type): void
+    public function setType(string $serializer): void
     {
-        if (! key_exists($type, static::$serializerMethods)) {
+        if (! key_exists($serializer, static::$serializerMethods)) {
             throw new CacheException("Invalid serializer type");
         }
 
-        $this->type = $type;
+        $this->type = $serializer;
     }
 
     /**
@@ -55,14 +55,14 @@ class CacheSerializer implements CacheSerializerInterface
      * @param mixed $value
      * @return string
      */
-    public function getEncodeValue($value): string
+    public function getEncodeValue(mixed $value): string
     {
         if ($this->type === static::SERIALIZE) {
             $value = serialize($value);
         }
 
         if ($this->type === static::JSON) {
-            $value = json_encode($value);
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
         }
 
         return $value;
@@ -74,7 +74,7 @@ class CacheSerializer implements CacheSerializerInterface
      * @param mixed $value
      * @return string
      */
-    public function getDecodeValue($value): string
+    public function getDecodeValue(mixed $value): string
     {
         if ($this->type === static::SERIALIZE) {
             $value = unserialize($value);
