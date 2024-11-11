@@ -15,9 +15,9 @@ class ExceptionDataProvider extends Exception implements Throwable
     /**
      * Название поля
      *
-     * @var string
+     * @var string|null
      */
-    protected string $field = "";
+    protected ?string $field = null;
 
     /**
      * signal
