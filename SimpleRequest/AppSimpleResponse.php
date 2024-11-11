@@ -91,15 +91,34 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
     /**
      * Retrieves a comma-separated string of the values for a single header.
      *
+     * This method returns all of the header values of the given
+     * case-insensitive header name as a string concatenated together using
+     * a comma.
+     *
+     * NOTE: Not all header values may be appropriately represented using
+     * comma concatenation. For such headers, use getHeader() instead
+     * and supply your own delimiter when concatenating.
+     *
+     * If the header does not appear in the message, this method MUST return
+     * an empty string.
+     *
      * @param string $name Case-insensitive header field name.
-     * @return string A string of values as provided for the given header concatenated together using a comma.
-     *                If the header does not appear in the message, this method MUST return an empty string.
+     * @return string A string of values as provided for the given header
+     *                concatenated together using a comma. If the header does not appear in
+     *                the message, this method MUST return an empty string.
      */
     public function getHeaderLine(string $name): string
     {
-        $header = $this->getHeader($name);
+        if (! empty($name)) {
+            $name = trim(mb_strtolower($name));
+            $name = str_replace(" ", "-", ucwords(str_replace("-", " ", $name)));
 
-        return join(",", $header);
+            if (array_key_exists($name, $this->response['headers'])) {
+                return $this->response['headers'][$name];
+            }
+        }
+
+        return "";
     }
 
     /**
@@ -221,7 +240,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
             $cached = true;
         }
 
-        if ($this->getHeader('Content-Type') === 'json') {
+        if ($this->getHeaderLine('Content-Type') === 'json') {
             $data = $cached ? $data : json_decode($this->response['document'], true);
 
             return VarArray::get($key, $data, $default);
