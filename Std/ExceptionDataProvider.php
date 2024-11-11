@@ -26,21 +26,21 @@ class ExceptionDataProvider extends Exception
      *
      * @var string
      */
-    protected string $file;
+    protected string $file = "";
 
     /**
      * The line where the error happened
      *
      * @var int
      */
-    protected int $line;
+    protected int $line = 0;
 
     /**
      * Название поля
      *
      * @var string
      */
-    protected string $field;
+    protected string $field = "";
 
     /**
      * signal
@@ -144,7 +144,7 @@ class ExceptionDataProvider extends Exception
      * @param int|string|null $signal
      * @return $this
      */
-    public function signal($signal): static
+    public function signal(int|string|null $signal): static
     {
         $this->setSignal($signal);
 
