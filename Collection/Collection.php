@@ -1394,7 +1394,7 @@ class Collection implements BaseCollection, Iterator, ArrayAccess, Countable, Ar
         }
 
         return function ($item) use ($value) {
-            return Helper::arrayGet($value, $item);
+            return Helper::arrayGet($item, $value);
         };
     }
 
