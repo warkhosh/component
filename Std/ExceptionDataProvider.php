@@ -5,36 +5,13 @@ namespace Warkhosh\Component\Std;
 use Exception;
 use Throwable;
 
-class ExceptionDataProvider extends Exception
+/**
+ * ExceptionDataProvider
+ *
+ * Класс для своих исключений с дополнительными полями $field, $signal, $system
+ */
+class ExceptionDataProvider extends Exception implements Throwable
 {
-    /**
-     * The error message
-     *
-     * @var string
-     */
-    protected $message;
-
-    /**
-     * The error code
-     *
-     * @var int
-     */
-    protected $code;
-
-    /**
-     * The filename where the error happened
-     *
-     * @var string
-     */
-    protected string $file = "";
-
-    /**
-     * The line where the error happened
-     *
-     * @var int
-     */
-    protected int $line = 0;
-
     /**
      * Название поля
      *
@@ -70,46 +47,6 @@ class ExceptionDataProvider extends Exception
     public static function init(string $message = "", int $code = 0, Throwable $previous = null): ExceptionDataProvider
     {
         return new static($message, $code, $previous);
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     */
-    public function file(string $file): static
-    {
-        $this->setFile($file);
-
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return void
-     */
-    private function setFile(string $file): void
-    {
-        $this->file = $file;
-    }
-
-    /**
-     * @param string $line
-     * @return $this
-     */
-    public function line(string $line): static
-    {
-        $this->setLine($line);
-
-        return $this;
-    }
-
-    /**
-     * @param string $line
-     * @return void
-     */
-    private function setLine(string $line): void
-    {
-        $this->line = $line;
     }
 
     /**
