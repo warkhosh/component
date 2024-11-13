@@ -183,8 +183,8 @@ class AppStorage
      */
     public function delete(array|string $paths, bool $silent = true): array|bool
     {
-        $list = is_array($paths);
-        $paths = $list ? $paths : (array)$paths;
+        $isList = is_array($paths);
+        $paths = $isList ? $paths : (array)$paths;
         $success = [];
 
         if (count($paths)) {
@@ -213,6 +213,8 @@ class AppStorage
                         } else {
                             $success[$path] = false;
                         }
+                    } else {
+                        $success[$path] = false;
                     }
 
                 } catch (Throwable $e) { // php 7.1
@@ -225,7 +227,7 @@ class AppStorage
             }
         }
 
-        return $list ? $success : VarArray::getFirst($success);
+        return $isList ? $success : VarArray::getFirst($success);
     }
 
     /**
