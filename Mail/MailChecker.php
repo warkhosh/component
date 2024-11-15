@@ -8,7 +8,7 @@ use Warkhosh\Variable\VarStr;
 /**
  * MailChecker
  *
- * @version v1.0
+ * @version v1.1
  * @package Ekv\Framework\Components\Mail
  */
 class MailChecker
@@ -29,8 +29,6 @@ class MailChecker
 
     public function __construct()
     {
-        $this->fakerDomainList = [];
-        $this->competitorList = [];
     }
 
     /**
@@ -162,5 +160,27 @@ class MailChecker
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Переопределяет список доменов для проверки временного email
+     *
+     * @param array $fakerDomainList
+     * @return void
+     */
+    public function setFakerDomainList(array $fakerDomainList): void
+    {
+        $this->fakerDomainList = $fakerDomainList;
+    }
+
+    /**
+     * Переопределяет список доменов конкурентов для проверки email
+     *
+     * @param array $competitorList
+     * @return void
+     */
+    public function setCompetitorList(array $competitorList): void
+    {
+        $this->competitorList = $competitorList;
     }
 }
