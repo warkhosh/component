@@ -8,7 +8,7 @@ use Warkhosh\Variable\VarStr;
 /**
  * MailChecker
  *
- * @version v1.1
+ * @version v1.2
  * @package Ekv\Framework\Components\Mail
  */
 class MailChecker
@@ -35,36 +35,36 @@ class MailChecker
      * Проверка адреса на корректность с точки зрения букв
      *
      * @param mixed $email
-     * @return bool
+     * @return string|true
      */
-    public function isCorrect(mixed $email): bool
+    public function isCorrect(mixed $email): string|true
     {
         try {
-            if ($this->basicCorrect($email) !== true) {
-                return false;
+            if (! empty($check = $this->basicCorrect($email))) {
+                return $check;
             }
 
             [$user, $domain] = explode('@', $email);
 
             // Имя длиннее 2 символов
             if (mb_strlen($user) < 2) {
-                return false;
+                throw new Exception("Recipient name is shorter than 2 characters");
             }
 
             // Проверка символа точки в домене минимум один раз
             if (count(explode(".", $domain)) < 2) {
-                return false;
+                throw new Exception("There is no [dot] symbol in the email address domain");
             }
 
             // Проверка наличия букв в домене (без точек)
             if (mb_strlen(str_replace('.', '', $domain)) > 3) {
-                return false;
+                throw new Exception("There are no characters in the email address domain");
             }
 
             return true;
 
         } catch (Exception $e) {
-            return false;
+            return $e->getMessage();
         }
     }
 
@@ -72,25 +72,25 @@ class MailChecker
      * Проверка домена у email адреса на причастность к временным
      *
      * @param mixed $email
-     * @return bool
+     * @return string|true
      */
-    public function isFakeDomain(mixed $email): bool
+    public function isFakeDomain(mixed $email): string|true
     {
         try {
-            if ($this->basicCorrect($email) !== true) {
-                return false;
+            if (! empty($check = $this->basicCorrect($email))) {
+                return $check;
             }
 
             [, $domain] = explode('@', $email);
 
             if (in_array($domain, $this->fakerDomainList, true)) {
-                return false;
+                throw new Exception("The domain belongs to temporary services");
             }
 
             return true;
 
         } catch (Exception $e) {
-            return false;
+            return $e->getMessage();
         }
     }
 
@@ -98,25 +98,25 @@ class MailChecker
      * Проверка домена у email адреса на причастность к конкурентам
      *
      * @param mixed $email
-     * @return bool
+     * @return string|true
      */
-    public function isCompetitorList(mixed $email): bool
+    public function isCompetitorList(mixed $email): string|true
     {
         try {
-            if ($this->basicCorrect($email) !== true) {
-                return false;
+            if (! empty($check = $this->basicCorrect($email))) {
+                return $check;
             }
 
             [, $domain] = explode('@', $email);
 
             if (in_array($domain, $this->competitorList, true)) {
-                return false;
+                throw new Exception("The domain belongs to competitors");
             }
 
             return true;
 
         } catch (Exception $e) {
-            return false;
+            return $e->getMessage();
         }
     }
 
@@ -126,13 +126,13 @@ class MailChecker
      * Проверяется что он строка, она не содержит не чего кроме символов и в ней есть разделитель собака
      *
      * @param mixed $email
-     * @return bool
+     * @return string|true
      */
-    private function basicCorrect(mixed $email): bool
+    private function basicCorrect(mixed $email): string|true
     {
         try {
             if (! is_string($email) || empty($email)) {
-                return false;
+                throw new Exception("The email address is not a string or is empty");
             }
 
             // Конвертируем символы в UTF-8
@@ -142,23 +142,23 @@ class MailChecker
             $email = trim($email);
 
             if (empty($email)) {
-                return false;
+                throw new Exception("The email address turned out to be empty after converting to UTF-8");
             }
 
             // Проверка, что после удаления пробелов и кареток длинна введенного адреса осталось прежней
             if ($email !== preg_replace("/\s/", "", $email)) {
-                return false;
+                throw new Exception("Email address contains control characters and spaces");
             }
 
             // Проверка наличия символа собаки
             if (preg_replace('/[^@]/ium', '', $email) !== '@') {
-                return false;
+                throw new Exception("One comma character was not found in the email address");
             }
 
             return true;
 
         } catch (Exception $e) {
-            return false;
+            return $e->getMessage();
         }
     }
 
