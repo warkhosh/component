@@ -1,8 +1,6 @@
 <?php
 
-// Пример для реализации в проектах
 use Warkhosh\Component\Collection\Collection;
-use Warkhosh\Component\Config\AppConfig;
 use Warkhosh\Component\Server\AppServer;
 use Warkhosh\Variable\VarArray;
 use Warkhosh\Variable\VarFloat;
@@ -13,6 +11,8 @@ if (false && ! function_exists('getConfig')) {
     /**
      * Короткий синтаксис обращения к конфигу
      *
+     * @note example
+     *
      * @param string|null $name
      * @param mixed $default
      * @return mixed
@@ -20,7 +20,8 @@ if (false && ! function_exists('getConfig')) {
     function getConfig(string $name = null, mixed $default = null): mixed
     {
         try {
-            $appConfig = AppConfig::getInstance();
+            $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
+
             //$appConfig->setBasePath(app()->getBasePath() . '/Application/Configs');
 
             return $appConfig->get($name, $default);
