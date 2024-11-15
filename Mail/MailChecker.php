@@ -37,7 +37,7 @@ class MailChecker
      * @param mixed $email
      * @return string|true
      */
-    public function isCorrect(mixed $email): string|true
+    public function isCorrect(mixed $email): string|bool
     {
         try {
             if (! empty($check = $this->basicCorrect($email))) {
@@ -74,7 +74,7 @@ class MailChecker
      * @param mixed $email
      * @return string|true
      */
-    public function isFakeDomain(mixed $email): string|true
+    public function isFakeDomain(mixed $email): string|bool
     {
         try {
             if (! empty($check = $this->basicCorrect($email))) {
@@ -100,7 +100,7 @@ class MailChecker
      * @param mixed $email
      * @return string|true
      */
-    public function isCompetitorList(mixed $email): string|true
+    public function isCompetitorList(mixed $email): string|bool
     {
         try {
             if (! empty($check = $this->basicCorrect($email))) {
@@ -128,7 +128,7 @@ class MailChecker
      * @param mixed $email
      * @return string|true
      */
-    private function basicCorrect(mixed $email): string|true
+    private function basicCorrect(mixed $email): string|bool
     {
         try {
             if (! is_string($email) || empty($email)) {
