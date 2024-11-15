@@ -8,7 +8,7 @@ use Warkhosh\Variable\VarStr;
 /**
  * MailChecker
  *
- * @version v1.2
+ * @version v1.3
  * @package Ekv\Framework\Components\Mail
  */
 class MailChecker
@@ -57,7 +57,7 @@ class MailChecker
             }
 
             // Проверка наличия букв в домене (без точек)
-            if (mb_strlen(str_replace('.', '', $domain)) > 3) {
+            if (mb_strlen(str_replace('.', '', $domain)) <= 3) {
                 throw new Exception("There are no characters in the email address domain");
             }
 
