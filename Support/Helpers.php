@@ -211,15 +211,15 @@ if (! function_exists('convertToUTF')) {
     function convertToUTF(?string $text = ''): string
     {
         return VarStr::getTransformToEncoding($text, 'UTF-8');
-        //        $encoding = mb_detect_encoding($text, mb_detect_order(), false);
+        //$encoding = mb_detect_encoding($text, mb_detect_order(), false);
         //
-        //        if ($encoding === "UTF-8") {
-        //            $text = mb_convert_encoding($text, 'UTF-8');
-        //        }
+        //if ($encoding === "UTF-8") {
+        //    $text = mb_convert_encoding($text, 'UTF-8');
+        //}
         //
-        //        $out = @iconv(mb_detect_encoding($text, mb_detect_order(), false), "UTF-8//IGNORE", $text);
+        //$out = @iconv(mb_detect_encoding($text, mb_detect_order(), false), "UTF-8//IGNORE", $text);
         //
-        //        return $out;
+        //return $out;
     }
 }
 
