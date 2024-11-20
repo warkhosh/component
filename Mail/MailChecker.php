@@ -8,7 +8,7 @@ use Warkhosh\Variable\VarStr;
 /**
  * MailChecker
  *
- * @version v1.4
+ * @version v1.5
  * @package Ekv\Framework\Components\Mail
  */
 class MailChecker
@@ -40,13 +40,13 @@ class MailChecker
     public function isCorrect(mixed $email): string|bool
     {
         try {
-            if (! empty($check = $this->typeChecking($email))) {
+            if (is_string($check = $this->typeChecking($email))) {
                 return $check;
             }
 
             $email = $this->getPrepareEmailBeforeTest((string)$email);
 
-            if (! empty($check = $this->basicCorrect($email))) {
+            if (is_string($check = $this->basicCorrect($email))) {
                 return $check;
             }
 
@@ -91,13 +91,13 @@ class MailChecker
     public function isFakeDomain(mixed $email): string|bool
     {
         try {
-            if (! empty($check = $this->typeChecking($email))) {
+            if (is_string($check = $this->typeChecking($email))) {
                 return $check;
             }
 
             $email = $this->getPrepareEmailBeforeTest((string)$email);
 
-            if (! empty($check = $this->basicCorrect($email))) {
+            if (is_string($check = $this->basicCorrect($email))) {
                 return $check;
             }
 
@@ -120,16 +120,16 @@ class MailChecker
      * @param float|int|string|null $email
      * @return string|true
      */
-    public function isCompetitorList(mixed $email): string|bool
+    public function isCompetitor(mixed $email): string|bool
     {
         try {
-            if (! empty($check = $this->typeChecking($email))) {
+            if (is_string($check = $this->typeChecking($email))) {
                 return $check;
             }
 
             $email = $this->getPrepareEmailBeforeTest((string)$email);
 
-            if (! empty($check = $this->basicCorrect($email))) {
+            if (is_string($check = $this->basicCorrect($email))) {
                 return $check;
             }
 
