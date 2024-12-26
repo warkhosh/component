@@ -3,36 +3,10 @@
 use Warkhosh\Component\Collection\Collection;
 use Warkhosh\Component\Server\AppServer;
 use Warkhosh\Variable\VarArray;
+use Warkhosh\Variable\VarBool;
 use Warkhosh\Variable\VarFloat;
 use Warkhosh\Variable\VarInt;
 use Warkhosh\Variable\VarStr;
-
-if (false && ! function_exists('getConfig')) {
-    /**
-     * Короткий синтаксис обращения к конфигу
-     *
-     * @note example
-     *
-     * @param string|null $name
-     * @param mixed $default
-     * @return mixed
-     */
-    function getConfig(string $name = null, mixed $default = null): mixed
-    {
-        try {
-            $appConfig = \Warkhosh\Component\Config\AppConfig::getInstance();
-
-            //$appConfig->setBasePath(app()->getBasePath() . '/Application/Configs');
-
-            return $appConfig->get($name, $default);
-
-        } catch (Throwable $e) {
-            //Log::error($e);
-        }
-
-        return $default;
-    }
-}
 
 if (! function_exists('e')) {
     /**
@@ -100,61 +74,45 @@ if (! function_exists('getArrayWrap')) {
     }
 }
 
+/**
+ * Альтернативный вариант проверки значения на истину (не требует указывать namespace и в шаблонах будет более коротким)
+ *
+ * @param mixed $var
+ * @param bool $strict
+ * @return bool
+ */
 if (! function_exists('isTrue')) {
     /**
-     * Проверка истинности значения;
+     * Проверка истинности значения
      *
      * @param mixed $var
      * @param bool $strict
      * @return bool
-     * @throws Exception
      */
     function isTrue(mixed $var = null, bool $strict = false): bool
     {
-        if ($var === true) {
-            return true;
-        }
-
-        if (is_array($var) || is_object($var)) {
-            return false;
-        }
-
-        if ($strict === false) {
-            if ((int)$var === 1 || VarStr::getLower(trim($var)) === 'true') {
-                return true;
-            }
-        }
-
-        return false;
+        return VarBool::isTrue($var, $strict);
     }
 }
 
+/**
+ * Альтернативный вариант проверки значения на истину (не требует указывать namespace и в шаблонах будет более коротким)
+ *
+ * @param mixed $var
+ * @param bool $strict
+ * @return bool
+ */
 if (! function_exists('isFalse')) {
     /**
-     * Проверка истинности значения;
+     * Проверка не истинности значения
      *
      * @param mixed $var
      * @param bool $strict
      * @return bool
-     * @throws Exception
      */
     function isFalse(mixed $var = null, bool $strict = false): bool
     {
-        if ($var === false) {
-            return true;
-        }
-
-        if (is_array($var) || is_object($var)) {
-            return false;
-        }
-
-        if ($strict === false) {
-            if (((int)$var === 0 || VarStr::getLower(trim($var)) === 'false')) {
-                return true;
-            }
-        }
-
-        return false;
+        return VarBool::isFalse($var, $strict);
     }
 }
 
