@@ -26,6 +26,14 @@
     },
     {
       "type": "git",
+      "url": "https://gitverse.ru/warkhosh/config.git"
+    },
+    {
+      "type": "git",
+      "url": "https://gitverse.ru/warkhosh/storage.git"
+    },
+    {
+      "type": "git",
       "url": "https://github.com/warkhosh/variable.git"
     },
     {
@@ -46,6 +54,8 @@
     "ext-dom": "*",
     "ext-simplexml": "*",
     "warkhosh/assist": "dev-master",
+    "warkhosh/config": "dev-master",
+    "warkhosh/storage": "dev-master",
     "warkhosh/variable": "dev-master",
     "warkhosh/singleton": "dev-master"
   },
