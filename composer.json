@@ -22,7 +22,15 @@
   "repositories": [
     {
       "type": "git",
+      "url": "https://gitverse.ru/warkhosh/assist.git"
+    },
+    {
+      "type": "git",
       "url": "https://github.com/warkhosh/variable.git"
+    },
+    {
+      "type": "git",
+      "url": "https://gitverse.ru/warkhosh/singleton.git"
     }
   ],
   "require": {
@@ -32,13 +40,18 @@
     "ext-iconv": "*",
     "ext-mbstring": "*",
     "psr/simple-cache": "^1.0",
-    "warkhosh/variable": "dev-master",
     "ext-fileinfo": "*",
     "ext-posix": "*",
     "psr/http-client": "^1.0",
     "ext-dom": "*",
     "ext-simplexml": "*",
-    "laravel/pint": "^1.13"
+    "warkhosh/assist": "dev-master",
+    "warkhosh/variable": "dev-master",
+    "warkhosh/singleton": "dev-master"
+  },
+  "require-dev": {
+    "jetbrains/phpstorm-attributes": "dev-master",
+    "laravel/pint": "^1.18"
   },
   "autoload": {
     "psr-4": {
