@@ -3,7 +3,7 @@
 namespace Warkhosh\Component\Config;
 
 use Warkhosh\Component\Storage\AppStorage;
-use Warkhosh\Component\Traits\Singleton;
+use Warkhosh\Singleton\Trait\Singleton;
 use Warkhosh\Variable\VarArray;
 use Warkhosh\Variable\VarStr;
 use Throwable;

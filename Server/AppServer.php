@@ -2,8 +2,8 @@
 
 namespace Warkhosh\Component\Server;
 
-use Warkhosh\Component\Traits\Singleton;
 use Warkhosh\Component\Url\UrlHelper;
+use Warkhosh\Singleton\Trait\Singleton;
 use Warkhosh\Variable\VarArray;
 use Exception;
 
