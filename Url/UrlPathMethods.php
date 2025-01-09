@@ -5,7 +5,6 @@ namespace Warkhosh\Component\Url;
 use Exception;
 use Warkhosh\Variable\VarFloat;
 use Warkhosh\Variable\VarInt;
-use Warkhosh\Variable\VarStr;
 
 trait UrlPathMethods
 {
@@ -53,7 +52,7 @@ trait UrlPathMethods
         // проверка с обратной стороны списка
         if (! is_null($key) && $key < 0 && is_null($limit)) {
             // отрицательное число превращаем в положительное
-            $key = (getNum(trim(VarStr::getMake($key), '-')) - 1);
+            $key = (getNum(trim(getMakeString($key), '-')) - 1);
 
             $reverse = array_reverse($this->pathResults);
             $select = array_slice($reverse, $offset);
@@ -74,7 +73,7 @@ trait UrlPathMethods
 
             if ($limit < 0) {
                 // отрицательное число превращаем в положительное
-                $limit = getNum(trim(VarStr::getMake($limit), '-'));
+                $limit = getNum(trim(getMakeString($limit), '-'));
                 $reverse = array_reverse($this->pathResults);
                 $select = array_slice($reverse, $offset, $limit);
 
@@ -104,7 +103,7 @@ trait UrlPathMethods
         }
 
         if (! is_null($key) && $key < 0) {
-            $key = (getNum(trim(VarStr::getMake($key), '-')) - 1);
+            $key = (getNum(trim(getMakeString($key), '-')) - 1);
             $reverse_params = array_reverse($this->types);
 
             if (array_key_exists($key, $reverse_params)) {
@@ -152,7 +151,7 @@ trait UrlPathMethods
         }
 
         if (! is_null($key) && $key < 0) {
-            $key = (getNum(trim(VarStr::getMake($key), '-')) - 1);
+            $key = (getNum(trim(getMakeString($key), '-')) - 1);
             $reverse_params = array_reverse($this->data);
 
             if (array_key_exists($key, $reverse_params)) {
@@ -290,7 +289,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -327,7 +326,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -364,7 +363,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -401,7 +400,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -438,7 +437,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -475,7 +474,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -512,7 +511,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 
@@ -549,7 +548,7 @@ trait UrlPathMethods
             "num" => VarInt::getMakePositiveInteger($url),
             "int", "integer" => VarInt::getMake($url),
             "float" => VarFloat::getMake($url),
-            "string" => VarStr::getMake($url),
+            "string" => getMakeString($url),
             default => $url,
         };
 

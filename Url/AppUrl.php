@@ -138,7 +138,7 @@ class AppUrl
      */
     public function set(?string $url = null, bool $strict = false): static
     {
-        $this->originalUrl = VarStr::trim(VarStr::getMake($url));
+        $this->originalUrl = VarStr::trim(getMakeString($url));
         $this->primaryUrl = is_null($url) ? null : $this->originalUrl;
 
         if ($strict) {

@@ -398,7 +398,7 @@ class UrlHelper
             return [];
         }
 
-        $str = VarStr::getMake(VarStr::trim($str));
+        $str = getMakeString(VarStr::trim($str));
         $str = VarStr::getUrlDecode($str);
 
         // если указали ссылку с путями, то выбираем из неё только query параметры

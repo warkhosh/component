@@ -5,7 +5,6 @@ namespace Warkhosh\Component\Config;
 use Warkhosh\Component\Storage\AppStorage;
 use Warkhosh\Singleton\Trait\Singleton;
 use Warkhosh\Variable\VarArray;
-use Warkhosh\Variable\VarStr;
 use Throwable;
 use Exception;
 
@@ -82,7 +81,7 @@ class AppConfig
             $keys = VarArray::explode('.', $key);
 
             if (is_null($file = VarArray::getFirst($keys))) {
-                throw new Exception("Bed config file: ".VarStr::getMake($key));
+                throw new Exception("Bed config file: ".getMakeString($key));
             }
 
             if (! (isset($this->files[$file]) && array_key_exists($file, $this->files))) {

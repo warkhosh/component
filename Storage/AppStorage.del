@@ -576,7 +576,7 @@ class AppStorage
             ? $param['ignore'] : ['.gitignore'];
 
         if (! is_null($dir)) {
-            $dir = trim(VarStr::getMake($dir));
+            $dir = trim(getMakeString($dir));
             $dir = mb_substr($dir, -1) === '/' ? $dir : $dir.'/';
 
             if (is_dir($dir)) {
