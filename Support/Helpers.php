@@ -2,7 +2,6 @@
 
 use Warkhosh\Component\Collection\Collection;
 use Warkhosh\Component\Server\AppServer;
-use Warkhosh\Variable\VarArray;
 use Warkhosh\Variable\VarFloat;
 
 if (! function_exists('server')) {
@@ -237,41 +236,6 @@ if (! function_exists('getPhoneFormat')) {
         }
 
         return $str;
-    }
-}
-
-if (! function_exists('toSnakeCase')) {
-    /**
-     * Преобразование Camel case в Snake case!
-     *
-     * @param string $input
-     * @return string
-     */
-    function toSnakeCase(string $input = ''): string
-    {
-        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
-        }
-
-        return implode('_', $ret);
-    }
-}
-
-if (! function_exists('toCamelCase')) {
-    /**
-     * Преобразование Snake case в Camel case!
-     *
-     * @param string $input
-     * @return string
-     * @throws Exception
-     */
-    function toCamelCase(string $input = ''): string
-    {
-        $input = str_replace('-', '_', $input);
-
-        return implode('', VarArray::ucfirst(explode('_', $input)));
     }
 }
 
