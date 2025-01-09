@@ -69,10 +69,7 @@ class UrlHelper
      */
     public static function getPaths(string $str = '', bool $clearBadPath = false): array
     {
-        if (getEncoding($str) == 'windows-1251') {
-            $str = @iconv('windows-1251', 'utf-8//ignore', $str);
-        }
-
+        $str = toUTF8($str);
         $str = rawurldecode($str); // Преобразовывает символьные коды в их символы, %20 - станет пробелом
 
         // Что-бы правильно обрабатывать кривые урлы, левый слеш убираем, а правый оставляем
