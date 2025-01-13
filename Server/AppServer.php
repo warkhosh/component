@@ -5,6 +5,7 @@ namespace Warkhosh\Component\Server;
 use Warkhosh\Component\Url\UrlHelper;
 use Warkhosh\Singleton\Trait\Singleton;
 use Warkhosh\Variable\VarArray;
+use Warkhosh\Variable\VarStr;
 use Exception;
 
 /**
@@ -175,7 +176,7 @@ class AppServer
         if ($name === 'request_paths') {
             if (! key_exists('request_paths', $this->property)) {
                 $this->property['request_paths'] = array_values(
-                    VarArray::explode("/", $this->request_path, [''])
+                    VarStr::explode("/", $this->request_path, [''])
                 );
             }
 
@@ -314,7 +315,7 @@ class AppServer
         } elseif (is_array($name) && count($name)) {
             foreach ($name as $key => $value) {
                 if (is_string($key)) { // проверка наличия метода и его значения
-                    $result = (VarArray::get("{$key}", $this->referer_queries) === $value);
+                    $result = (getFromArray("{$key}", $this->referer_queries) === $value);
 
                 } else {
                     $result = in_array($value, $this->referer_queries); // проверяем только наличие метода
@@ -345,7 +346,7 @@ class AppServer
         } elseif (is_array($name) && count($name)) {
             foreach ($name as $key => $value) {
                 if (is_string($key)) { // проверка наличия метода и его значения
-                    $result = (VarArray::get("{$key}", $this->request_queries) === $value);
+                    $result = (getFromArray($key, $this->request_queries) === $value);
 
                 } else {
                     $result = in_array($value, $this->referer_queries); // проверяем только наличие метода

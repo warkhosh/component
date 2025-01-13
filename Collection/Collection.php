@@ -6,7 +6,6 @@ use Warkhosh\Component\Collection\Interfaces\Arrayable;
 use Warkhosh\Component\Collection\Interfaces\BaseCollection;
 use Warkhosh\Component\Collection\Interfaces\Jsonable;
 use Warkhosh\Component\Traits\CollectionMethod;
-use Warkhosh\Variable\VarArray;
 use JsonSerializable;
 use Traversable;
 use ArrayAccess;
@@ -952,7 +951,7 @@ class Collection implements BaseCollection, Iterator, ArrayAccess, Countable, Ar
     public function max(?string $key = null): float|int
     {
         return $this->reduce(function (int $carry, $item) use ($key) {
-            $item = is_null($key) ? $item : VarArray::get($key, $item, 0);
+            $item = is_null($key) ? $item : getFromArray($key, $item, 0);
             $item = is_float($item) ? $item : intval($item);
 
             return max($item, $carry);
@@ -983,7 +982,7 @@ class Collection implements BaseCollection, Iterator, ArrayAccess, Countable, Ar
     public function min(?string $key = null): float|int
     {
         return $this->reduce(function ($carry, $item) use ($key) {
-            $item = is_null($key) ? $item : VarArray::get($key, $item, 0);
+            $item = is_null($key) ? $item : getFromArray($key, $item, 0);
             $item = is_float($item) ? $item : intval($item);
 
             return min($item, $carry);

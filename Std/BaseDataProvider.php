@@ -338,7 +338,7 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * public function get($index)
      * {
      * if ($this->useDefault) {
-     * return VarArray::get($index, $this->data, $this->default);
+     * return getFromArray($index, $this->data, $this->default);
      * }
      *
      * return $this->data[$index];

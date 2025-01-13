@@ -5,7 +5,6 @@ namespace Warkhosh\Component\SimpleRequest;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
-use Warkhosh\Variable\VarArray;
 use Throwable;
 
 use function stream_get_meta_data;
@@ -90,7 +89,7 @@ class AppSimpleResponseStream implements \Psr\Http\Message\StreamInterface
 
         } else {
             $fstat = fstat($stream);
-            $options['size'] = (int)VarArray::get("size", array_slice($fstat, 13), 0);
+            $options['size'] = (int)getFromArray("size", array_slice($fstat, 13), 0);
         }
 
         $this->metaData = $options['meta_data'] ?? [];

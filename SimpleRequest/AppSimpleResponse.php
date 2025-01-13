@@ -9,7 +9,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use stdClass;
 use Throwable;
-use Warkhosh\Variable\VarArray;
 
 class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
 {
@@ -33,11 +32,11 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      */
     public function __construct(array $response)
     {
-        $response['errno'] = (int)VarArray::get("errno", $response, 0);
-        $response['error'] = (string)VarArray::get("error", $response, "");
-        $response['document'] = (string)VarArray::get("document", $response, "");
-        $response['headers'] = (array)VarArray::get("headers", $response, []);
-        $response['http_code'] = (int)VarArray::get("http_code", $response, 0);
+        $response['errno'] = (int)getFromArray("errno", $response, 0);
+        $response['error'] = (string)getFromArray("error", $response, "");
+        $response['document'] = (string)getFromArray("document", $response, "");
+        $response['headers'] = (array)getFromArray("headers", $response, []);
+        $response['http_code'] = (int)getFromArray("http_code", $response, 0);
 
         $this->response = $response;
         $this->stream = new AppSimpleResponseStream($this->response['document']);
@@ -243,7 +242,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
         if ($this->getHeaderLine('Content-Type') === 'json') {
             $data = $cached ? $data : json_decode($this->response['document'], true);
 
-            return VarArray::get($key, $data, $default);
+            return getFromArray($key, $data, $default);
         }
 
         return $default;
@@ -300,7 +299,7 @@ class AppSimpleResponse implements \Psr\Http\Message\ResponseInterface
      */
     public function getProtocolVersion(): string
     {
-        return (string)VarArray::get("headers.http-version", $this->response, "");
+        return (string)getFromArray("headers.http-version", $this->response, "");
     }
 
     /**
