@@ -3,7 +3,6 @@
 namespace Warkhosh\Component\Mail;
 
 use Exception;
-use Warkhosh\Variable\VarStr;
 
 /**
  * MailChecker
@@ -195,7 +194,7 @@ class MailChecker
     private function getPrepareEmailBeforeTest(string $email): string
     {
         // Конвертируем символы в UTF-8
-        $email = VarStr::getTransformToEncoding($email, 'UTF-8');
+        $email = toUTF8($email);
 
         // Converts HTML entities into symbols
         $email = html_entity_decode($email);

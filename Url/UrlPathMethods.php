@@ -3,8 +3,6 @@
 namespace Warkhosh\Component\Url;
 
 use Exception;
-use Warkhosh\Variable\VarFloat;
-use Warkhosh\Variable\VarInt;
 
 trait UrlPathMethods
 {
@@ -286,9 +284,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -323,9 +321,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -360,9 +358,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -397,9 +395,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -434,9 +432,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -471,9 +469,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -508,9 +506,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };
@@ -545,9 +543,9 @@ trait UrlPathMethods
         $url = ! is_array($url) ? $url : '';
 
         return match ($type) {
-            "num" => VarInt::getMakePositiveInteger($url),
-            "int", "integer" => VarInt::getMake($url),
-            "float" => VarFloat::getMake($url),
+            "num" => getMakePositiveInteger($url),
+            "int", "integer" => getMakeInteger($url),
+            "float" => getMakeFloat($url),
             "string" => getMakeString($url),
             default => $url,
         };

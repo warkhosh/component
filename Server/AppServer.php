@@ -4,8 +4,6 @@ namespace Warkhosh\Component\Server;
 
 use Warkhosh\Component\Url\UrlHelper;
 use Warkhosh\Singleton\Trait\Singleton;
-use Warkhosh\Variable\VarArray;
-use Warkhosh\Variable\VarStr;
 use Exception;
 
 /**
@@ -176,7 +174,7 @@ class AppServer
         if ($name === 'request_paths') {
             if (! key_exists('request_paths', $this->property)) {
                 $this->property['request_paths'] = array_values(
-                    VarStr::explode("/", $this->request_path, [''])
+                    getExplodeString("/", $this->request_path, [''])
                 );
             }
 
@@ -185,7 +183,7 @@ class AppServer
 
         if ($name === 'request_first_path') {
             if (! key_exists('request_first_path', $this->property)) {
-                $this->property['request_first_path'] = VarArray::getFirst($this->request_paths);
+                $this->property['request_first_path'] = getFirstValueInArray($this->request_paths);
             }
 
             return $this->property['request_first_path'];
@@ -366,14 +364,16 @@ class AppServer
     /**
      * Модифицирует переданный список query значений
      *
-     * @param array $insert - список значений для добавления к query параметрам
-     * @param array $remove - список значений для удаления из query параметров
-     * @param array $queries - список query параметров
+     * @param array $insert список значений для добавления к query параметрам
+     * @param array $remove список значений для удаления из query параметров
+     * @param array $queries список query параметров
      * @return array
      */
     public function getModifiedQueryList(array $insert = [], array $remove = [], array $queries = []): array
     {
-        $queries = VarArray::getItemsExtract($remove, $queries);
+        foreach ($queries as $key => $value) {
+            $queries[$key] = getExtractFromArray($remove, $value);
+        }
 
         foreach ($insert as $key => $value) {
             $queries[$key] = $value;
@@ -385,14 +385,17 @@ class AppServer
     /**
      * Формирует список query значений из referer query от переданных параметров
      *
-     * @param array $insert - список значений для добавления к query параметрам
-     * @param array $remove - список значений для удаления из query параметров
+     * @param array $insert список значений для добавления к query параметрам
+     * @param array $remove список значений для удаления из query параметров
      * @return array
      */
     public static function getModifyQueryInReferer(array $insert = [], array $remove = []): array
     {
         $queries = static::getInstance()->referer_queries;
-        $queries = VarArray::getItemsExtract($remove, $queries);
+
+        foreach ($queries as $key => $value) {
+            $queries[$key] = getExtractFromArray($remove, $value);
+        }
 
         foreach ($insert as $key => $value) {
             $queries[$key] = $value;
@@ -404,14 +407,17 @@ class AppServer
     /**
      * Формирует список query значений в зависимости от переданных параметров
      *
-     * @param array $insert - список значений для добавления к query параметрам
-     * @param array $remove - список значений для удаления из query параметров
+     * @param array $insert список значений для добавления к query параметрам
+     * @param array $remove список значений для удаления из query параметров
      * @return array
      */
     public static function getModifyQueryInRequest(array $insert = [], array $remove = []): array
     {
         $queries = static::getInstance()->referer_queries;
-        $queries = VarArray::getItemsExtract($remove, $queries);
+
+        foreach ($queries as $key => $value) {
+            $queries[$key] = getExtractFromArray($remove, $value);
+        }
 
         foreach ($insert as $key => $value) {
             $queries[$key] = $value;

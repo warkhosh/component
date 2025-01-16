@@ -2,8 +2,6 @@
 
 namespace Warkhosh\Component\Url;
 
-use Warkhosh\Variable\VarArray;
-use Warkhosh\Variable\VarStr;
 use Exception;
 
 class UrlHelper
@@ -28,7 +26,7 @@ class UrlHelper
      */
     public static function getRemoveNoSemanticChar(string $str = '', string $ignore = '', bool $toLower = true): string
     {
-        $str = rawurldecode(VarStr::trim($str)); // Преобразовывает символьные коды в символ. %20 - станет пробелом
+        $str = rawurldecode(getTrimString($str)); // Преобразовывает символьные коды в символ. %20 - станет пробелом
         $str = $toLower ? strtolower($str) : $str;
 
         return preg_replace("|[^a-zA-Z0-9\_\-".preg_quote($ignore)."]|ium", "", $str);
@@ -73,11 +71,11 @@ class UrlHelper
         $str = rawurldecode($str); // Преобразовывает символьные коды в их символы, %20 - станет пробелом
 
         // Что-бы правильно обрабатывать кривые урлы, левый слеш убираем, а правый оставляем
-        $part = VarStr::explode('/', ltrim($str, '/'), ["", "\n", "\t", "\r"]);
+        $part = getExplodeString('/', ltrim($str, '/'), ["", "\n", "\t", "\r"]);
 
         if (count($part) >= 1) {
             // удаляем последнее значение если в нем присутствует точка
-            if (VarStr::find('.', VarArray::getLast($part))) {
+            if (isFindInString('.', getLastValueInArray($part))) {
                 array_pop($part);
             }
         }
@@ -163,7 +161,7 @@ class UrlHelper
 
         } elseif (array_key_exists('REQUEST_URI', $_SERVER)) {
             $requestUri = (string)$_SERVER['REQUEST_URI'];
-            $requestUri = VarStr::getTransformToEncoding($requestUri, "UTF-8");
+            $requestUri = toUTF8($requestUri);
         }
 
         $requestUri = trim($requestUri, " \t\n\r\0\x0B");
@@ -198,7 +196,7 @@ class UrlHelper
     public static function getPath(?string $uri): string
     {
         if ($uri !== "") {
-            $uri = parse_url(rawurldecode(VarStr::trim((string)$uri)), PHP_URL_PATH);
+            $uri = parse_url(rawurldecode(getTrimString((string)$uri)), PHP_URL_PATH);
             $info = pathinfo($uri);
 
             if (isset($info['extension'])) {
@@ -214,7 +212,7 @@ class UrlHelper
             }
         }
 
-        return VarStr::start("/", (string)$uri);
+        return getStartWithCharString("/", (string)$uri);
     }
 
     /**
@@ -240,7 +238,7 @@ class UrlHelper
                 $_SERVER['CMF_REFERER'] = "/{$uri}";
             }
 
-            $_SERVER['CMF_REFERER'] = VarStr::getTransformToEncoding($_SERVER['CMF_REFERER'], "UTF-8");
+            $_SERVER['CMF_REFERER'] = toUTF8($_SERVER['CMF_REFERER']);
 
             return $_SERVER['CMF_REFERER'];
         }
@@ -265,7 +263,7 @@ class UrlHelper
             $_SERVER['HTTP_USER_AGENT'] = trim($_SERVER['HTTP_USER_AGENT'], "\x00..\x1F");
 
             $_SERVER['HTTP_USER_AGENT'] = str_replace(["\n", "\t", "\r"], '', $_SERVER['HTTP_USER_AGENT']);
-            $_SERVER['CMF_HTTP_USER_AGENT'] = VarStr::getUrlDecode($_SERVER['HTTP_USER_AGENT']);
+            $_SERVER['CMF_HTTP_USER_AGENT'] = rawurldecode($_SERVER['HTTP_USER_AGENT']);
 
             $pattern = "/[^a-zA-Zа-яА-ЯйЙёЁ0-9\/\\\,\.\:\;\!\"\'\@\#\$\%\&\*\-\+\_\?\=\|\(\)\[\]\{\}\<\>\s]/";
             $_SERVER['CMF_HTTP_USER_AGENT'] = preg_replace($pattern, "", $_SERVER['CMF_HTTP_USER_AGENT']);
@@ -368,7 +366,7 @@ class UrlHelper
             return "";
         }
 
-        $str = parse_url(VarStr::trim($str), PHP_URL_PATH);
+        $str = parse_url(getTrimString($str), PHP_URL_PATH);
         $info = pathinfo($str);
         $file = '';
 
@@ -398,15 +396,15 @@ class UrlHelper
             return [];
         }
 
-        $str = getMakeString(VarStr::trim($str));
-        $str = VarStr::getUrlDecode($str);
+        $str = getTrimString($str);
+        $str = rawurldecode($str);
 
         // если указали ссылку с путями, то выбираем из неё только query параметры
         if (mb_substr($str, 0, 1) === '/' || mb_substr($str, 0, 4) === 'http') {
             $str = ! is_null($tmp = parse_url($str, PHP_URL_QUERY)) ? $tmp : '';
         }
 
-        parse_str(VarStr::getRemoveStart("?", $str), $queries);
+        parse_str(getStartNotWithString("?", $str), $queries);
 
         return $queries;
     }
@@ -427,11 +425,11 @@ class UrlHelper
 
         if (isset($_SERVER['REQUEST_METHOD']) && array_key_exists('REQUEST_METHOD', $_SERVER)) {
             $_SERVER['REQUEST_METHOD'] = strtoupper(trim($_SERVER['REQUEST_METHOD']));
-            $requestMethod = VarStr::getLower($_SERVER['REQUEST_METHOD']);
+            $requestMethod = getLowerString($_SERVER['REQUEST_METHOD']);
 
             // По общему тренду поддерживаю передачу POST данных с переменной _method
             if ($requestMethod === 'post' && isset($_POST['_method']) && $_POST['_method'] != '') {
-                $_POST['_method'] = VarStr::getLower(trim($_POST['_method']));
+                $_POST['_method'] = getLowerString(trim($_POST['_method']));
 
                 if (in_array($_POST['_method'], ['put', 'patch', 'delete'])) {
                     $_SERVER['REQUEST_METHOD'] = strtoupper($requestMethod = $_POST['_method']);
@@ -453,7 +451,7 @@ class UrlHelper
      */
     public static function getGenerated(array $parts = []): string
     {
-        $scheme = isset($parts['scheme']) ? VarStr::ending("://", $parts['scheme']) : 'http://';
+        $scheme = isset($parts['scheme']) ? getEndWithCharString("://", $parts['scheme']) : 'http://';
         $host = $parts['host'] ?? '';
         $port = isset($parts['port']) ? ':'.$parts['port'] : '';
         $user = $parts['user'] ?? '';
@@ -470,7 +468,9 @@ class UrlHelper
         if (isset($parts['queries']) && is_array($parts['queries'])) {
             $query = count($parts['queries']) ? "?".http_build_query($parts['queries']) : '';
         } else {
-            $query = isset($parts['query']) && ! isEmpty($parts['query']) ? VarStr::start("?", $parts['query']) : '';
+            $query = isset($parts['query']) && ! isEmpty($parts['query'])
+                ? getStartWithCharString("?", $parts['query'])
+                : '';
         }
 
         $fragment = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';

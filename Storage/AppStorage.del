@@ -2,8 +2,6 @@
 
 namespace Warkhosh\Component\Storage;
 
-use Warkhosh\Variable\VarArray;
-use Warkhosh\Variable\VarStr;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Throwable;
@@ -188,7 +186,7 @@ class AppStorage
         $success = [];
 
         if (count($paths)) {
-            $paths = array_flip(VarArray::getRemove($paths, [false, true, null]));
+            $paths = array_flip(getRemoveValueInArray($paths, [false, true, null]));
 
             foreach ($paths as $path => $row) {
                 try {
@@ -227,7 +225,7 @@ class AppStorage
             }
         }
 
-        return $isList ? $success : VarArray::getFirst($success);
+        return $isList ? $success : getFirstValueInArray($success);
     }
 
     /**
@@ -466,7 +464,7 @@ class AppStorage
     public function getDirEssences(string $dir, ?string $basePath = null, array $options = []): array
     {
         if (is_string($basePath)) {
-            $dir = VarStr::getRemoveStart($basePath, $dir);
+            $dir = getStartNotWithString($basePath, $dir);
         }
 
         $relative = rtrim($dir, '/');

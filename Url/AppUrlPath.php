@@ -2,8 +2,6 @@
 
 namespace Warkhosh\Component\Url;
 
-use Warkhosh\Variable\VarStr;
-
 /**
  * Class AppUrlPath
  *
@@ -82,7 +80,7 @@ class AppUrlPath
         $url = parse_url(rawurldecode($url));
 
         if (isset($url['path']) && array_key_exists('path', $url)) {
-            $paths = VarStr::explode('/', $url['path'], ['', ' ']);
+            $paths = getExplodeString('/', $url['path'], ['', ' ']);
             $types = [];
 
             if (count($paths) > 0) {

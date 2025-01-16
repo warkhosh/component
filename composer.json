@@ -34,10 +34,6 @@
     },
     {
       "type": "git",
-      "url": "https://github.com/warkhosh/variable.git"
-    },
-    {
-      "type": "git",
       "url": "https://gitverse.ru/warkhosh/singleton.git"
     }
   ],
@@ -56,7 +52,6 @@
     "warkhosh/assist": "dev-master",
     "warkhosh/config": "dev-master",
     "warkhosh/storage": "dev-master",
-    "warkhosh/variable": "dev-master",
     "warkhosh/singleton": "dev-master"
   },
   "require-dev": {

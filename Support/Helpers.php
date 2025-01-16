@@ -2,7 +2,6 @@
 
 use Warkhosh\Component\Collection\Collection;
 use Warkhosh\Component\Server\AppServer;
-use Warkhosh\Variable\VarFloat;
 
 if (! function_exists('server')) {
     /**
@@ -32,8 +31,9 @@ if (! function_exists('getArrayWrap')) {
      * Быстрое преобразование значения в массив
      *
      * @param $items
-     * @param bool $strict - флаг соответствия типа
+     * @param bool $strict флаг соответствия типа
      * @return array
+     * @deprecated заменить на getValueData() который есть в warkhosh/assist
      */
     function getArrayWrap($items, bool $strict = true): array
     {
@@ -113,7 +113,7 @@ if (! function_exists('httpResponseCode')) {
      * @param int|null $code
      * @return bool|int
      * @throws Exception
-     * @deprecated все реализации надо переписать на setHttpResponseCode() и getHttpResponseCode()
+     * @deprecated все реализации надо переписать на setHttpResponseCode() и getHttpResponseCode() которые есть в warkhosh/assist
      */
     function httpResponseCode(?int $code = null): bool|int
     {
@@ -236,38 +236,6 @@ if (! function_exists('getPhoneFormat')) {
         }
 
         return $str;
-    }
-}
-
-if (! function_exists('round_up')) {
-    /**
-     * Округление в большую сторону
-     *
-     * @note в идеале использовать BC Math Функции (http://php.net/manual/ru/ref.bc.php)
-     *
-     * @param mixed $number
-     * @param int $precision
-     * @return float
-     */
-    function round_up(mixed $number, int $precision = 2): float
-    {
-        return VarFloat::getMake($number, $precision, 'upward');
-    }
-}
-
-if (! function_exists('round_down')) {
-    /**
-     * Округление в меньшую сторону
-     *
-     * @note в идеале использовать BC Math Функции (http://php.net/manual/ru/ref.bc.php)
-     *
-     * @param mixed $number
-     * @param int $precision
-     * @return float
-     */
-    function round_down(mixed $number, int $precision = 2): float
-    {
-        return VarFloat::getMake($number, $precision, 'downward');
     }
 }
 

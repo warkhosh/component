@@ -2,9 +2,6 @@
 
 namespace Warkhosh\Component\Url;
 
-use Warkhosh\Variable\VarArray;
-use Warkhosh\Variable\VarStr;
-
 /**
  * Class AppUrl
  *
@@ -138,7 +135,7 @@ class AppUrl
      */
     public function set(?string $url = null, bool $strict = false): static
     {
-        $this->originalUrl = VarStr::trim(getMakeString($url));
+        $this->originalUrl = getTrimString(getMakeString($url));
         $this->primaryUrl = is_null($url) ? null : $this->originalUrl;
 
         if ($strict) {
@@ -462,15 +459,15 @@ class AppUrl
 
         if (($count = count($arg)) > 0) {
             if ($count > 1) {
-                return VarArray::getOnly($arg, $data); // список полей
+                return getExtractFromArray($arg, $data); // список полей
 
             } else {
                 if (is_array($arg[0])) {
-                    return VarArray::getOnly($arg[0], $data);
+                    return getExtractFromArray($arg[0], $data);
 
                 } else {
                     if (is_string($arg[0])) { // если передали один строчный параметр
-                        return VarArray::getFirst(VarArray::getOnly([$arg[0]], $data)); // вернуть одно значение
+                        return getFirstValueInArray(getExtractFromArray([$arg[0]], $data)); // вернуть одно значение
                     }
                 }
             }
@@ -487,7 +484,7 @@ class AppUrl
      */
     protected function getRelative(string $url = ''): string
     {
-        $relativeUrl = VarStr::getRemoveStart($this->basePath, $url);
+        $relativeUrl = getStartNotWithString($this->basePath, $url);
 
         // если удаление прошло удачно, то отслеживаем наличие слеша в начале урла
         if ($relativeUrl !== $url) {
@@ -541,7 +538,7 @@ class AppUrl
 
         } else {
             $info['dirname'] = $info['dirname'] === '/' ? '' : "/".ltrim($info['dirname'], '/');
-            $info['basename'] = $info['basename'] === '/' ? '' : VarStr::start('/', $info['basename']);
+            $info['basename'] = $info['basename'] === '/' ? '' : getStartWithCharString('/', $info['basename']);
             $info['dirname'] = $info['dirname'].$info['basename']; // объединяем пути
             unset($info['basename']);
         }
@@ -554,7 +551,7 @@ class AppUrl
         $path = isEmpty($info['dirname']) ? "/" : $info['dirname'];
 
         if ($this->isSlashAtEnd()) {
-            $path = VarStr::ending("/", $path);
+            $path = getEndWithCharString("/", $path);
         }
 
         // указан флаг преобразования абсолютного значения на относительное по отношения к страницам сайта;
