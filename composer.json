@@ -35,6 +35,10 @@
     {
       "type": "git",
       "url": "https://gitverse.ru/warkhosh/singleton.git"
+    },
+    {
+      "type": "git",
+      "url": "https://gitverse.ru/warkhosh/exception.git"
     }
   ],
   "require": {
@@ -52,7 +56,8 @@
     "warkhosh/assist": "dev-master",
     "warkhosh/config": "dev-master",
     "warkhosh/storage": "dev-master",
-    "warkhosh/singleton": "dev-master"
+    "warkhosh/singleton": "dev-master",
+    "warkhosh/exception": "dev-master"
   },
   "require-dev": {
     "jetbrains/phpstorm-attributes": "dev-master",

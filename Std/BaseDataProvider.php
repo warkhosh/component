@@ -4,6 +4,7 @@ namespace Warkhosh\Component\Std;
 
 use Warkhosh\Component\Collection\Interfaces\Arrayable;
 use Warkhosh\Component\Collection\Interfaces\Jsonable;
+use Warkhosh\Exception\ImprovedException;
 use ArrayObject;
 use JsonSerializable;
 use Traversable;
@@ -600,7 +601,7 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
             $this->data['exception_line'] = $exception->getLine();
             $this->data['exception_trace'] = $exception->getTraceAsString();
 
-            if ($exception instanceof ExceptionDataProvider) {
+            if ($exception instanceof ImprovedException) {
                 $field = $exception->getField();
                 $this->data['field'] = empty($field) ? null : $field;
 
