@@ -5,7 +5,7 @@ namespace Warkhosh\Component\Std;
 /**
  * Interface FacadeInterface
  *
- * @package Ekv\Framework\Components\Facade\Interfaces
+ * @package Warkhosh\Component\Std
  */
 interface DataProviderInterface
 {
