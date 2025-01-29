@@ -27,6 +27,10 @@ class ExceptionDataProvider extends Exception implements Throwable
     protected int|string|null $signal = null;
 
     /**
+     * Признак системной ошибки
+     *
+     * @note по этому флагу далее алгоритмы могут понимать что ошибка системная и дополнять техническими данными которые скрыты для других
+     *
      * @var int
      */
     protected int $system = 1;
