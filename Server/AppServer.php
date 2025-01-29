@@ -88,7 +88,7 @@ class AppServer
 
         if ($name === 'http_response_code') {
             // не пишем в переменную http_response_code значение, ведь код может измениться от сценария!
-            return httpResponseCode();
+            return getHttpResponseCode();
         }
 
         if ($name === 'referer_queries') {
