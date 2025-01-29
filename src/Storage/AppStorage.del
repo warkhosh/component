@@ -568,7 +568,7 @@ class AppStorage
         array $param = ['dir' => null, 'expire' => 86400, 'ignore' => ['.gitignore'], 'show' => false]
     ): void {
         $dir = $param['dir'] ?? null;
-        $expire = isset($param['expire']) ? getNum($param['expire']) : ((60 * 60) * 24);
+        $expire = isset($param['expire']) ? getMakePositiveInteger($param['expire']) : ((60 * 60) * 24);
         $show = (isset($param['show']) && isTrue($param['show']));
         $ignore = isset($param['ignore']) && is_array($param['ignore']) && count($param['ignore']) > 0
             ? $param['ignore'] : ['.gitignore'];

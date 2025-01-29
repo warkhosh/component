@@ -38,7 +38,7 @@ trait UrlPathMethods
             $this->setPathResults();
         }
 
-        $offset = getNum($offset);
+        $offset = getMakePositiveInteger($offset);
 
         // Проверка наличие корректного пути в указанном списке значений
         if (! is_null($key) && $key > 0 && is_null($limit)) {
@@ -50,7 +50,7 @@ trait UrlPathMethods
         // проверка с обратной стороны списка
         if (! is_null($key) && $key < 0 && is_null($limit)) {
             // отрицательное число превращаем в положительное
-            $key = (getNum(trim(getMakeString($key), '-')) - 1);
+            $key = (getMakePositiveInteger(trim(getMakeString($key), '-')) - 1);
 
             $reverse = array_reverse($this->pathResults);
             $select = array_slice($reverse, $offset);
@@ -71,7 +71,7 @@ trait UrlPathMethods
 
             if ($limit < 0) {
                 // отрицательное число превращаем в положительное
-                $limit = getNum(trim(getMakeString($limit), '-'));
+                $limit = getMakePositiveInteger(trim(getMakeString($limit), '-'));
                 $reverse = array_reverse($this->pathResults);
                 $select = array_slice($reverse, $offset, $limit);
 
@@ -101,7 +101,7 @@ trait UrlPathMethods
         }
 
         if (! is_null($key) && $key < 0) {
-            $key = (getNum(trim(getMakeString($key), '-')) - 1);
+            $key = (getMakePositiveInteger(trim(getMakeString($key), '-')) - 1);
             $reverse_params = array_reverse($this->types);
 
             if (array_key_exists($key, $reverse_params)) {
@@ -113,7 +113,7 @@ trait UrlPathMethods
 
         // Если ключ не указали, а запросили диапазон, то возвращаем массив.
         // Массив будет иметь указанное число записей или меньший диапазон значений если в списке нет нужных значений.
-        if (! is_null($limit) && getNum($limit) > 0) {
+        if (! is_null($limit) && getMakePositiveInteger($limit) > 0) {
             //$select = array_slice($this->types, $offset, $limit);
             //return array_replace(array_fill(0, $limit, 'undefined'), $select);
             return array_slice($this->types, $offset, $limit);
@@ -123,7 +123,7 @@ trait UrlPathMethods
             return $this->types;
         }
 
-        if (getNum($key) === 0) {
+        if (getMakePositiveInteger($key) === 0) {
             return 'undefined';
         }
 
@@ -149,7 +149,7 @@ trait UrlPathMethods
         }
 
         if (! is_null($key) && $key < 0) {
-            $key = (getNum(trim(getMakeString($key), '-')) - 1);
+            $key = (getMakePositiveInteger(trim(getMakeString($key), '-')) - 1);
             $reverse_params = array_reverse($this->data);
 
             if (array_key_exists($key, $reverse_params)) {
@@ -161,7 +161,7 @@ trait UrlPathMethods
 
         // Если ключ не указали, а запросили диапазон, то возвращаем массив.
         // Массив будет иметь указанное число записей или меньший диапазон значений если в списке нет нужных значений.
-        if (! is_null($limit) && getNum($limit) > 0) {
+        if (! is_null($limit) && getMakePositiveInteger($limit) > 0) {
             return array_slice($this->data, $offset, $limit);
         }
 
