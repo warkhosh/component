@@ -10,21 +10,20 @@ use JsonSerializable;
 use ArrayObject;
 use Traversable;
 use Throwable;
-use stdClass;
 
 /**
- * BaseDataProvider (поставщик данных)
+ * BaseDataProvider (поставщик данных).
  *
- * Класс для хранения в нем данных и использования универсальных методов при работе с ними
+ * Класс для хранения в нем данных и использования универсальных методов при работе с ними.
  *
- * @note Не реализует Iterator (foreach и while с объектом не выдадут ошибку, но и не отработают)
- * @note ArrayObject изначально использовался для декоративного применения, чтобы phpstorm не подсвечивал magic переменные
- * @note ArrayObject в версии 1.2 заменен на stdClass, но его методы используется
+ * @note ArrayObject позволяет работать с объектом как с массивом.
+ *       Можно пользоваться конструкцией перебора foreach или обращаться к значениям по ключу через квадратные скобки.
+ * @note Все переопределенные методы ArrayObject тут для работы с нашей переменной $data.
  *
  * @package Warkhosh\Component\Std
- * @version 1.2
+ * @version 1.3
  */
-class BaseDataProvider extends stdClass implements Arrayable, DataProviderInterface
+class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInterface
 {
     /**
      * @var array
@@ -48,6 +47,7 @@ class BaseDataProvider extends stdClass implements Arrayable, DataProviderInterf
      */
     public function __construct(array|Arrayable|float|int|Jsonable|string|null $input = [])
     {
+        //parent::__construct($input);
         $this->data = $this->getArrayItems($input);
     }
 
