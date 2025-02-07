@@ -5,8 +5,9 @@ namespace Warkhosh\Component\Std;
 use Warkhosh\Component\Collection\Interfaces\Arrayable;
 use Warkhosh\Component\Collection\Interfaces\Jsonable;
 use Warkhosh\Exception\ImprovedExceptionInterface;
-use ArrayObject;
+use JetBrains\PhpStorm\NoReturn;
 use JsonSerializable;
+use ArrayObject;
 use Traversable;
 use Throwable;
 
@@ -45,6 +46,7 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
     public function __construct($input = [])
     {
         $this->data = $this->getArrayItems($input);
+        parent::__construct($this->data);
     }
 
     /**
@@ -96,7 +98,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param int $flags
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function asort(int $flags = SORT_REGULAR): static
     {
         asort($this->data, $flags);
@@ -124,7 +125,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param int $flags
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function ksort(int $flags = SORT_REGULAR): static
     {
         krsort($this->data, $flags);
@@ -139,7 +139,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      *
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function natsort(): static
     {
         natsort($this->data);
@@ -154,7 +153,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      *
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function natcasesort(): static
     {
         natcasesort($this->data);
@@ -197,7 +195,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param mixed $value
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function offsetSet(mixed $key, mixed $value): static
     {
         $this->data[$key] = $value;
@@ -213,7 +210,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param mixed $key
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function offsetUnset(mixed $key): static
     {
         if (! is_null($key) && key_exists($key, $this->data)) {
@@ -243,7 +239,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param callable $callback
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function uasort(callable $callback): static
     {
         uasort($this->data, $callback);
@@ -259,7 +254,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param callable $callback
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function uksort(callable $callback): static
     {
         uksort($this->data, $callback);
@@ -275,7 +269,6 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      * @param mixed $value
      * @return $this
      */
-    #[\ReturnTypeWillChange]
     public function append(mixed $value): static
     {
         $this->data[] = $value;
@@ -568,7 +561,7 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
      *
      * @return void
      */
-    #[\JetBrains\PhpStorm\NoReturn]
+    #[NoReturn]
     public function dd(): void
     {
         var_dump($this->all());
@@ -587,46 +580,22 @@ class BaseDataProvider extends ArrayObject implements Arrayable, DataProviderInt
     }
 
     /**
-     * Добавление переданного исключения
+     * Добавление значений исключения в поставщике данных
      *
-     * @param $exception
+     * @param Throwable $exception
      * @return $this
      */
-    public function addException($exception): static
+    public function addException(Throwable $exception): static
     {
-        if ($exception instanceof Throwable) {
-            $this->data['exception_message'] = $exception->getMessage();
-            $this->data['exception_code'] = $exception->getCode();
-            $this->data['exception_file'] = $exception->getFile()."(".$exception->getLine().")";
-            $this->data['exception_line'] = $exception->getLine();
-            $this->data['exception_trace'] = $exception->getTraceAsString();
-
-            if ($exception instanceof ImprovedExceptionInterface) {
-                $field = $exception->getField();
-                $this->data['field'] = empty($field) ? null : $field;
-
-                if ($exception->getSignal() !== 1) {
-                    if (isset($this->data['exception_code'])) {
-                        unset($this->data['exception_code']);
-                    }
-
-                    if (isset($this->data['exception_file'])) {
-                        unset($this->data['exception_file']);
-                    }
-
-                    if (isset($this->data['exception_line'])) {
-                        unset($this->data['exception_line']);
-                    }
-
-                    if (isset($this->data['exception_trace'])) {
-                        unset($this->data['exception_trace']);
-                    }
-                }
+        if ($exception instanceof ImprovedExceptionInterface) {
+            foreach ($exception->toArray() as $key => $value) {
+                $this->data["exception_{$key}"] = $value;
             }
 
-        } else {
-            $this->data['exception_message'] = (string)$exception;
+            return $this;
         }
+
+        $this->data['exception_message'] = $exception->getMessage();
 
         return $this;
     }

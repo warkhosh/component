@@ -2,6 +2,8 @@
 
 namespace Warkhosh\Component\Std;
 
+use Throwable;
+
 /**
  * Interface FacadeInterface
  *
@@ -253,8 +255,8 @@ interface DataProviderInterface
     /**
      * Добавление переданного исключения
      *
-     * @param $exception
+     * @param Throwable $exception
      * @return $this
      */
-    public function addException($exception): static;
+    public function addException(Throwable $exception): static;
 }
