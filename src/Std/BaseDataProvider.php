@@ -591,13 +591,13 @@ class BaseDataProvider extends stdClass implements Arrayable, DataProviderInterf
     {
         if ($exception instanceof ImprovedExceptionInterface) {
             foreach ($exception->toArray() as $key => $value) {
-                $this->data["exception_{$key}"] = $value;
+                $this->offsetSet("exception_{$key}", $value);
             }
 
             return $this;
         }
 
-        $this->data['exception_message'] = $exception->getMessage();
+        $this->offsetSet("exception_message", $exception->getMessage());
 
         return $this;
     }
