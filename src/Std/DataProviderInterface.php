@@ -8,6 +8,7 @@ use Throwable;
  * Interface FacadeInterface
  *
  * @package Warkhosh\Component\Std
+ * @deprecated новая реализация теперь в \Warkhosh\DataProvider\DataProviderInterface
  */
 interface DataProviderInterface
 {
