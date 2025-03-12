@@ -374,42 +374,44 @@ if (! function_exists('getArrayToObject')) {
     }
 }
 
-if (! function_exists('getAmountMemory')) {
-    /**
-     * Возвращает размер памяти в указанной единице измерения.
-     *
-     * @param int $size
-     * @param string $unit
-     * @param bool $designation
-     * @return float|int|string
-     */
-    function getAmountMemory(int $size, string $unit = 'b', bool $designation = true): float|int|string
-    {
-        if ($unit == 'kb') {
-            return round($size / 1024, 2).($designation ? ' Kb' : '');
+//if (! function_exists('getAmountMemory')) {
+//    /**
+//     * Возвращает размер памяти в указанной единице измерения.
+//     *
+//     * @param int $size
+//     * @param string $unit
+//     * @param bool $designation
+//     * @return float|int|string
+//     * @deprecated этот метод теперь есть в warkhosh/assist
+//     */
+//    function getAmountMemory(int $size, string $unit = 'b', bool $designation = true): float|int|string
+//    {
+//        if ($unit == 'kb') {
+//            return round($size / 1024, 2).($designation ? ' Kb' : '');
+//
+//        } elseif ($unit == 'mb') {
+//            return round($size / 1048576, 2).($designation ? ' Mb' : '');
+//        }
+//
+//        return $size.($designation ? ' Byte' : '');
+//    }
+//}
 
-        } elseif ($unit == 'mb') {
-            return round($size / 1048576, 2).($designation ? ' Mb' : '');
-        }
-
-        return $size.($designation ? ' Byte' : '');
-    }
-}
-
-if (! function_exists('getFileSize')) {
-    /**
-     * Возвращает размер файла в указанной единице измерения.
-     *
-     * @param int $size
-     * @param string $unit
-     * @param bool $designation
-     * @return string
-     */
-    function getFileSize(int $size, string $unit = 'b', bool $designation = true): string
-    {
-        return getAmountMemory($size, $unit, $designation);
-    }
-}
+//if (! function_exists('getFileSize')) {
+//    /**
+//     * Возвращает размер файла в указанной единице измерения.
+//     *
+//     * @param int $size
+//     * @param string $unit
+//     * @param bool $designation
+//     * @return string
+//     * @deprecated этот метод теперь есть в warkhosh/assist
+//     */
+//    function getFileSize(int $size, string $unit = 'b', bool $designation = true): string
+//    {
+//        return getAmountMemory($size, $unit, $designation);
+//    }
+//}
 
 if (! function_exists('getMemoryPeakUsage')) {
     /**
