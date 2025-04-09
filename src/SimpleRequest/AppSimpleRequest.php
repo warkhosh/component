@@ -453,7 +453,7 @@ class AppSimpleRequest
     {
         $encodedAuth = base64_encode($user.":".$password);
 
-        $this->setHeader("Authentication : Basic ".$encodedAuth);
+        $this->setHeader("Authentication: Basic ".$encodedAuth);
         $this->options[CURLOPT_USERPWD] = $user.":".$password;
         $this->options[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
     }
